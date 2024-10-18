@@ -14,7 +14,7 @@ function App() {
   const showNavbarFooter = location.pathname !== '/auth/login' && location.pathname !== '/auth/register';
 
   return (
-    <div className="h-[100vh]">
+    <div className="">
       {/* Render Navbar and Footer only if the current route is not /auth/login or /auth/register */}
       {showNavbarFooter && <Navbar />}
 

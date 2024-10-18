@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, TextField, Grid, IconButton, Box, Divider, MenuItem } from '@mui/material';
+import { Button, TextField, Grid, IconButton, Box, Divider, MenuItem,Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle  } from '@mui/material';
 import { Formik, Field, Form, FieldArray, ErrorMessage } from 'formik';
 import validationSchema from '../components/Validations/RecipeSchema';
 import { RiMenuAddFill } from "react-icons/ri";
@@ -13,8 +13,21 @@ import FormControl from '@mui/material/FormControl';
 import NativeSelect from '@mui/material/NativeSelect';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-
+import { useState } from 'react';
 const AddRecipeForm = () => {
+    const [open, setOpen] = useState(false);
+    const handleClickOpen = () => {
+        setOpen(true); // Open the dialog
+    };
+
+    const handleClose = () => {
+        setOpen(false); // Close the dialog without navigating
+    };
+
+    const handleConfirm = () => {
+        setOpen(false); // Close the dialog
+        navigate('/'); // Navigate to home or the desired route
+    };
     const cuisineOptions = [
         { value: 'italian', label: 'Italian' },
         { value: 'indian', label: 'Indian' },
@@ -84,25 +97,27 @@ const AddRecipeForm = () => {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         required
+                                        
                                     />
                                     <TextField
                                         id="outlined-multiline-flexible"
                                         label="Recipe description"
                                         multiline
                                         fullWidth
+                                        required
                                         maxRows={4}
                                         name='description'
                                         value={values.description}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        required
+                                        
                                     />
                                 </div>
 
                             </Grid>
 
                             <Grid item xs={12} sm={6}>
-                                <ImageUploadField values={values} setFieldValue={setFieldValue}  />
+                                <ImageUploadField values={values} setFieldValue={setFieldValue} />
                             </Grid>
                             {/* Ingredients FieldArray */}
                             <hr className='w-full py-2 mt-5 mb-2' />
@@ -117,7 +132,7 @@ const AddRecipeForm = () => {
                                                 <Grid container key={index} spacing={2} alignItems="center">
                                                     <Grid item xs={11}>
                                                         <Field
-                                                        required
+                                                            
                                                             as={TextField}
                                                             fullWidth
                                                             name={`ingredients[${index}]`}
@@ -141,6 +156,7 @@ const AddRecipeForm = () => {
                                                 </Grid>
                                             ))}
                                             <Button
+                                            required
                                                 variant="outlined"
                                                 startIcon={<AddIcon />}
                                                 onClick={() => push('')}
@@ -235,6 +251,7 @@ const AddRecipeForm = () => {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         required
+                                        
                                     />
                                     <TextField
                                         select
@@ -286,7 +303,7 @@ const AddRecipeForm = () => {
                                     <h1 className='text-md font-medium'>Cuisine </h1>
                                     <FormControl fullWidth>
                                         <NativeSelect
-                                        required
+                                            reuired
                                             defaultValue={values.cuisine}
                                             name="cuisine"
                                             value={values.cuisine}
@@ -329,7 +346,8 @@ const AddRecipeForm = () => {
                                 <Box display="flex" justifyContent="right" gap={2}>
                                     <Button
                                         color="primary"
-                                        type=""
+                                        type="button"
+                                        onClick={handleClickOpen}
                                         sx={{
 
                                             '&:hover': {
@@ -339,6 +357,32 @@ const AddRecipeForm = () => {
                                     >
                                         cancel
                                     </Button>
+                                    <Dialog
+                                        open={open}
+                                        onClose={handleClose}
+                                        aria-labelledby="alert-dialog-title"
+                                        aria-describedby="alert-dialog-description"
+                                    >
+                                        <DialogTitle id="alert-dialog-title">{"Are you sure you want to leave?"}</DialogTitle>
+                                        <DialogContent>
+                                            <DialogContentText id="alert-dialog-description">
+                                                If you leave now, any unsaved changes will be lost.
+                                            </DialogContentText>
+                                        </DialogContent>
+                                        <DialogActions>
+                                            <Button onClick={handleClose} color="primary">
+                                                No, Stay
+                                            </Button>
+                                            <Button onClick={handleConfirm}  variant='contained'   sx={{
+                                            bgcolor: '#FF6216', // Use the primary color from Tailwind config
+                                            '&:hover': {
+                                                bgcolor: '#E55A12', // Change to secondary color from Tailwind config on hover
+                                            },
+                                        }}>
+                                                Yes, Leave
+                                            </Button>
+                                        </DialogActions>
+                                    </Dialog>
                                     <Button
                                         variant="contained"
                                         color="primary"

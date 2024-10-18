@@ -1,17 +1,21 @@
 import React from 'react'
-
+import revealElements from '../../scrollReveal';
+import { useEffect } from 'react';
+import './recipe.css'
 const TrendingCard = () => {
+    useEffect(() => {
+        revealElements(); // Initialize ScrollReveal
+    }, []);
     return (
-        <div className=''><a
-            href="#"
-            className="flex flex-col items-center bg-white  rounded-sm  md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
+        <div className='productcard'>
+            <div className="flex flex-col items-center bg-white  productCard  rounded-sm  md:flex-row md:max-w-xl hover:cursor-pointer"
         >
             <img
-                className="object-cover    md:h-auto md:w-48 "
+                className="object-cover    md:h-auto md:w-48 w-full "
                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHi7GCv2HdNaNwaXEd9tYGW3gvnD3QBlDHkw&s"
                 alt=""
             />
-            <div className="flex flex-col justify-between p-4 leading-normal">
+            <div className="flex flex-col justify-between p-4 leading-normal textpart bg-white">
                 <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                     Creamy Garlic Parmesan Pasta
                 </h5>
@@ -19,7 +23,7 @@ const TrendingCard = () => {
                     This indulgent pasta dish is creamy, rich, and full of flavor. With a simple garlic Parmesan sauce, it's perfect for a weeknight dinner that’s both quick and satisfying.
                 </p>
             </div>
-        </a>
+        </div>
         </div>
     )
 }

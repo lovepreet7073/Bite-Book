@@ -21,7 +21,7 @@ const ImageUploadField = ({ values, setFieldValue }) => {
         <div className="flex flex-col items-center justify-center w-full">
             {/* Display selected image preview */}
             {imagePreview ? (
-                <div className="w-full h-40 flex items-center justify-center">
+                <div className="w-full h-80 flex items-center justify-center">
                     <img
                         src={imagePreview} // Use the preview URL here
                         alt="Selected Preview"

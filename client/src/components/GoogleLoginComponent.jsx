@@ -1,11 +1,10 @@
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
-import { toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { googlelogin } from '../redux/Auth/Actions';
-import { FcGoogle } from 'react-icons/fc'; // Make sure to import FcGoogle
 import { useNavigate } from 'react-router-dom';
+import showCustomToast from './ToastComponent';
 const GoogleLoginComponent = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -15,7 +14,7 @@ const GoogleLoginComponent = () => {
             const jwtDetail = jwtDecode(credentialResponse.credential);
             console.log("Decoded JWT:", jwtDetail);
             dispatch(googlelogin({ googleToken: credentialResponse.credential }));
-            toast.success('Login Successfully');
+            showCustomToast('Login successfully!', 'success');
             navigate('/')
         } catch (error) {
             console.error('Error decoding token or making API request', error);

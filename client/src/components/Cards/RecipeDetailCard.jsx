@@ -5,17 +5,22 @@ import { useParams } from 'react-router-dom';
 import { findRecipeById } from '../../redux/Recipe/Actions';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../config/apiUrl';
-findRecipeById
+import moment from 'moment';
+import revealElements from '../../scrollReveal';
+  
 const RecipeDetailCard = () => {
     const params = useParams();
     const dispatch = useDispatch();
     const { recipe } = useSelector(store => store)
     console.log(recipe, "detils");
-
     useEffect(() => {
+        revealElements(); // Initialize ScrollReveal
+    }, []);
+    useEffect(() => {
+        const token = localStorage.getItem('jwt')
         const data = { recipeId: params?.recipeId }
         console.log(data, "data")
-        dispatch(findRecipeById(data))
+        dispatch(findRecipeById(data,token))
 
     }, [params?.recipeId])
 
@@ -55,7 +60,7 @@ const RecipeDetailCard = () => {
 
                 <section className='grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 px-4 pt-10'>
                     <div className="flex flex-col items-center">
-                        <div className="overflow-hidden rounded-lg max-w-[430rem] max-h-[89rem]">
+                        <div className="overflow-hidden rounded-lg max-w-[430rem] max-h-[89rem] left">
                             <img
                                 src={`${API_BASE_URL}/images/${recipe?.recipe?.imageUrl}`}
                                 className="h-full w-full object-cover object-center"
@@ -69,13 +74,14 @@ const RecipeDetailCard = () => {
 
                     </div>
 
-                    <div className="lg:col-span-1 max-auto max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-7xl lg:px-8 lg:pb-24">
+                    <div className="lg:col-span-1 max-auto  right max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-7xl lg:px-8 lg:pb-24">
                         <div className="lg:col-span-2 ">
                             <h1 className="text-xl lg:text-4xl font-bold text-gray-900 tracking-wider mb-2">{recipe?.recipe?.title}</h1>
                             <h1 className="text-lg lg:text-xl font-normal text-gray-900 mt-4 tracking-wider  leading-18">{recipe?.recipe?.description}</h1>
                             <h1 className='text-lg lg:text-lg text-slate-700 opacity-70 pt-1 mt-4'>
-                                By {recipe?.recipe?.userId?.fullName} | Updated on October 8, 2024
+                                By {recipe?.recipe?.userId?.fullName} | {moment(recipe?.recipe?.createdAt).format('MMMM D, YYYY')}
                             </h1>
+
                         </div>
 
 

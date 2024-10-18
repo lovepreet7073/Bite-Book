@@ -5,9 +5,10 @@ import {
 } from "@headlessui/react";
 import DropdownMenu from "./Dropdown";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import logo from '../../assets/logo.png'
+import logo from '../../assets/2.png'
 import { useEffect } from "react";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
+import { GetRecipes } from "../../redux/Recipe/Actions";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import SearchBar from "./SearchBar";
 import { useNavigate } from "react-router-dom";
@@ -15,35 +16,36 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../Redux/Auth/Actions";
 import { getUser } from "../../Redux/Auth/Actions";
 import VariantAvatars from "../Avatar";
+import { useState } from "react";
 const navigation = [
-  { name: "Home", href: "#", current: true, hasDropdown: false },
+  { name: "Home", id: "Home", current: true, hasDropdown: false },
   {
     name: "Ingredients",
-    href: "#",
+    id: "Ingredients",
     current: false,
     hasDropdown: true,
     dropdownItems: [
-      { name: "Fruits", href: "#" },
-      { name: "Vegetables", href: "#" },
-      { name: "Dairy", href: "#" }, 
-      { name: "Cheese", href: "#" },
-      { name: "Pasta", href: "#" },
+      { name: "Fruits", id: "Fruits" },
+      { name: "Vegetables", id: "Vegetables" },
+      { name: "Dairy", id: "Dairy" },
+      { name: "Cheese", id: "Cheese" },
+      { name: "Pasta", id: "Pasta" },
     ],
   },
   {
     name: "Cuisines",
-    href: "#",
+    id: "Cuisines",
     current: false,
     hasDropdown: true,
     dropdownItems: [
-      { name: "Italian", href: "#" },
-      { name: "Mexican", href: "#" },
-      { name: "Indian", href: "#" },
-      { name: "chinese", href: "#" },
-      { name: "american", href: "#" },
-      { name: "thai", href: "#" },
-      { name: "french", href: "#" },
-      { name: "japanese", href: "#" },
+      { name: "Italian", id: "Italian" },
+      { name: "Mexican", id: "Mexican" },
+      { name: "Indian", id: "Indian" },
+      { name: "chinese", id: "chinese" },
+      { name: "american", id: "american" },
+      { name: "thai", id: "thai" },
+      { name: "french", id: "french" },
+      { name: "japanese", id: "japanese" },
     ],
   },
 ];
@@ -57,6 +59,46 @@ function classNames(...classes) {
 export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [selectedIngredient, setSelectedIngredient] = useState("");
+  const [selectedCuisine, setSelectedCuisine] = useState("");
+
+
+  const handleFilterChange = (filterType, value) => {
+    if (filterType === "ingredients") {
+      // Set selected ingredient and clear cuisine filter
+      setSelectedIngredient(value);
+      setSelectedCuisine("");  // Clear the cuisine filter
+    } else if (filterType === "cuisines") {
+      // Set selected cuisine and clear ingredient filter
+      setSelectedCuisine(value);
+      setSelectedIngredient("");  // Clear the ingredient filter
+    }
+  };
+
+  // Update URL based on selected filters
+  useEffect(() => {
+    const query = new URLSearchParams();
+
+    if (selectedIngredient) {
+      query.set("ingredient", selectedIngredient);
+    }
+    if (selectedCuisine) {
+      query.set("cuisine", selectedCuisine);
+    }
+
+    // Update the browser URL with the new query string, without reloading the page
+    const newUrl = `${window.location.pathname}?${query.toString()}`;
+    window.history.pushState(null, "", newUrl);
+
+    // Fetch recipes whenever filters change
+    dispatch(GetRecipes({ ingredient: selectedIngredient, cuisine: selectedCuisine }));
+
+  }, [selectedIngredient, selectedCuisine, dispatch]);
+
+
+
+
+
   const { auth } = useSelector(store => store)
   const handleLoginBtn = () => {
     navigate('/auth/login')
@@ -79,16 +121,16 @@ export default function Navbar() {
 
   const isAuthenticate = localStorage.getItem('jwt')
   return (
-    <Disclosure as="nav" className="bg-[#01161e] lg:px-8 py-1  z-10 w-full filter backdrop-blur-sm">
+    <Disclosure as="nav" className="bg-[#01161e]  sticky top-0 z-50 py-3 backdrop-blur-lg  border-neutral-700/80 lg:px-8">
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-1 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[#FF6216] ">
+            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-4 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[#FF6216] ">
               <span className="sr-only">Open main menu</span>
               <Bars3Icon
                 aria-hidden="true"
-                className="block h-6 w-6 group-data-[open]:hidden"
+                className="block h-8 w-8 group-data-[open]:hidden"
               />
               <XMarkIcon
                 aria-hidden="true"
@@ -100,8 +142,9 @@ export default function Navbar() {
             <div className="flex flex-shrink-0 items-center">
               <img
                 alt="Your Company"
-                src="https://e7.pngegg.com/pngimages/854/415/png-clipart-recipe-cooking-chef-dish-food-cooking-food-recipe-thumbnail.png"
-                className="lg:block h-[35px] w-[35px] object-cover object-top rounded-full hidden"
+                src={logo}
+                className="lg:block h-[45px] w-[45px] object-cover object-top hidden"
+                title="Bite Book"
               />
             </div>
             <div className="hidden sm:ml-6 sm:block">
@@ -112,9 +155,11 @@ export default function Navbar() {
                       key={item.name}
                       title={item.name}
                       items={item.dropdownItems}
+                      filterType={item.name.toLowerCase()} // Pass either 'ingredients' or 'cuisines'
+                      onFilterChange={handleFilterChange}  // Passing filter type (ingredients/cuisines)
                     />
                   ) : (
-                    <a
+                    <div
                       key={item.name}
                       href={item.href}
                       aria-current={item.current ? "page" : undefined}
@@ -126,7 +171,7 @@ export default function Navbar() {
                       )}
                     >
                       {item.name}
-                    </a>
+                    </div>
                   )
                 )}
               </div>
@@ -204,40 +249,49 @@ export default function Navbar() {
         </div>
       </div>
 
-      <DisclosurePanel className="sm:hidden">
-        <div className="space-y-1 px-2 pb-3 pt-2">
-          {navigation.map((item) => (
-            <DisclosureButton
-              key={item.name}
-              as="a"
-              href={item.href}
-              aria-current={item.current ? "page" : undefined}
-              className={classNames(
-                item.current
-                  ? "bg-gray-900 text-white"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                "block rounded-md px-3 py-2 text-base font-medium"
-              )}
-            >
-              {item.name}
-            </DisclosureButton>
-          ))}
+      <DisclosurePanel className="sm:hidden flex ">
+        <div className="space-y-1 px-2 pb-3 pt-2 flex flex-col text-lg ">
+          {navigation.map((item) =>
+            item.hasDropdown ? (
+              <DropdownMenu
+                key={item.name}
+                title={item.name}
+                items={item.dropdownItems}
+                filterType={item.name.toLowerCase()} // Passing filter type (ingredients/cuisines)
+              />
+            ) : (
+              <div
+                key={item.name}
+                href={item.href}
+                aria-current={item.current ? "page" : undefined}
+                className={classNames(
+                  item.current
+                    ? "text-[#FF6216] lg:border-b-[#FF6216] lg:border-b text-lg "
+                    : "text-gray-300 hover:text-[#FF6216] hover:border-b-[#FF6216] hover:border-b-2",
+                  " px-3 py-2 text-sm font-medium"
+                )}
+              >
+                {item.name}
+              </div>
+            )
+          )}
+          <>
+            {!isAuthenticate ? (
+              <div className="flex gap-4 items-center sm:block md:hidden">
+                <button className="text-white hover:border hover:text-[#FF6216] hover:border-[#FF6216] rounded py-1 px-2 font-semibold transition duration-900 ease-in-out mr-2" onClick={handleLoginBtn}>
+                  Login
+                </button>
+
+                <span className="text-white mr-2">|</span>
+
+                <button className="text-white border border-neutral-100 rounded py-1 px-2" onClick={handleRegisterBtn}>
+                  Register
+                </button>
+              </div>
+            ) : null}</>
         </div>
-        {!isAuthenticate ?
-          <div className="flex gap-4 items-center sm:block hidden">
-            <button className="text-white hover:border hover:text-[#FF6216] hover:border-[#FF6216] rounded py-1 px-2 font-semibold transition duration-900 ease-in-out mr-2" onClick={handleLoginBtn}>
-              Login
-            </button>
 
-            <span className="text-white mr-2">|</span>
 
-            <button className="text-white border border-neutral-100 rounded py-1 px-2" onClick={handleRegisterBtn}>
-              Register
-            </button>
-          </div>
-
-          : <></>
-        }
 
       </DisclosurePanel>
     </Disclosure>

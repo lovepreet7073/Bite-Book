@@ -1,0 +1,8 @@
+.productCard .textpart  {
+    transition: transform .3s ease-out;
+}
+
+.productCard:hover .textpart {
+    transform: translateY(-1rem);
+
+}

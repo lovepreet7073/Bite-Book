@@ -1,6 +1,5 @@
 import React from "react";
 import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import GoogleLoginComponent from "../components/GoogleLoginComponent";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field } from 'formik';
@@ -10,7 +9,11 @@ import { useDispatch } from "react-redux";
 import { login } from "../Redux/Auth/Actions";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import revealElements from "../scrollReveal";
 const Login = () => {
+    useEffect(() => {
+        revealElements(); // Initialize ScrollReveal
+    }, []);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const handleSubmit = (values) => {
@@ -40,18 +43,19 @@ const Login = () => {
 
     return (
         <div className="w-full h-screen flex items-center ">
-            <div className="relative hidden  w-1/2 h-full lg:flex flex-col sm:hidden lg:block">
+            <div className="relative hidden  w-1/2 h-full lg:flex flex-col sm:hidden lg:block right">
                 <img
                     src="https://st2.depositphotos.com/3889193/7173/i/450/depositphotos_71739083-stock-photo-healthy-vegetarian-home-made-food.jpg"
                     className="w-full h-full object-cover object-right"
                     alt="Healthy Food"
                 />
             </div>
-            <div className="h-full bg-[#f5f5f5] flex flex-col lg:w-1/2 w-full px-[2rem] lg:px-[7rem] py-2 justify-around items-center">
-                <h1 className="w-full text-xl text-[#060606] font-semibold max-w-[500px] mx-auto mr-auto mb-3 mt-2">BiteBook</h1>
+            <div className="left h-full bg-[#f5f5f5] flex flex-col lg:w-1/2 w-full px-[2rem] lg:px-[7rem] py-2 justify-around items-center">
                 <div className="w-full flex flex-col max-w-[500px]">
-                    <div className="w-full flex flex-col mb-2">
-                        <h3 className="text-3xl font-semibold mb-2">Login</h3>
+                    <div className="w-full flex flex-col ">
+                <h1 className="w-full text-xl text-[#060606] font-semibold max-w-[500px] mx-auto mr-auto mb-4 mt-2">BiteBook</h1>
+
+                        <h3 className="text-3xl font-semibold mb-2 mt-2">Login</h3>
                         <p className="text-sm mb-2">Welcome Back! Please enter your details</p>
                     </div>
 

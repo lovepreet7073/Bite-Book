@@ -1,13 +1,17 @@
 import React from "react";
-import { FcGoogle } from "react-icons/fc";
 import TextField from '@mui/material/TextField';
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field } from "formik";
 import { useDispatch, useSelector } from 'react-redux';
 import RegisterSchema from "../components/Validations/RegisterSchema";
 import { register } from "../Redux/Auth/Actions";// if you already have this schema defined
 import GoogleLoginComponent from "../components/GoogleLoginComponent";
+import revealElements from "../scrollReveal";
 const Register = () => {
+  useEffect(() => {
+    revealElements(); // Initialize ScrollReveal
+}, []);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { auth } = useSelector(store => store);
@@ -16,13 +20,13 @@ const Register = () => {
     : null;
   return (
     <div className="w-full h-screen flex items-center ">
-      <div className="relative hidden  w-1/2 h-full lg:flex flex-col sm:hidden lg:block">
+      <div className="relative hidden  w-1/2 h-full lg:flex flex-col sm:hidden lg:block right">
         <img
           src="https://st2.depositphotos.com/3889193/7173/i/450/depositphotos_71739083-stock-photo-healthy-vegetarian-home-made-food.jpg"
           className="w-full h-full object-cover object-right "
         />
       </div>
-      <div className="h-full bg-[#f5f5f5] flex flex-col lg:w-1/2 w-full px-[2rem] lg:px-[7rem] py-2 justify-around items-center">
+      <div className="h-full bg-[#f5f5f5] left flex flex-col lg:w-1/2 w-full px-[2rem] lg:px-[7rem] py-2 justify-around items-center">
         <div className="w-full flex flex-col max-w-[500px]">
           <div className="w-full flex flex-col mb-2">
             <h3 className="text-xl font-semibold mb-2">Sign Up and Share Your Recipes!</h3>
@@ -128,7 +132,7 @@ const Register = () => {
                 </div>
 
                 <div className="w-full flex flex-col">
-                  <button type="submit" className="w-full hover: my-4 rounded-md mt-3 p-3 text-center flex items-center justify-center text-white bg-[#060606] font-semibold">
+                  <button type="submit" className="hero-buttons w-full hover: my-4 rounded-md mt-3 p-3 text-center flex items-center justify-center text-white bg-[#060606] font-semibold">
                     Sign Up
                   </button>
                 </div>
@@ -141,7 +145,7 @@ const Register = () => {
             <div className="w-full h-[1px] bg-black"></div>
             <p className="text-lg absolute text-black/80 bg-[#f5f5f5]">or</p>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 hero-buttons2">
             <GoogleLoginComponent />
 
           </div>

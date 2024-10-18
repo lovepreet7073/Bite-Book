@@ -9,9 +9,11 @@ import {
     GET_USER_REQUEST,
     GET_USER_SUCCESS,
     GET_USER_FAILURE,
-    GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_REQUEST, GOOGLE_LOGIN_SUCCESS
+    GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_REQUEST, GOOGLE_LOGIN_SUCCESS,
+    UPDATE_USER_REQUEST, UPDATE_USER_SUCCESS, UPDATE_USER_FAILURE,
 } from './ActionType'
 import axios from 'axios'
+import { api } from '../../config/apiUrl';
 export const register = (userData) => async (dispatch) => {
     dispatch({ type: REGISTER_REQUEST })
     console.log('inside')
@@ -118,5 +120,26 @@ export const googlelogin = (userData, navigate) => async (dispatch) => {
     }
 };
 
+export const updateUser = (updatedUserData, jwt) => async (dispatch) => {
+    dispatch({ type: UPDATE_USER_REQUEST });
+    try {
+        const res = await api.put(`${API_BASE_URL}/api/update-user`, updatedUserData, {
+            headers: {
+                "Authorization": `Bearer ${jwt}`,
+            }
+        });
 
+        const updatedUser = res.data.user;
+
+        dispatch({
+            type: UPDATE_USER_SUCCESS,
+            payload: updatedUser
+        });
+    } catch (error) {
+        dispatch({
+            type: UPDATE_USER_FAILURE,
+            payload: error.response?.data?.message || error.message
+        });
+    }
+};
 

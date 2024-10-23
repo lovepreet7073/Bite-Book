@@ -44,7 +44,7 @@ const SearchBar = () => {
         <input
           type="text"
           placeholder="Search recipes or ingredients..."
-          className="block p-[3px] lg:p-[5px] w-full bg-transparent text-white placeholder-neutral-400 focus:border-[#FF6216] focus:ring-[#FF6216] sm:w-64 focus:outline-none"
+          className="block p-[3px] lg:p-[5px] w-full bg-transparent text-black placeholder-neutral-400 focus:border-[#FF6216] focus:ring-[#FF6216] sm:w-64 focus:outline-none"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)} // Trigger search on input change
         />

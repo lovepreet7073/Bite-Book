@@ -14,7 +14,7 @@ import {
 } from './ActionType'
 import axios from 'axios'
 import { api } from '../../config/apiUrl';
-export const register = (userData) => async (dispatch) => {
+export const register = (userData,navigate) => async (dispatch) => {
     dispatch({ type: REGISTER_REQUEST })
     console.log('inside')
     try {
@@ -29,6 +29,7 @@ export const register = (userData) => async (dispatch) => {
             type: REGISTER_SUCCESS,
             payload: user
         })
+        navigate('/')
     } catch (error) {
         dispatch({
             type: REGISTER_FAILURE,

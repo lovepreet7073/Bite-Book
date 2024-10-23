@@ -6,3 +6,6 @@
     transform: translateY(-1rem);
 
 }
+.carousel-container {
+    background-color: red; /* Just for debugging */
+}

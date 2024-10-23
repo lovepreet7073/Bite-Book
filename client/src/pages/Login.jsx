@@ -6,7 +6,7 @@ import { Formik, Form, Field } from 'formik';
 import TextField from '@mui/material/TextField';
 import LoginSchema from "../components/Validations/LoginSchema";
 import { useDispatch } from "react-redux";
-import { login } from "../Redux/Auth/Actions";
+import { login } from "../redux/Auth/Actions";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import revealElements from "../scrollReveal";

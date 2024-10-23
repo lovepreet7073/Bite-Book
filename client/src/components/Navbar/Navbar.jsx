@@ -9,12 +9,11 @@ import logo from '../../assets/2.png'
 import { useEffect } from "react";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
 import { GetRecipes } from "../../redux/Recipe/Actions";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import SearchBar from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../Redux/Auth/Actions";
-import { getUser } from "../../Redux/Auth/Actions";
+import { logout } from "../../redux/Auth/Actions";
+import { getUser } from "../../redux/Auth/Actions";
 import VariantAvatars from "../Avatar";
 import { useState } from "react";
 const navigation = [
@@ -65,17 +64,14 @@ export default function Navbar() {
 
   const handleFilterChange = (filterType, value) => {
     if (filterType === "ingredients") {
-      // Set selected ingredient and clear cuisine filter
       setSelectedIngredient(value);
       setSelectedCuisine("");  // Clear the cuisine filter
     } else if (filterType === "cuisines") {
-      // Set selected cuisine and clear ingredient filter
       setSelectedCuisine(value);
       setSelectedIngredient("");  // Clear the ingredient filter
     }
   };
 
-  // Update URL based on selected filters
   useEffect(() => {
     const query = new URLSearchParams();
 
@@ -86,12 +82,17 @@ export default function Navbar() {
       query.set("cuisine", selectedCuisine);
     }
 
-    // Update the browser URL with the new query string, without reloading the page
     const newUrl = `${window.location.pathname}?${query.toString()}`;
     window.history.pushState(null, "", newUrl);
-
-    // Fetch recipes whenever filters change
-    dispatch(GetRecipes({ ingredient: selectedIngredient, cuisine: selectedCuisine }));
+    console.log(newUrl, "newUrl");
+    console.log(selectedIngredient, "selectedIngredient");
+    console.log(selectedCuisine, "selectedCuisine");
+    if (selectedIngredient || selectedCuisine) {
+      dispatch(GetRecipes({ ingredient: selectedIngredient, cuisine: selectedCuisine }));
+      navigate(`/user/recipes?${query.toString()}`);
+    } else {
+      dispatch(GetRecipes({}));
+    }
 
   }, [selectedIngredient, selectedCuisine, dispatch]);
 
@@ -121,12 +122,12 @@ export default function Navbar() {
 
   const isAuthenticate = localStorage.getItem('jwt')
   return (
-    <Disclosure as="nav" className="bg-[#01161e]  sticky top-0 z-50 py-3 backdrop-blur-lg  border-neutral-700/80 lg:px-8">
+    <Disclosure as="nav" className="  sticky top-0 z-50 py-3 backdrop-blur-lg  border-neutral-700/80 lg:px-8 border-b border-neutral-300">
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative flex h-16 items-center justify-between">
+        <div className="relative flex h-14 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-4 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[#FF6216] ">
+            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[#FF6216] ">
               <span className="sr-only">Open main menu</span>
               <Bars3Icon
                 aria-hidden="true"
@@ -165,9 +166,9 @@ export default function Navbar() {
                       aria-current={item.current ? "page" : undefined}
                       className={classNames(
                         item.current
-                          ? "text-[#FF6216] border-b-[#FF6216] border-b"
+                          ? "text-[#FF6216] border-b-[#FF6216] border-b-2"
                           : "text-gray-300 hover:text-[#FF6216] hover:border-b-[#FF6216] hover:border-b-2",
-                        " px-3 py-2 text-sm font-medium"
+                        " px-3 py-2 text-md font-medium"
                       )}
                     >
                       {item.name}
@@ -230,13 +231,13 @@ export default function Navbar() {
                 </MenuItems>
               </Menu> :
               <div className="flex gap-4 items-center sm:block hidden">
-                <button className="text-white hover:border hover:text-[#FF6216] hover:border-[#FF6216] rounded py-1 px-2 font-semibold transition duration-900 ease-in-out mr-2" onClick={handleLoginBtn}>
+                <button className="text-black hover:border hover:text-[#FF6216] hover:border-[#FF6216] rounded py-1 px-2 font-semibold transition duration-900 ease-in-out mr-2" onClick={handleLoginBtn}>
                   Login
                 </button>
 
                 <span className="text-white mr-2">|</span>
 
-                <button className="text-white border border-neutral-100 rounded py-1 px-2" onClick={handleRegisterBtn}>
+                <button className="text-primary border border-[#FF6216] rounded py-1 px-2" onClick={handleRegisterBtn}>
                   Register
                 </button>
               </div>
@@ -257,7 +258,8 @@ export default function Navbar() {
                 key={item.name}
                 title={item.name}
                 items={item.dropdownItems}
-                filterType={item.name.toLowerCase()} // Passing filter type (ingredients/cuisines)
+                filterType={item.name.toLowerCase()} // Pass either 'ingredients' or 'cuisines'
+                onFilterChange={handleFilterChange}  // Passing filter type (ingredients/cuisines)
               />
             ) : (
               <div

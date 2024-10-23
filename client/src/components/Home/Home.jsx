@@ -12,9 +12,8 @@ const Home = () => {
   const navigate = useNavigate();
   console.log(recipe, "recipe-home")
   useEffect(() => {
-    // Dispatch the GetRecipes action when the component mounts
     dispatch(GetRecipes());
-  }, [dispatch]);
+  }, [dispatch, recipe.updatedRecipe]);
 
 
 
@@ -31,8 +30,8 @@ const Home = () => {
         {/* Grid Layout for Recipes */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 p-4">
           {recipe?.allRecipes && recipe.allRecipes.length > 0 ? (
-            recipe.allRecipes.slice(0, 3).map((item) => ( // Limit the number of recipes to 3
-              <RecipeReviewCard key={item._id} recipe={item} /> // Pass individual recipe to RecipeReviewCard
+            recipe.allRecipes.slice(0, 3).map((item) => (
+              <RecipeReviewCard key={item._id} recipe={item} />
             ))
           ) : (
             <p>No recipes available.</p>

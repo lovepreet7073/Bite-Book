@@ -1,32 +1,35 @@
 const Recipe = require('../Models/recipeModel')
-
+const userService = require('../Services/userService')
 
 const addRecipe = async (req, res) => {
     try {
-        const { title, description, ingredients, directions, prepTime, cookTime, notes, cuisine } = req.body;
+        const { title, description, ingredients, directions, notes, cuisine } = req.body;
+
+        // Parse JSON strings for prepTime and cookTime
+        const prepTime = JSON.parse(req.body.prepTime);
+        const cookTime = JSON.parse(req.body.cookTime);
 
         const userId = req.user._id;
 
+        let imageUrl = [];
 
-        let imageUrl = null;
-
-        if (req.file) {
-
-            imageUrl = req.file ? req.file.filename : undefined;
+        // Check if files are uploaded and add their filenames to imageUrl array
+        if (req.files && req.files.length > 0) {
+            imageUrl = req.files.map(file => file.filename); // Map over the files to get their filenames
         }
 
-
+        // Create new recipe document
         const newRecipe = new Recipe({
-            userId,  // Add the userId to associate the recipe with the user
+            userId,
             title,
             description,
             cuisine,
-            ingredients,
-            directions,
-            prepTime,
-            cookTime,
+            ingredients: JSON.parse(ingredients), // Parse array if needed
+            directions: JSON.parse(directions),   // Parse array if needed
+            prepTime,  // Object: { time, unit }
+            cookTime,  // Object: { time, unit }
             notes,
-            imageUrl,  // Store the image name
+            imageUrl,  // Store the array of image names
         });
 
         // Save the recipe to the database
@@ -38,7 +41,7 @@ const addRecipe = async (req, res) => {
         console.error('Error adding recipe:', error);
         res.status(500).json({ message: 'Error adding recipe', error });
     }
-}
+};
 
 const getAllRecipes = async (req, res) => {
     try {
@@ -108,11 +111,95 @@ const userRecipes = async (req, res) => {
 };
 
 
+const likeRecipe = async (req, res) => {
+    try {
+        const { recipeId, userId } = req.params;
+
+        const recipe = await Recipe.findById(recipeId);
+        const user = await userService.findUserById(userId);
+
+        if (!recipe) {
+            return res.status(404).json({ message: "Recipe not found" });
+        }
+
+        if (!user) {
+            return res.status(404).json({ message: "" });
+        }
+        const likedIndex = recipe.likedBy.indexOf(userId);
+        if (likedIndex !== -1) {
+            recipe.likedBy.splice(likedIndex, 1);
+            recipe.likes -= 1;
+        } else {
+            recipe.likedBy.push(userId);
+            recipe.likes += 1;
+        }
+
+        const savedRecipe = await recipe.save();
+        await savedRecipe.populate("userId");
+        res.status(200).json(savedRecipe);
+    } catch (error) {
+        console.error("Error liking recipe:", error);
+        res
+            .status(500)
+            .json({ message: "An error occurred while liking the recipe." });
+    }
+}
+
+
+const deleteRecipe = async (req, res) => {
+    try {
+        const { recipeId } = req.params;
+
+        // Find the recipe by ID
+        const recipe = await Recipe.findById(recipeId);
+
+        // If recipe doesn't exist, return a 404 error
+        if (!recipe) {
+            return res.status(404).json({ message: 'Recipe not found' });
+        }
+
+        // Delete the recipe
+        await Recipe.findByIdAndDelete(recipeId);
+
+        // Return success response
+        res.status(200).json({ message: 'Recipe deleted successfully' });
+    } catch (error) {
+        // Handle any errors
+        res.status(500).json({ message: 'An error occurred while deleting the recipe', error: error.message });
+    }
+};
+
+
+const updateRecipe = async (req, res) => {
+    try {
+        const { title, cuisine, description, ingredients, directions, imageUrl, notes, cookTime, prepTime } = req.body;
+  console.log(req.body,"req.body;")
+        // Access recipeId from params
+        const recipeId = req.params.recipeId;
+
+        const updatedRecipe = await Recipe.findByIdAndUpdate(
+            recipeId, // Use the recipeId from params
+            { title, cuisine, description, ingredients, directions, imageUrl, notes, cookTime, prepTime },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedRecipe) {
+            return res.status(404).json({ message: 'Recipe not found' });
+        }
+
+        res.status(200).json(updatedRecipe);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
 
 module.exports = {
     addRecipe,
     getAllRecipes,
     findRecipeById,
     SearchRecipe,
-    userRecipes
+    userRecipes,
+    likeRecipe,
+    deleteRecipe,
+    updateRecipe
 }

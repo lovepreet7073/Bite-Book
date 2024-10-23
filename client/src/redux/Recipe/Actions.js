@@ -1,8 +1,8 @@
 import { api } from "../../config/apiUrl"
-import { ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS, USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS } from "./ActionTypes"
+import { ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS, RECIPE_LIKE_FAILURE, RECIPE_LIKE_REQUEST, RECIPE_LIKE_SUCCESS, USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS, DELETE_RECIPE_FAILURE, DELETE_RECIPE_REQUEST, DELETE_RECIPE_SUCCESS, UPDATE_RECIPE_REQUEST, UPDATE_RECIPE_SUCCESS, UPDATE_RECIPE_FAILURE } from "./ActionTypes"
 import { API_BASE_URL } from "../../config/apiUrl"
 
-export const addRecipe = (recipeData) => async (dispatch) => {
+export const addRecipe = (recipeData,navigate) => async (dispatch) => {
     dispatch({ type: ADD_RECIPE_REQUEST })
     console.log('inside-addrecipe', recipeData)
     try {
@@ -19,6 +19,7 @@ export const addRecipe = (recipeData) => async (dispatch) => {
             type: ADD_RECIPE_SUCCESS,
             payload: data
         })
+        navigate('/')
     } catch (error) {
         dispatch({
             type: ADD_RECIPE_FAILURE,
@@ -60,13 +61,13 @@ export const GetRecipes = (filters) => async (dispatch) => {
 };
 
 
-export const findRecipeById = (reqData,jwt) => async (dispatch) => {
+export const findRecipeById = (reqData, jwt) => async (dispatch) => {
     dispatch({ type: FIND_RECIPE_BY_ID_REQUEST })
 
     const { recipeId } = reqData;
 
     try {
-        const { data } = await api.get(`/api/recipe-get/${recipeId}`,{
+        const { data } = await api.get(`/api/recipe-get/${recipeId}`, {
             headers: {
                 "Authorization": `Bearer ${jwt}`
             }
@@ -80,17 +81,77 @@ export const findRecipeById = (reqData,jwt) => async (dispatch) => {
 }
 
 
-export const userRecipes = (userId,jwt) => async (dispatch) => {
+export const userRecipes = (userId, jwt) => async (dispatch) => {
     dispatch({ type: USER_RECIPES_REQUEST });
 
     try {
-        const { data } = await api.get(`/api/user-recipe-get/${userId}`,{
-              headers: {
+        const { data } = await api.get(`/api/user-recipe-get/${userId}`, {
+            headers: {
                 "Authorization": `Bearer ${jwt}`
             }
         });
         dispatch({ type: USER_RECIPES_SUCCESS, payload: data });
     } catch (error) {
         dispatch({ type: USER_RECIPES_FAILURE, payload: error.message });
+    }
+};
+
+
+export const DeleteRecipe = (recipeId) => async (dispatch) => {
+    dispatch({ type: DELETE_RECIPE_REQUEST });
+
+    try {
+        // Use DELETE method instead of GET
+        const { data } = await api.delete(`/api/delete-recipe/${recipeId}`);
+
+        dispatch({ type: DELETE_RECIPE_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({
+            type: DELETE_RECIPE_FAILURE, payload: error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        });
+    }
+};
+
+
+
+
+export const likeRecipe = (recipeId, userId) => async (dispatch) => {
+    dispatch({ type: RECIPE_LIKE_REQUEST })
+    console.log('inside-addrecipe', recipeId, userId)
+    try {
+        const res = await api.post(`${API_BASE_URL}/api/user-recipe-like/${recipeId}/${userId}`)
+        console.log(res, "res")
+        const data = res?.data;
+
+
+        dispatch({
+            type: RECIPE_LIKE_SUCCESS,
+            payload: data
+        })
+    } catch (error) {
+        dispatch({
+            type: RECIPE_LIKE_FAILURE,
+            payload: error.response ? error.response.data : error.message
+        })
+    }
+}
+
+export const UpdateRecipe = (recipeId, formData) => async (dispatch) => {
+    dispatch({ type: UPDATE_RECIPE_REQUEST });
+
+    try {
+        // Send the formData in the PUT request
+        const { data } = await api.put(`/api/update-recipe/${recipeId}`, formData);
+
+        dispatch({ type: UPDATE_RECIPE_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({
+            type: UPDATE_RECIPE_FAILURE,
+            payload: error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message,
+        });
     }
 };

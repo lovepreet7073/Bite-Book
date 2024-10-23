@@ -1,89 +1,46 @@
-import React, { useState } from 'react';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { findRecipeById } from '../../redux/Recipe/Actions';
-import { useSelector } from 'react-redux';
 import { API_BASE_URL } from '../../config/apiUrl';
 import moment from 'moment';
 import revealElements from '../../scrollReveal';
-  
+import Carousel from '../Carousel'; // Import your Carousel component
+
 const RecipeDetailCard = () => {
     const params = useParams();
     const dispatch = useDispatch();
-    const { recipe } = useSelector(store => store)
-    console.log(recipe, "detils");
+    const { recipe } = useSelector(store => store);
+    console.log(recipe, "details");
+
     useEffect(() => {
         revealElements(); // Initialize ScrollReveal
     }, []);
+
     useEffect(() => {
-        const token = localStorage.getItem('jwt')
-        const data = { recipeId: params?.recipeId }
-        console.log(data, "data")
-        dispatch(findRecipeById(data,token))
-
-    }, [params?.recipeId])
-
-
+        const token = localStorage.getItem('jwt');
+        const data = { recipeId: params?.recipeId };
+        console.log(data, "data");
+        dispatch(findRecipeById(data, token));
+    }, [params?.recipeId]);
 
     return (
         <div className="bg-white lg:px-20">
             <div className="pt-6">
-                {/* <nav aria-label="Breadcrumb">
-                    <ol role="list" className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-
-                        <li >
-                            <div className="flex items-center">
-                                <a href='#' className="mr-2 text-lg font-medium text-gray-900">
-
-                                </a>
-                                <svg
-                                    fill="currentColor"
-                                    width={16}
-                                    height={20}
-                                    viewBox="0 0 16 20"
-                                    aria-hidden="true"
-                                    className="h-5 w-4 text-gray-300"
-                                >
-                                    <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
-                                </svg>
-                            </div>
-                        </li>
-
-                        <li className="text-sm">
-                            <a href= '#'aria-current="page" className="font-medium text-gray-500 hover:text-gray-600">
-                       
-                            </a>
-                        </li>
-                    </ol>
-                </nav> */}
-
                 <section className='grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 px-4 pt-10'>
-                    <div className="flex flex-col items-center">
-                        <div className="overflow-hidden rounded-lg max-w-[430rem] max-h-[89rem] left">
-                            <img
-                                src={`${API_BASE_URL}/images/${recipe?.recipe?.imageUrl}`}
-                                className="h-full w-full object-cover object-center"
-                            // alt={product.title}
-                            />
-                        </div>
-
-
-
-
-
+                    <div className=" rounded-lg max-w-[430rem] max-h-[89rem]">
+                        {/* Carousel for Recipe Images */}
+                        <Carousel data={recipe?.recipe?.imageUrl || []} /> {/* Use your images array */}
                     </div>
 
-                    <div className="lg:col-span-1 max-auto  right max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-7xl lg:px-8 lg:pb-24">
-                        <div className="lg:col-span-2 ">
+                    <div className="lg:col-span-1 max-auto right max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-7xl lg:px-8 lg:pb-24">
+                        <div className="lg:col-span-2">
                             <h1 className="text-xl lg:text-4xl font-bold text-gray-900 tracking-wider mb-2">{recipe?.recipe?.title}</h1>
-                            <h1 className="text-lg lg:text-xl font-normal text-gray-900 mt-4 tracking-wider  leading-18">{recipe?.recipe?.description}</h1>
+                            <h1 className="text-lg lg:text-xl font-normal text-gray-900 mt-4 tracking-wider leading-18">{recipe?.recipe?.description}</h1>
                             <h1 className='text-lg lg:text-lg text-slate-700 opacity-70 pt-1 mt-4'>
                                 By {recipe?.recipe?.userId?.fullName} | {moment(recipe?.recipe?.createdAt).format('MMMM D, YYYY')}
                             </h1>
-
                         </div>
-
 
                         {/* Ingredients and Directions Section */}
                         <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-6">
@@ -133,8 +90,6 @@ const RecipeDetailCard = () => {
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
                 </section>
             </div>

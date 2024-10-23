@@ -5,19 +5,28 @@ import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field } from "formik";
 import { useDispatch, useSelector } from 'react-redux';
 import RegisterSchema from "../components/Validations/RegisterSchema";
-import { register } from "../Redux/Auth/Actions";// if you already have this schema defined
+import { register } from "../redux/Auth/Actions";// if you already have this schema defined
 import GoogleLoginComponent from "../components/GoogleLoginComponent";
 import revealElements from "../scrollReveal";
+import showCustomToast from "../components/ToastComponent";
 const Register = () => {
   useEffect(() => {
     revealElements(); // Initialize ScrollReveal
-}, []);
+  }, []);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { auth } = useSelector(store => store);
   const emailError = auth?.error && auth?.error?.error && auth?.error?.error?.includes("User already exists")
     ? "User already exists"
     : null;
+  const handleSubmit = (values) => {
+
+    dispatch(register(values, navigate));
+    showCustomToast('Register successfully', 'success'); // Adjust the message as needed
+
+
+  };
+
   return (
     <div className="w-full h-screen flex items-center ">
       <div className="relative hidden  w-1/2 h-full lg:flex flex-col sm:hidden lg:block right">
@@ -41,9 +50,7 @@ const Register = () => {
               password: '',
             }}
             validationSchema={RegisterSchema} // Use your validation schema here
-            onSubmit={(values) => {
-              dispatch(register(values));
-            }}
+            onSubmit={handleSubmit}
           >
             {({ values, errors, touched, handleChange, handleBlur }) => (
               <Form className="w-full flex flex-col">

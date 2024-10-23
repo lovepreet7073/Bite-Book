@@ -5,6 +5,17 @@ const recipeSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
     },
+    likes: {
+        type: Number,
+        default: 0
+    },
+    likedBy: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "users",
+        }
+    ],
+
     title: {
         type: String,
         required: true,
@@ -52,7 +63,7 @@ const recipeSchema = new mongoose.Schema({
         default: '',
     },
     imageUrl: {
-        type: String,
+        type: [String],
         default: '',
     },
 }, { timestamps: true });

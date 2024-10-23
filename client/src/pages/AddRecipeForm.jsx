@@ -1,21 +1,24 @@
 import React from 'react';
-import { Button, TextField, Grid, IconButton, Box, Divider, MenuItem,Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle  } from '@mui/material';
+import { Button, TextField, Grid, IconButton, Box, Divider, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { Formik, Field, Form, FieldArray, ErrorMessage } from 'formik';
-import validationSchema from '../components/Validations/RecipeSchema';
 import { RiMenuAddFill } from "react-icons/ri";
 import AddIcon from '@mui/icons-material/Add';
-import ImageUploadField from '../components/ImageUploadField';
+import MultipleImageUploadField from '../components/ImageUploadField';
 import { RxCross2 } from "react-icons/rx";
 import { addRecipe } from '../redux/Recipe/Actions';
 import { useDispatch, useSelector } from 'react-redux';
-import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import NativeSelect from '@mui/material/NativeSelect';
-import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import showCustomToast from '../components/ToastComponent';
 const AddRecipeForm = () => {
     const [open, setOpen] = useState(false);
+    const location = useLocation(); // Access location
+
+    const { recipe } = location.state || {}; // Get recipe from state
+
     const handleClickOpen = () => {
         setOpen(true); // Open the dialog
     };
@@ -39,36 +42,52 @@ const AddRecipeForm = () => {
         { value: 'japanese', label: 'Japanese' },
         // Add more cuisines as needed
     ];
-    const { recipe } = useSelector(store => store)
     const navigate = useNavigate();
     console.log(recipe, "recipe")
+
+    // Update the initial values to reflect the passed recipe data
     const initialValues = {
-        title: '',
-        cuisine: '',
-        description: '',
-        ingredients: [''], // Start with one empty ingredient
-        directions: [''],  // Start with one empty direction
-        imageUrl: null,
-        notes: '',         // Initialize notes as an empty string
+        title: recipe?.title || '',
+        cuisine: recipe?.cuisine || '',
+        description: recipe?.description || '',
+        ingredients: recipe?.ingredients || [''],
+        directions: recipe?.directions || [''],
+        imageUrl: recipe?.imageUrl || [],
+        notes: recipe?.notes || '',
         cookTime: {
-            time: '',       // Initialize prepTime as an object with time
-            unit: 'mins',   // Default unit is "mins"
-        },   // I      // Initialize cookTime as an empty string or number
+            time: recipe?.cookTime?.time || '',
+            unit: recipe?.cookTime?.unit || 'mins',
+        },
         prepTime: {
-            time: '',       // Initialize prepTime as an object with time
-            unit: 'mins',   // Default unit is "mins"
-        }      // Initialize prepTime as an empty string or number
+            time: recipe?.prepTime?.time || '',
+            unit: recipe?.prepTime?.unit || 'mins',
+        }
     };
+
+
+
     const handleSubmit = (values) => {
-        console.log(values, "valuyes")
-        dispatch(addRecipe(values))
-        toast.success('Recipe added Successfully')
-        navigate('/')
-    }
+        const formData = new FormData();
+
+        Object.keys(values).forEach((key) => {
+            if (key === 'imageUrl') {
+                values[key].forEach((file) => formData.append('imageUrl', file));
+            } else if (typeof values[key] === 'object' && values[key] !== null) {
+
+                formData.append(key, JSON.stringify(values[key]));
+            } else {
+                formData.append(key, values[key]);
+            }
+        });
+        dispatch(addRecipe(formData,navigate))
+        showCustomToast('Recipe added successfully!', 'success');
+   
+    };
+
 
     const dispatch = useDispatch();
     return (
-        <div className='px-[12rem] py-12 flex justify-center flex-col mx-auto'>
+        <div className='lg:px-[12rem] px-10 py-12 flex justify-center flex-col mx-auto'>
 
             <div className='flex items-center gap-3'>
                 <h1 className='text-3xl font-bold text-slate-800 mt-2 mb-4'>Add a Recipe </h1>
@@ -97,7 +116,7 @@ const AddRecipeForm = () => {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         required
-                                        
+
                                     />
                                     <TextField
                                         id="outlined-multiline-flexible"
@@ -110,14 +129,14 @@ const AddRecipeForm = () => {
                                         value={values.description}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        
+
                                     />
                                 </div>
 
                             </Grid>
 
                             <Grid item xs={12} sm={6}>
-                                <ImageUploadField values={values} setFieldValue={setFieldValue} />
+                                <MultipleImageUploadField values={values} setFieldValue={setFieldValue} />
                             </Grid>
                             {/* Ingredients FieldArray */}
                             <hr className='w-full py-2 mt-5 mb-2' />
@@ -132,7 +151,7 @@ const AddRecipeForm = () => {
                                                 <Grid container key={index} spacing={2} alignItems="center">
                                                     <Grid item xs={11}>
                                                         <Field
-                                                            
+
                                                             as={TextField}
                                                             fullWidth
                                                             name={`ingredients[${index}]`}
@@ -156,7 +175,7 @@ const AddRecipeForm = () => {
                                                 </Grid>
                                             ))}
                                             <Button
-                                            required
+                                                required
                                                 variant="outlined"
                                                 startIcon={<AddIcon />}
                                                 onClick={() => push('')}
@@ -237,7 +256,7 @@ const AddRecipeForm = () => {
                                 </FieldArray>
                             </Grid>
 
-                            <Grid item xs={6}>
+                            <Grid item xs={12} sm={6}>
                                 <div className='flex gap-5 items-center mt-5'>
                                     <h1 className='text-md font-medium'>Prep Time</h1>
                                     <TextField
@@ -251,7 +270,7 @@ const AddRecipeForm = () => {
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         required
-                                        
+
                                     />
                                     <TextField
                                         select
@@ -268,7 +287,7 @@ const AddRecipeForm = () => {
                             </Grid>
 
                             {/* Cook Time */}
-                            <Grid item xs={6}>
+                            <Grid item xs={12} sm={6}>
                                 <div className='flex gap-5 items-center mt-2'>
                                     <h1 className='text-md font-medium'>Cook Time <span className='text-sm text-neutral-400'>(optional)</span></h1>
                                     <TextField
@@ -298,7 +317,7 @@ const AddRecipeForm = () => {
                             </Grid>
 
                             <hr className='w-full py-2 mt-5 mb-2' />
-                            <Grid item xs={6}>
+                            <Grid item xs={12} sm={6}>
                                 <div className='flex flex-col gap-10'>
                                     <h1 className='text-md font-medium'>Cuisine </h1>
                                     <FormControl fullWidth>
@@ -323,7 +342,7 @@ const AddRecipeForm = () => {
                                 </div>
                             </Grid>
 
-                            <Grid item xs={6} >
+                            <Grid item xs={12} sm={6}>
                                 <div className=' flex gap-6 flex-col'>
 
                                     <h1 className='text-md font-medium'>Notes <span className='text-sm text-neutral-400'>(optional)</span></h1>
@@ -373,12 +392,12 @@ const AddRecipeForm = () => {
                                             <Button onClick={handleClose} color="primary">
                                                 No, Stay
                                             </Button>
-                                            <Button onClick={handleConfirm}  variant='contained'   sx={{
-                                            bgcolor: '#FF6216', // Use the primary color from Tailwind config
-                                            '&:hover': {
-                                                bgcolor: '#E55A12', // Change to secondary color from Tailwind config on hover
-                                            },
-                                        }}>
+                                            <Button onClick={handleConfirm} variant='contained' sx={{
+                                                bgcolor: '#FF6216', // Use the primary color from Tailwind config
+                                                '&:hover': {
+                                                    bgcolor: '#E55A12', // Change to secondary color from Tailwind config on hover
+                                                },
+                                            }}>
                                                 Yes, Leave
                                             </Button>
                                         </DialogActions>

@@ -3,14 +3,13 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 export default function DropdownMenu({ title, items, filterType, onFilterChange }) {
   const handleFilter = (name, id) => {
-    console.log(name,id,"datataa")
-    // Call the parent's filter change handler and pass the selected filter value
+    console.log(name, id, "datataa")
     onFilterChange(filterType, id);
   };
 
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <MenuButton className="inline-flex justify-center text-white hover:text-[#FF6216] hover:border-b border-b-[#fb8500] px-3 py-2 text-sm font-medium">
+      <MenuButton className="inline-flex justify-center text-black hover:text-[#FF6216] hover:border-b-2 border-b-[#fb8500] px-3 py-2 text-md font-medium">
         {title}
         <ChevronDownIcon className="-mr-1 h-5 w-5" aria-hidden="true" />
       </MenuButton>

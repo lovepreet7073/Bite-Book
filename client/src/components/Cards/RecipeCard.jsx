@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
-import BasicRating from './Rating'; // Assuming you have a custom Rating component
-import { API_BASE_URL } from '../../config/apiUrl'; // Assuming you have API_BASE_URL defined
+import BasicRating from './Rating';
+import { API_BASE_URL } from '../../config/apiUrl';
 import { useNavigate } from 'react-router-dom';
 import './recipe.css';
 import revealElements from '../../scrollReveal';
 import { likeRecipe } from '../../redux/Recipe/Actions';
+import showCustomToast from '../../components/ToastComponent'; // Import your custom toast function
 
 export default function RecipeReviewCard({ recipe }) {
-    const [isLiked, setIsLiked] = useState(false); // Local state to manage liked status
+    const [isLiked, setIsLiked] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { auth } = useSelector((store) => store);
     const token = localStorage.getItem('jwt');
 
     useEffect(() => {
-        revealElements(); // Initialize ScrollReveal
+        revealElements();
     }, []);
 
-    // Set initial liked status based on whether the user already liked the recipe
     useEffect(() => {
         if (recipe?.likedBy?.includes(auth?.user?._id)) {
             setIsLiked(true);
@@ -29,12 +29,17 @@ export default function RecipeReviewCard({ recipe }) {
     }, [recipe, auth]);
 
     const handleLikeClick = (event) => {
-        event.stopPropagation(); // Prevent click from propagating to card
-        setIsLiked((prevIsLiked) => !prevIsLiked);
+        event.stopPropagation();
+        const newIsLiked = !isLiked;
+        setIsLiked(newIsLiked);
         dispatch(likeRecipe(recipe?._id, auth?.user?._id));
+
+        // Show custom toast notification with different icons
+        const message = newIsLiked ? 'You liked  this recipe!' : 'You unliked this recipe!';
+        const type = newIsLiked ? 'success' : 'info'; // You can choose the type based on your preference
+        showCustomToast(message, type);
     };
 
-    // Select the first image from the imageUrl array
     const firstImageUrl = recipe.imageUrl?.[0] ? `${API_BASE_URL}/images/${recipe.imageUrl[0]}` : null;
 
     return (
@@ -64,7 +69,7 @@ export default function RecipeReviewCard({ recipe }) {
                 <div
                     title={!token ? 'Log in to like the recipe!' : ''}
                     className='w-10 h-10 bg-primary rounded-full top-[1%] right-[1%] flex justify-center items-center absolute hover:bg-secondary'
-                    onClick={token ? handleLikeClick : null}  // Only allow click if the token is available
+                    onClick={token ? handleLikeClick : null}
                 >
                     {isLiked ? (
                         <FaHeart className='text-white' size={20} />
@@ -75,7 +80,7 @@ export default function RecipeReviewCard({ recipe }) {
 
                 {/* Recipe Rating */}
                 <div disableSpacing className='p-0 flex items-center gap-1'>
-                    <BasicRating /> {/* Custom Rating Component */}
+                    <BasicRating />
                     <p className='text-sm text-slate-500'>{recipe.ratings || 'No ratings yet'}</p>
                 </div>
             </div>

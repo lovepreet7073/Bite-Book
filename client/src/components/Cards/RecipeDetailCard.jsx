@@ -88,6 +88,7 @@ const RecipeDetailCard = () => {
                                         ))}
                                     </ol>
                                 </div>
+                                <p>{recipe?.notes}</p>
                             </div>
                         </div>
                     </div>

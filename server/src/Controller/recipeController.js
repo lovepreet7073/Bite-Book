@@ -172,7 +172,7 @@ const deleteRecipe = async (req, res) => {
 
 const updateRecipe = async (req, res) => {
     try {
-        const { title, cuisine, description, ingredients, directions, imageUrl, notes, cookTime, prepTime } = req.body;
+        const { title, cuisine, description, ingredients, directions, imageUrl, notes, cookTime, prepTime, } = req.body;
   console.log(req.body,"req.body;")
         // Access recipeId from params
         const recipeId = req.params.recipeId;

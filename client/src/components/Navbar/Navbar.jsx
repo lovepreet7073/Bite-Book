@@ -122,7 +122,7 @@ export default function Navbar() {
 
   const isAuthenticate = localStorage.getItem('jwt')
   return (
-    <Disclosure as="nav" className="  sticky top-0 z-50 py-3 backdrop-blur-lg  border-neutral-700/80 lg:px-8 border-b border-neutral-300">
+    <Disclosure as="nav" className="  sticky top-0 z-50 py-3 backdrop-blur-lg  border-neutral-300/80 lg:px-8 border-b border-neutral-300">
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative flex h-14 items-center justify-between">

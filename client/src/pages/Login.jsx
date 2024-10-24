@@ -1,35 +1,43 @@
-import React from "react";
-import { useState } from "react";
-import GoogleLoginComponent from "../components/GoogleLoginComponent";
+import { BiLeftArrowAlt } from "react-icons/bi";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field } from 'formik';
 import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import LoginSchema from "../components/Validations/LoginSchema";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/Auth/Actions";
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
 import revealElements from "../scrollReveal";
+import showCustomToast from "../components/ToastComponent";
+import GoogleLoginComponent from "../components/GoogleLoginComponent";
 const Login = () => {
     useEffect(() => {
         revealElements(); // Initialize ScrollReveal
     }, []);
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [showPassword, setShowPassword] = useState(false);
+    const [initialErrors, setInitialErrors] = useState({ email: '', password: '' });
+
     const handleSubmit = (values) => {
         const userData = {
             email: values.email,
             password: values.password,
         };
-        dispatch(login(userData, navigate));
+        dispatch(login(userData, navigate))
+            .then(() => {
+             showCustomToast('Login successfully', 'success');
+            });
     };
-    // Access Redux state for potential backend errors
+
     const auth = useSelector(state => state.auth);
 
-    const [initialErrors, setInitialErrors] = useState({ email: '', password: '' });
     useEffect(() => {
         if (auth?.error) {
-            console.log(auth?.error);  // Check the structure
+            console.log(auth?.error);
             const emailError = auth?.error?.error?.includes("User not found with email")
                 ? "User not found with this email"
                 : '';
@@ -40,10 +48,9 @@ const Login = () => {
         }
     }, [auth?.error]);
 
-
     return (
-        <div className="w-full h-screen flex items-center ">
-            <div className="relative hidden  w-1/2 h-full lg:flex flex-col sm:hidden lg:block right">
+        <div className="w-full h-screen flex items-center">
+            <div className="relative hidden w-1/2 h-full lg:flex flex-col sm:hidden lg:block right">
                 <img
                     src="https://st2.depositphotos.com/3889193/7173/i/450/depositphotos_71739083-stock-photo-healthy-vegetarian-home-made-food.jpg"
                     className="w-full h-full object-cover object-right"
@@ -51,15 +58,14 @@ const Login = () => {
                 />
             </div>
             <div className="left h-full bg-[#f5f5f5] flex flex-col lg:w-1/2 w-full px-[2rem] lg:px-[7rem] py-2 justify-around items-center">
+                <BiLeftArrowAlt className="absolute top-[8%] left-[2%] mb-[2%] cursor-pointer hover:text-primary" size={33} title="Back to Home" onClick={() => navigate('/')} />
                 <div className="w-full flex flex-col max-w-[500px]">
-                    <div className="w-full flex flex-col ">
-                <h1 className="w-full text-xl text-[#060606] font-semibold max-w-[500px] mx-auto mr-auto mb-4 mt-2">BiteBook</h1>
-
+                    <div className="w-full flex flex-col">
+                        <h1 className="w-full text-xl text-[#060606] font-semibold max-w-[500px] mx-auto mr-auto mb-4 mt-2">BiteBook</h1>
                         <h3 className="text-3xl font-semibold mb-2 mt-2">Login</h3>
                         <p className="text-sm mb-2">Welcome Back! Please enter your details</p>
                     </div>
 
-                    {/* Formik Form */}
                     <Formik
                         initialValues={{ email: '', password: '' }}
                         validationSchema={LoginSchema}
@@ -92,9 +98,20 @@ const Login = () => {
                                     as={TextField}
                                     id="standard-password-input"
                                     label="Password"
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     name="password"
                                     variant="standard"
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                {showPassword ? (
+                                                    <VisibilityOff onClick={() => setShowPassword(false)} style={{ cursor: 'pointer' }} />
+                                                ) : (
+                                                    <Visibility onClick={() => setShowPassword(true)} style={{ cursor: 'pointer' }} />
+                                                )}
+                                            </InputAdornment>
+                                        ),
+                                    }}
                                     sx={{
                                         width: '100%',
                                         marginBottom: '16px',
@@ -130,10 +147,9 @@ const Login = () => {
 
                     <div className="mt-2">
                         <GoogleLoginComponent />
-
                     </div>
-
                 </div>
+
                 <div className="w-full flex items-center justify-center">
                     <p className="text-sm font-normal text-[#060606] mt-0">
                         Create an account?{" "}

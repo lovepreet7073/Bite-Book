@@ -60,15 +60,22 @@ const SearchBar = () => {
               onClick={() => handleSuggestionClick(suggestion)}
             >
               {/* Recipe Image */}
-              {suggestion.imageUrl ? (
+              {Array.isArray(suggestion.imageUrl) && suggestion.imageUrl.length > 0 ? (
                 <img
-                  src={`${API_BASE_URL}/images/${suggestion.imageUrl}`}
+                  src={`${API_BASE_URL}/images/${suggestion.imageUrl[0]}`} // Display the first image from the array
+                  alt={suggestion.title}
+                  className="w-12 h-12 object-cover rounded-md mr-2"
+                />
+              ) : suggestion.imageUrl ? (
+                <img
+                  src={`${API_BASE_URL}/images/${suggestion.imageUrl}`} // Handle single image case
                   alt={suggestion.title}
                   className="w-12 h-12 object-cover rounded-md mr-2"
                 />
               ) : (
-                <div className="w-12 h-12 bg-gray-200 rounded-md mr-2"></div>
+                <div className="w-12 h-12 bg-gray-200 rounded-md mr-2"></div> // Fallback if no image
               )}
+
 
               <div className="flex-1">
                 {/* Recipe Title */}

@@ -23,7 +23,7 @@ const UserProfile = () => {
     if (activeSection === 'myRecipes' && userId) {
       dispatch(userRecipes(userId, token));
     }
-  }, [activeSection, userId, dispatch, recipe.deletedrecipe]);
+  }, [activeSection, userId, dispatch]);
 
   useEffect(() => {
     if (auth.user) {
@@ -57,7 +57,7 @@ const UserProfile = () => {
 
 
   return (
-    <Container maxWidth="lg" className="py-10">
+    <Container maxWidth="lg" className="py-10 ">
       <Grid container spacing={6}>
         {/* Sidebar */}
         <Grid item xs={12} sm={3}>

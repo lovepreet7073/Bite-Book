@@ -48,7 +48,7 @@ export const recipeReducer = (state = initialState, action) => {
         case UPDATE_RECIPE_SUCCESS:
             return {
                 ...state,
-                updatedRecipe:action.payload,
+                updatedRecipe: action.payload,
                 loading: false,
             }
         case ADD_RECIPE_FAILURE:
@@ -57,7 +57,7 @@ export const recipeReducer = (state = initialState, action) => {
         case USER_RECIPES_FAILURE:
         case RECIPE_LIKE_FAILURE:
         case DELETE_RECIPE_FAILURE:
-        case UPDATE_RECIPE_FAILURE:    
+        case UPDATE_RECIPE_FAILURE:
             return { ...state, isLoading: false, error: action.payload }
 
 

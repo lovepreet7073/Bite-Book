@@ -73,16 +73,26 @@ const AddRecipeForm = () => {
             if (key === 'imageUrl') {
                 values[key].forEach((file) => formData.append('imageUrl', file));
             } else if (typeof values[key] === 'object' && values[key] !== null) {
-
                 formData.append(key, JSON.stringify(values[key]));
             } else {
                 formData.append(key, values[key]);
             }
         });
-        dispatch(addRecipe(formData,navigate))
-        showCustomToast('Recipe added successfully!', 'success');
-   
+
+        dispatch(addRecipe(formData, navigate))
+            .then((response) => {
+                if (response && !response.error) {
+                    showCustomToast('Recipe added successfully', 'success');
+                    navigate('/'); // Navigate to the home page on success
+                } else {
+                    // showCustomToast('Failed to add the recipe', 'error');
+                }
+            })
+            .catch((error) => {
+                showCustomToast('An error occurred', 'error');
+            });
     };
+
 
 
     const dispatch = useDispatch();

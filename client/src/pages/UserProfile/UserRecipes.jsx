@@ -5,14 +5,17 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import showCustomToast from '../../components/ToastComponent';
-import { DeleteRecipe } from '../../redux/Recipe/Actions';
+import { DeleteRecipe, userRecipes } from '../../redux/Recipe/Actions';
 import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 const UserRecipes = () => {
     const navigate = useNavigate();
-    const { recipe } = useSelector(store => store)
+    const { recipe, auth } = useSelector(store => store)
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedRecipeId, setSelectedRecipeId] = useState(null);
     const dispatch = useDispatch();
+    const token = localStorage.getItem('jwt');
+    const userId = auth?.user?._id;
     const handleDeleteClick = (event, recipeId) => {
 
         console.log(event, recipeId)
@@ -20,22 +23,22 @@ const UserRecipes = () => {
         setSelectedRecipeId(recipeId); // Store the recipe ID to be deleted
         setOpenDialog(true); // Open the confirmation dialog
     };
-    const handleConfirmDelete = async () => {
-        try {
-            // Dispatch delete recipe action
-            await dispatch(DeleteRecipe(selectedRecipeId));
+    const handleConfirmDelete = () => {
+        dispatch(DeleteRecipe(selectedRecipeId))
 
-            // Show success toast
-            showCustomToast('Recipe deleted successfully');
-        } catch (error) {
-            showCustomToast('Failed to delete recipe', 'error');
-        } finally {
-            // Close the dialog
-            setOpenDialog(false);
-        }
+        dispatch(userRecipes(userId, token))
+            .then(() => {
+                showCustomToast('Recipe deleted successfully', 'success');
+                setOpenDialog(false);
+            })
+
     };
 
-    // Handle dialog close without deleting
+    // useEffect(() => {
+
+
+    // }, [userId, dispatch, recipe.deletedrecipe]);
+
     const handleCancelDelete = () => {
         setOpenDialog(false); // Close the dialog without deleting
     };
@@ -80,29 +83,57 @@ const UserRecipes = () => {
                                 onClick={() => navigate(`/user/recipe/${recipe._id}`)}
                             >
                                 <div className="mb-4 flex flex-col gap-2">
-                                    {/* Recipe Image with blur effect */}
-                                    {recipe.imageUrl && (
+                                    {Array.isArray(recipe.imageUrl) && recipe.imageUrl.length > 0 ? (
                                         <div className="h-[13rem] group">
                                             <img
                                                 className="h-full imghover w-full object-cover object-top transition duration-300 group-hover:blur-sm"
-                                                src={`${API_BASE_URL}/images/${recipe.imageUrl}`}
+                                                src={`${API_BASE_URL}/images/${recipe.imageUrl[0]}`} // Use the first image from the array
                                                 alt={recipe.title}
                                             />
                                             {/* Overlay for buttons */}
                                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-40 h-full">
                                                 <div className="flex gap-2">
-                                                    <Button variant='outlined' onClick={(event) => handleEdit(event, recipe)}  sx={{
+                                                    <Button variant='outlined' onClick={(event) => handleEdit(event, recipe)} sx={{
                                                         border: "1px solid #E55A12",
                                                         padding: '4px',
                                                         fontSize: '12px',
-
                                                         color: "#E55A12",
                                                         '&:hover': {
                                                             bgcolor: '#E55A12',
                                                             color: 'white',
                                                         },
-                                                    }}
-                                                    >Edit</Button>
+                                                    }}>Edit</Button>
+                                                    <Button variant='contained' onClick={(event) => handleDeleteClick(event, recipe._id)} sx={{
+                                                        bgcolor: '#FF6216',
+                                                        padding: '4px',
+                                                        fontSize: '12px',
+                                                        '&:hover': {
+                                                            bgcolor: '#E55A12',
+                                                        },
+                                                    }}>Delete</Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : recipe.imageUrl && (
+                                        <div className="h-[13rem] group">
+                                            <img
+                                                className="h-full imghover w-full object-cover object-top transition duration-300 group-hover:blur-sm"
+                                                src={`${API_BASE_URL}/images/${recipe.imageUrl}`} // Use the single image string
+                                                alt={recipe.title}
+                                            />
+                                            {/* Overlay for buttons */}
+                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-40 h-full">
+                                                <div className="flex gap-2">
+                                                    <Button variant='outlined' onClick={(event) => handleEdit(event, recipe)} sx={{
+                                                        border: "1px solid #E55A12",
+                                                        padding: '4px',
+                                                        fontSize: '12px',
+                                                        color: "#E55A12",
+                                                        '&:hover': {
+                                                            bgcolor: '#E55A12',
+                                                            color: 'white',
+                                                        },
+                                                    }}>Edit</Button>
                                                     <Button variant='contained' onClick={(event) => handleDeleteClick(event, recipe._id)} sx={{
                                                         bgcolor: '#FF6216',
                                                         padding: '4px',

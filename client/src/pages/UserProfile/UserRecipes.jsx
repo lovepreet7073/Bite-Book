@@ -150,7 +150,7 @@ const UserRecipes = () => {
                                     {/* Recipe Title and Cuisine */}
                                     <div className="px-1 bg-white ">
                                         <h5
-                                            className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white"
+                                            className="mb-2 text-xl font-bold tracking-tight text-gray-900"
                                             style={{ transition: 'underline 0.3s ease' }}
                                         >
                                             {recipe.title}

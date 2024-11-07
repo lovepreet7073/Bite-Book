@@ -14,12 +14,13 @@ import {
 } from './ActionType'
 import axios from 'axios'
 import { api } from '../../config/apiUrl';
+
+
 export const register = (userData,navigate) => async (dispatch) => {
     dispatch({ type: REGISTER_REQUEST })
     console.log('inside')
     try {
         const res = await axios.post(`${API_BASE_URL}/auth/register`, userData)
-        console.log(res, "res")
         const user = res?.data;
         if (user.jwt) {
             localStorage.setItem("jwt", user.jwt)
@@ -98,12 +99,9 @@ export const googlelogin = (userData, navigate) => async (dispatch) => {
     try {
         const res = await axios.post(`${API_BASE_URL}/auth/google-login`, userData);
         const user = res.data;
-        console.log(res, "res-redux")
         if (user.token) {
             localStorage.setItem("jwt", user.token);
         }
-
-        // Dispatch login success with JWT
         dispatch({
             type: GOOGLE_LOGIN_SUCCESS,
             payload: user.token,
@@ -111,10 +109,9 @@ export const googlelogin = (userData, navigate) => async (dispatch) => {
 
         navigate('/')
     } catch (error) {
-        // Dispatch failure action
         dispatch({
             type: GOOGLE_LOGIN_FAILURE,
-            payload: error.response ? error.response.data : error.message,
+            payload:error.message,
         });
 
 

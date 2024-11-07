@@ -23,7 +23,7 @@ const UserProfile = () => {
     if (activeSection === 'myRecipes' && userId) {
       dispatch(userRecipes(userId, token));
     }
-  }, [activeSection, userId, dispatch]);
+  }, [activeSection, userId, dispatch,recipe.deletedRecipe]);
 
   useEffect(() => {
     if (auth.user) {
@@ -128,6 +128,7 @@ const UserProfile = () => {
                   </Typography>
 
                   <TextField
+                  required
                     fullWidth
                     name="fullName"
                     variant="outlined"

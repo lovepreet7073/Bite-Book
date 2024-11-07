@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const reviewSchema = require('./RatingModel')
 const recipeSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -39,12 +39,12 @@ const recipeSchema = new mongoose.Schema({
     prepTime: {
         time: {
             type: Number,
-            required: true,
+            // required: true,
         },
         unit: {
             type: String,
             enum: ['mins', 'hours', 'days'],
-            required: true,
+            // required: true,
         }
     },
     cookTime: {
@@ -64,8 +64,9 @@ const recipeSchema = new mongoose.Schema({
     },
     imageUrl: {
         type: [String],
-        default: '',
+        default: [], // Set default to empty array
     },
+    reviews: [reviewSchema],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Recipe', recipeSchema);

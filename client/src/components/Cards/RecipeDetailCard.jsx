@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { findRecipeById } from '../../redux/Recipe/Actions';
-import { API_BASE_URL } from '../../config/apiUrl';
 import moment from 'moment';
 import revealElements from '../../scrollReveal';
 import Carousel from '../Carousel'; // Import your Carousel component
-
+import RecipeRatingReview from './Rating';
+import Reviews from './Reviews';
 const RecipeDetailCard = () => {
     const params = useParams();
     const dispatch = useDispatch();
@@ -26,11 +26,15 @@ const RecipeDetailCard = () => {
 
     return (
         <div className="bg-white lg:px-20">
+            
             <div className="pt-6">
                 <section className='grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 px-4 pt-10'>
                     <div className=" rounded-lg max-w-[430rem] max-h-[89rem]">
                         {/* Carousel for Recipe Images */}
-                        <Carousel data={recipe?.recipe?.imageUrl || []} /> {/* Use your images array */}
+                        <Carousel data={recipe?.recipe?.imageUrl || []} className='mb-3' /> {/* Use your images array */}
+                        <Reviews
+                           userReviews={recipe?.recipe?.reviews} 
+                         />
                     </div>
 
                     <div className="lg:col-span-1 max-auto right max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-7xl lg:px-8 lg:pb-24">
@@ -92,6 +96,14 @@ const RecipeDetailCard = () => {
                             </div>
                         </div>
                     </div>
+
+                </section>
+                <section className="mt-1 px-4 lg:px-20 mb-20">
+                    <RecipeRatingReview 
+                        recipeId={params?.recipeId} 
+                     
+                        // onSubmitReview={handleSubmitReview} 
+                    />
                 </section>
             </div>
         </div>

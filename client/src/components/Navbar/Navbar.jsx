@@ -5,6 +5,7 @@ import {
 } from "@headlessui/react";
 import DropdownMenu from "./Dropdown";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import logo from '../../assets/2.png'
 import { useEffect } from "react";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
@@ -61,7 +62,21 @@ export default function Navbar() {
   const [selectedIngredient, setSelectedIngredient] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("");
 
+  const [openLogoutDialog, setOpenLogoutDialog] = useState(false); // State for controlling dialog visibility
 
+  const handleLogout = () => {
+    setOpenLogoutDialog(true); // Open the confirmation dialog
+  };
+
+  const confirmLogout = () => {
+    dispatch(logout());
+    navigate('/'); // After logging out, navigate to the home page
+    setOpenLogoutDialog(false); // Close the dialog
+  };
+
+  const cancelLogout = () => {
+    setOpenLogoutDialog(false); // Close the dialog without logging out
+  };
   const handleFilterChange = (filterType, value) => {
     if (filterType === "ingredients") {
       setSelectedIngredient(value);
@@ -107,10 +122,7 @@ export default function Navbar() {
   const handleRegisterBtn = () => {
     navigate('/auth/register')
   }
-  const handleLogout = () => {
-    dispatch(logout())
-    navigate('/')
-  }
+
   const jwt = localStorage.getItem('jwt')
   useEffect(() => {
     if (jwt) {
@@ -118,7 +130,12 @@ export default function Navbar() {
     }
   }, [jwt, auth.jwt])
 
-
+  // Updated navigation with conditional navigation for Home
+  const handleNavigation = (itemId) => {
+    if (itemId === "Home" && location.pathname !== "/") {
+      navigate("/");
+    }
+  };
 
   const isAuthenticate = localStorage.getItem('jwt')
   return (
@@ -156,20 +173,23 @@ export default function Navbar() {
                       key={item.name}
                       title={item.name}
                       items={item.dropdownItems}
-                      filterType={item.name.toLowerCase()} // Pass either 'ingredients' or 'cuisines'
-                      onFilterChange={handleFilterChange}  // Passing filter type (ingredients/cuisines)
+                      filterType={item.name.toLowerCase()}
+                      onFilterChange={handleFilterChange}
                     />
                   ) : (
                     <div
+                      onClick={() => handleNavigation(item.id)}
                       key={item.name}
                       href={item.href}
                       aria-current={item.current ? "page" : undefined}
+
                       className={classNames(
                         item.current
-                          ? "text-[#FF6216] border-b-[#FF6216] border-b-2"
-                          : "text-gray-300 hover:text-[#FF6216] hover:border-b-[#FF6216] hover:border-b-2",
+                          ? "text-[#FF6216] border-b-[#FF6216] border-b-2 cursor-pointer"
+                          : "text-gray-300 hover:text-[#FF6216] hover:border-b-[#FF6216] hover:border-b-2 cursor-pointer",
                         " px-3 py-2 text-md font-medium"
                       )}
+
                     >
                       {item.name}
                     </div>
@@ -296,6 +316,34 @@ export default function Navbar() {
 
 
       </DisclosurePanel>
+      <Dialog
+        open={openLogoutDialog}
+        onClose={cancelLogout}
+        aria-labelledby="logout-dialog-title"
+        aria-describedby="logout-dialog-description"
+   
+      >
+        <DialogTitle id="logout-dialog-title">Logout Confirmation</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="logout-dialog-description">
+            Are you sure you want to log out?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button sx={{
+            "&:hover": {
+              borderBottomColor: "#E55A12", // Change to secondary color from Tailwind config on hover
+            },
+          }} onClick={cancelLogout} >Cancel</Button>
+          <Button onClick={confirmLogout} variant="contained" sx={{
+                      bgcolor: "#FF6216", // Use the primary color from Tailwind config
+                      "&:hover": {
+                        bgcolor: "#E55A12", // Change to secondary color from Tailwind config on hover
+                      },
+                    }}>Confirm</Button>
+        </DialogActions>
+      </Dialog>
+
     </Disclosure>
   );
 }

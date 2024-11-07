@@ -3,8 +3,7 @@ import { useSelector } from 'react-redux'
 import RecipeReviewCard from '../Cards/RecipeCard'
 const RecipeMain = () => {
   const {recipe}  =useSelector(store=>store)
-console.log(recipe.allRecipes,"AllRceipes")
-  
+  console.log(recipe.allRecipes,"recipe.allrecupes")
   return (
     <div className='flex flex-col justify-center items-center px-10 py-6 lg:mb-[10%]'>
       <section>

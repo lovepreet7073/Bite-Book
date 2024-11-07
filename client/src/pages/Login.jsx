@@ -16,7 +16,7 @@ const Login = () => {
     useEffect(() => {
         revealElements(); // Initialize ScrollReveal
     }, []);
-
+    const auth = useSelector(state => state.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [showPassword, setShowPassword] = useState(false);
@@ -27,17 +27,16 @@ const Login = () => {
             email: values.email,
             password: values.password,
         };
+
         dispatch(login(userData, navigate))
             .then(() => {
              showCustomToast('Login successfully', 'success');
             });
     };
 
-    const auth = useSelector(state => state.auth);
 
     useEffect(() => {
         if (auth?.error) {
-            console.log(auth?.error);
             const emailError = auth?.error?.error?.includes("User not found with email")
                 ? "User not found with this email"
                 : '';
@@ -50,7 +49,7 @@ const Login = () => {
 
     return (
         <div className="w-full h-screen flex items-center">
-            <div className="relative hidden w-1/2 h-full lg:flex flex-col sm:hidden lg:block right">
+            <div className="relative hidden w-1/2 h-full  flex-col sm:hidden lg:block right">
                 <img
                     src="https://st2.depositphotos.com/3889193/7173/i/450/depositphotos_71739083-stock-photo-healthy-vegetarian-home-made-food.jpg"
                     className="w-full h-full object-cover object-right"

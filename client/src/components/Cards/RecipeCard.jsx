@@ -8,9 +8,11 @@ import './recipe.css';
 import revealElements from '../../scrollReveal';
 import { likeRecipe } from '../../redux/Recipe/Actions';
 import showCustomToast from '../../components/ToastComponent'; // Import your custom toast function
-
+import Rating from '@mui/material/Rating';
 export default function RecipeReviewCard({ recipe }) {
+    console.log(recipe, "recipe")
     const [isLiked, setIsLiked] = useState(false);
+    const [value, setValue] = React.useState(2);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { auth } = useSelector((store) => store);
@@ -60,7 +62,7 @@ export default function RecipeReviewCard({ recipe }) {
                     <h3 className='font-bold text-xs text-neutral-400 tracking-wider mt-1'>
                         {recipe.cuisine.toUpperCase()}
                     </h3>
-                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ">
                         {recipe.title}
                     </h5>
                 </div>
@@ -80,8 +82,13 @@ export default function RecipeReviewCard({ recipe }) {
 
                 {/* Recipe Rating */}
                 <div disableSpacing className='p-0 flex items-center gap-1'>
-                    <BasicRating />
-                    <p className='text-sm text-slate-500'>{recipe.ratings || 'No ratings yet'}</p>
+                    <Rating name="disabled" value={value} disabled />
+                    <p className='text-sm text-slate-500'>
+                        {recipe?.reviews?.length
+                            ? `${recipe.reviews.length} ${recipe.reviews.length === 1 ? 'rating' : 'ratings'}`
+                            : 'No ratings yet'}
+                    </p>
+
                 </div>
             </div>
         </div>

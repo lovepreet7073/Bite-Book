@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Navbar from './components/Navbar/Navbar';
 import AuthRoutes from './routes/AuthRoutes';  // Assuming this will have Auth-related routes
 import CustomRoutes from './routes/CustomRoutes';
+import NotFound from './pages/NotFound';
 function App() {
   const location = useLocation();  // Get the current route
 
@@ -25,7 +26,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/auth/*" element={<AuthRoutes />} />
           <Route path="/user/*" element={<CustomRoutes />} />
-          
+          <Route path="*" element={<NotFound />}/>
         </Routes>
       </div>
 

@@ -21,25 +21,29 @@ const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { auth } = useSelector(store => store);
-  
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const emailError = auth?.error && auth?.error?.error && auth?.error?.error?.includes("User already exists")
+  const emailError =  auth?.error?.error?.includes("User already exists")
     ? "User already exists"
     : null;
 
+  
   const handleSubmit = (values) => {
     dispatch(register(values, navigate))
       .then(() => {
-        showCustomToast('Register successfully', 'success');
+        if (auth?.error?.error) {
+          showCustomToast('Registration failed', 'error');
+        } else {
+          showCustomToast('You are all set! Thanks for joining us!', 'success');
+        }
       })
     
   };
 
   return (
     <div className="w-full h-screen flex items-center ">
-      <div className="relative hidden w-1/2 h-full lg:flex flex-col sm:hidden lg:block right">
+      <div className="relative hidden w-1/2 h-full  flex-col sm:hidden lg:block right">
         <img
           src="https://st2.depositphotos.com/3889193/7173/i/450/depositphotos_71739083-stock-photo-healthy-vegetarian-home-made-food.jpg"
           className="w-full h-full object-cover object-right "

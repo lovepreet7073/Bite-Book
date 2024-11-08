@@ -161,8 +161,9 @@ export default function Navbar() {
               <img
                 alt="Your Company"
                 src={logo}
-                className="lg:block h-[45px] w-[45px] object-cover object-top hidden"
+                className="lg:block h-[45px] w-[45px] object-cover object-top hidden cursor-pointer"
                 title="Bite Book"
+                onClick={()=>navigate('/')}
               />
             </div>
             <div className="hidden sm:ml-6 sm:block">

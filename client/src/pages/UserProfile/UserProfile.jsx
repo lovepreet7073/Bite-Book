@@ -6,6 +6,11 @@ import { updateUser } from '../../redux/Auth/Actions';
 import showCustomToast from '../../components/ToastComponent';
 import UserRecipes from './UserRecipes';
 import { userRecipes } from '../../redux/Recipe/Actions';
+import SavedRecipes from './SavedRecipes';
+import { MdLock } from "react-icons/md";
+import { FcLike } from "react-icons/fc";
+import { BsFillInfoCircleFill } from "react-icons/bs";
+import { BiSolidFoodMenu } from "react-icons/bi";
 const UserProfile = () => {
   const { auth, recipe } = useSelector((store) => store);
   const [userData, setUserData] = useState({
@@ -23,7 +28,7 @@ const UserProfile = () => {
     if (activeSection === 'myRecipes' && userId) {
       dispatch(userRecipes(userId, token));
     }
-  }, [activeSection, userId, dispatch,recipe.deletedRecipe]);
+  }, [activeSection, userId, dispatch, recipe.deletedRecipe]);
 
   useEffect(() => {
     if (auth.user) {
@@ -68,18 +73,24 @@ const UserProfile = () => {
             </div>
             {/* Buttons to toggle sections */}
             <button
-              className={`w-full text-left p-3 hover:bg-slate-200 ${activeSection === 'personalInfo' ? 'border-l-primary border-l-4' : 'border-l-0'
+              className={`w-full gap-2 flex items-center  text-left p-3 hover:bg-slate-200 ${activeSection === 'personalInfo' ? 'border-l-primary border-l-4 text-primary' : 'border-l-0'
                 }`}
               onClick={() => setActiveSection('personalInfo')}
             >
-              Personal Info
+           <span><BsFillInfoCircleFill/></span>   Personal Info
             </button>
             <button
-              className={`w-full text-left p-3 hover:bg-slate-200 ${activeSection === 'myRecipes' ? 'border-l-primary border-l-4' : 'border-l-0'
+              className={`w-full gap-2 flex items-center text-left p-3 hover:bg-slate-200 ${activeSection === 'myRecipes' ? 'border-l-primary border-l-4   text-primary' : 'border-l-0'
                 }`}
               onClick={() => setActiveSection('myRecipes')}
             >
-              My Recipes
+             <span><BiSolidFoodMenu className=''/></span> My Recipes
+            </button>
+            <button
+              className={`w-full text-left p-3 gap-2 flex items-center hover:bg-slate-200 ${activeSection === 'savedRecipes' ? 'border-l-primary border-l-4 text-primary' : 'border-l-0'}`}
+              onClick={() => setActiveSection('savedRecipes')}
+            >
+             <span><FcLike/></span> Saved Recipes & Collections
             </button>
           </Paper>
         </Grid>
@@ -109,8 +120,11 @@ const UserProfile = () => {
                   </Button>
                 </div>
 
-                <Typography variant="body1" paragraph sx={{ marginTop: '13px' }}>
+                <Typography variant="body1" paragraph sx={{ marginTop: '13px',}}>
                   These details will be used for all the Meredith profiles associated with your email address...
+                </Typography>
+                <Typography variant='body2' sx={{ opacity: 0.5 ,display:'flex' ,alignItems:"center"}}>
+                <span><MdLock size={20}/></span>  Only you can see the information on this page. It will not be displayed for other users to see.
                 </Typography>
 
                 <form id="user-form" onSubmit={handleSave}>
@@ -128,7 +142,7 @@ const UserProfile = () => {
                   </Typography>
 
                   <TextField
-                  required
+                    required
                     fullWidth
                     name="fullName"
                     variant="outlined"
@@ -138,8 +152,10 @@ const UserProfile = () => {
                   />
                 </form>
               </>
-            ) : (
+            ) : activeSection === 'myRecipes' ? (
               <UserRecipes />
+            ) : (
+              <SavedRecipes />
             )}
           </Paper>
         </Grid>

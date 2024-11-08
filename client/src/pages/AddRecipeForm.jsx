@@ -13,6 +13,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import recipeValidationSchema from '../components/Validations/RecipeSchema'
 import { Formik, Field, Form, FieldArray, ErrorMessage } from "formik";
 import { RiMenuAddFill } from "react-icons/ri";
 import AddIcon from "@mui/icons-material/Add";
@@ -60,22 +61,23 @@ const AddRecipeForm = () => {
 
   // Update the initial values to reflect the passed recipe data
   const initialValues = {
-    title: recipe?.title || "",
-    cuisine: recipe?.cuisine || "Italian",
-    description: recipe?.description || "",
-    ingredients: recipe?.ingredients || [""],
-    directions: recipe?.directions || [""],
-    imageUrl: recipe?.imageUrl || [],
-    notes: recipe?.notes || "",
+    title: '',
+    description: '',
+    imageUrl: [], // Array for image URLs
+    cuisine: '',
+    ingredients: [], // List of ingredients
+    directions: [], // List of steps for directions
+    notes: '',
     cookTime: {
-      time: recipe?.cookTime?.time || 0,
-      unit: recipe?.cookTime?.unit || "mins",
+      time: 0,  // Time in minutes (you could adjust if necessary)
+      unit: "mins", // Could be "hours" or "mins"
     },
     prepTime: {
-      time: recipe?.prepTime?.time ||0,
-      unit: recipe?.prepTime?.unit || "mins",
+      time: 0,  // Time in minutes (you could adjust if necessary)
+      unit: "mins", // Could be "hours" or "mins"
     },
   };
+
 
   const handleSubmit = (values) => {
     console.log(values, "vaues-add")
@@ -116,8 +118,8 @@ const AddRecipeForm = () => {
 
         <RiMenuAddFill size={20} />
       </div>
-      <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-        {({ values, handleChange, handleBlur, setFieldValue }) => (
+      <Formik initialValues={initialValues} validationSchema={recipeValidationSchema} onSubmit={handleSubmit}>
+        {({ values, handleChange, handleBlur, setFieldValue, errors, touched, }) => (
           <Form>
             <Grid container spacing={2}>
               {/* Title */}
@@ -132,20 +134,24 @@ const AddRecipeForm = () => {
                     value={values.title}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    required
+                    error={touched.title && Boolean(errors.title)} // Set error to true if the field is touched and there's an error
+                    helperText={touched.title && errors.title} // Display the error message if the field is touched
                   />
+
                   <TextField
                     id="outlined-multiline-flexible"
                     label="Recipe description"
                     multiline
                     fullWidth
-                    required
                     maxRows={4}
                     name="description"
                     value={values.description}
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    error={touched.description && Boolean(errors.description)} // Set error to true if the field is touched and there's an error
+                    helperText={touched.description && errors.description} // Display the error message if the field is touched
                   />
+
                 </div>
               </Grid>
 
@@ -153,6 +159,8 @@ const AddRecipeForm = () => {
                 <MultipleImageUploadField
                   values={values}
                   setFieldValue={setFieldValue}
+                  error={errors.imageUrl}           // Pass the error for the imageUrl field
+                  touched={touched.imageUrl}
                 />
               </Grid>
               {/* Ingredients FieldArray */}
@@ -184,11 +192,22 @@ const AddRecipeForm = () => {
                               value={ingredient}
                               onChange={handleChange}
                               onBlur={handleBlur}
-                              sx={{ marginTop: 1 }}
+                              error={
+                                touched.ingredients &&
+                                touched.ingredients[index] &&
+                                Boolean(errors.ingredients && errors.ingredients[index])
+                              } // Sets error if the field is touched and there's an error for that index
                               helperText={
-                                <ErrorMessage name={`ingredients[${index}]`} />
-                              }
+                                touched.ingredients &&
+                                  touched.ingredients[index] &&
+                                  errors.ingredients &&
+                                  errors.ingredients[index] ? (
+                                  errors.ingredients[index]
+                                ) : null
+                              } // Displays the error message if it exists for that index
+                              sx={{ marginTop: 1 }}
                             />
+
                           </Grid>
                           <Grid item xs={1}>
                             <IconButton
@@ -242,7 +261,6 @@ const AddRecipeForm = () => {
                           <Grid item xs={11}>
                             <Field
                               as={TextField}
-                              required
                               fullWidth
                               name={`directions[${index}]`}
                               label={`Direction ${index + 1}`}
@@ -250,11 +268,24 @@ const AddRecipeForm = () => {
                               value={direction}
                               onChange={handleChange}
                               onBlur={handleBlur}
-                              sx={{ marginTop: 1 }}
+                              error={
+                                touched.directions &&
+                                touched.directions[index] &&
+                                Boolean(errors.directions && errors.directions[index])
+                              } // Sets error if the specific field is touched and there's an error for that index
                               helperText={
-                                <ErrorMessage name={`directions[${index}]`} />
-                              }
+                                touched.directions &&
+                                  touched.directions[index] &&
+                                  errors.directions &&
+                                  errors.directions[index] ? (
+                                  errors.directions[index]
+                                ) : (
+                                  <ErrorMessage name={`directions[${index}]`} />
+                                )
+                              } // Displays the error message if it exists for that index
+                              sx={{ marginTop: 1 }}
                             />
+
                           </Grid>
                           <Grid item xs={1}>
                             <IconButton
@@ -302,13 +333,18 @@ const AddRecipeForm = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     required
+                    error={touched.prepTime?.time && Boolean(errors.prepTime?.time)} // Set error if touched and there's an error
+                    helperText={touched.prepTime?.time && errors.prepTime?.time} // Display error message if any
                   />
                   <TextField
                     select
                     name="prepTime.unit"
                     value={values.prepTime.unit}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     sx={{ width: 100 }}
+                    error={touched.prepTime?.unit && Boolean(errors.prepTime?.unit)} // Error handling for the unit
+                    helperText={touched.prepTime?.unit && errors.prepTime?.unit} // Display error message if any
                   >
                     <MenuItem value="mins">mins</MenuItem>
                     <MenuItem value="hours">hours</MenuItem>
@@ -334,14 +370,19 @@ const AddRecipeForm = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     defaultValue={0}
+                    error={touched.cookTime?.time && Boolean(errors.cookTime?.time)} // Set error if touched and there's an error
+                    helperText={touched.cookTime?.time && errors.cookTime?.time} // Display error message if any
                   />
                   <TextField
                     name="cookTime.unit"
                     select
                     value={values.cookTime.unit}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     defaultValue="mins"
                     sx={{ width: 100 }}
+                    error={touched.cookTime?.unit && Boolean(errors.cookTime?.unit)} // Error handling for the unit
+                    helperText={touched.cookTime?.unit && errors.cookTime?.unit} // Display error message if any
                   >
                     <MenuItem value="mins">mins</MenuItem>
                     <MenuItem value="hours">hours</MenuItem>
@@ -349,6 +390,7 @@ const AddRecipeForm = () => {
                   </TextField>
                 </div>
               </Grid>
+
 
               <hr className="w-full py-2 mt-5 mb-2" />
               <Grid item xs={12} sm={6}>

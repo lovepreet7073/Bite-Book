@@ -21,7 +21,6 @@ const Login = () => {
     const dispatch = useDispatch();
     const [showPassword, setShowPassword] = useState(false);
     const [initialErrors, setInitialErrors] = useState({ email: '', password: '' });
-
     const handleSubmit = (values) => {
         const userData = {
             email: values.email,
@@ -30,9 +29,15 @@ const Login = () => {
 
         dispatch(login(userData, navigate))
             .then(() => {
-             showCustomToast('Login successfully', 'success');
+                // Only show success toast if login is successful
+                showCustomToast('Login successfully', 'success');
+            })
+            .catch((error) => {
+                // Show failure toast if there is an error
+                showCustomToast('Login failed! Please try again.', 'error');
             });
     };
+
 
 
     useEffect(() => {

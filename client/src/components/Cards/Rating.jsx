@@ -11,6 +11,7 @@ import {
 import moment from "moment";
 import { ReviewOnRecipe, findRecipeById } from "../../redux/Recipe/Actions";
 import VariantAvatars from "../Avatar";
+import showCustomToast from "../ToastComponent";
 
 const RecipeRatingReview = ({ recipeId, userReviews }) => {
   const dispatch = useDispatch();
@@ -25,6 +26,7 @@ const RecipeRatingReview = ({ recipeId, userReviews }) => {
 
   const handleSubmit = async () => {
     dispatch(ReviewOnRecipe(recipeId, rating, comment));
+    showCustomToast('Thanks for adding your feedback', 'success');
     setRating(0);
     setComment("");
     await dispatch(fetchRecipeById(recipeId));

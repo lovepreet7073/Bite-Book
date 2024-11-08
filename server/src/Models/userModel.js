@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    
+
     email: {
         type: String,
         required: true,
@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
         type: String,
 
     },
-
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
 
     createdAt: {
         type: Date,

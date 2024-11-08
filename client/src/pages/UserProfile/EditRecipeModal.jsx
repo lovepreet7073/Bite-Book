@@ -50,31 +50,28 @@ const EditRecipeForm = () => {
 
     const handleSubmit = (values, { setSubmitting }) => {
         const formData = new FormData();
-        // console.log(values.imageUrl,'mmmmmmm')
+
         Object.keys(values).forEach((key) => {
             if (key === "imageUrl") {
-                // values.imageUrl.forEach((image, index) => {
-                //     formData.append("imageUrl[]", image); // append each string with the same key
-                //   });
-                values[key].forEach((file) => formData.append("imageUrl", file));
+                values.imageUrl.forEach((file) => formData.append("imageUrl", file));
             } else if (key === "prepTime" || key === "cookTime") {
-                formData.append(`${key}.time`, values[key].time);
-                formData.append(`${key}.unit`, values[key].unit);
+                formData.append(key, JSON.stringify(values[key]));
             } else if (key === "ingredients" || key === "directions") {
-                values[key].forEach((item) => {
-                    formData.append(key, item); // Append each ingredient/direction as a separate formData entry
-                });
+                formData.append(key, JSON.stringify(values[key]));
             } else {
                 formData.append(key, values[key]);
             }
         });
 
-
-        // Dispatch the formData to your updateRecipe function
-        dispatch(UpdateRecipe(recipe._id, formData));
-        navigate('/')
-        showCustomToast("Updated successfully", "success");
-        setSubmitting(false);
+        dispatch(UpdateRecipe(recipe._id, formData))
+            .then(() => {
+                navigate('/');
+                showCustomToast("Updated successfully", "success");
+            })
+            .catch((error) => {
+                console.error("Error updating recipe:", error);
+            })
+            .finally(() => setSubmitting(false));
     };
 
 

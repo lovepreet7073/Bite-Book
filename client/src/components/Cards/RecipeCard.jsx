@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
-import BasicRating from './Rating';
+import { getUser } from '../../redux/Auth/Actions';
 import { API_BASE_URL } from '../../config/apiUrl';
 import { useNavigate } from 'react-router-dom';
 import './recipe.css';
@@ -10,13 +10,13 @@ import { likeRecipe } from '../../redux/Recipe/Actions';
 import showCustomToast from '../../components/ToastComponent'; // Import your custom toast function
 import Rating from '@mui/material/Rating';
 export default function RecipeReviewCard({ recipe }) {
-    console.log(recipe, "recipe")
     const [isLiked, setIsLiked] = useState(false);
     const [value, setValue] = React.useState(2);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { auth } = useSelector((store) => store);
     const token = localStorage.getItem('jwt');
+    console.log(auth, "auth")
 
     useEffect(() => {
         revealElements();
@@ -37,8 +37,11 @@ export default function RecipeReviewCard({ recipe }) {
         dispatch(likeRecipe(recipe?._id, auth?.user?._id));
 
         // Show custom toast notification with different icons
-        const message = newIsLiked ? 'You liked  this recipe!' : 'You unliked this recipe!';
+        const message = newIsLiked
+            ? 'Recipe added to favorites!'
+            : 'Recipe removed from favorites!';
         const type = newIsLiked ? 'success' : 'info'; // You can choose the type based on your preference
+
         showCustomToast(message, type);
     };
 

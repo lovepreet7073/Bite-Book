@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field } from "formik";
 import { useDispatch, useSelector } from 'react-redux';
 import RegisterSchema from "../components/Validations/RegisterSchema";
-import { register } from "../redux/Auth/Actions"; 
+import { register } from "../redux/Auth/Actions";
 import GoogleLoginComponent from "../components/GoogleLoginComponent";
 import revealElements from "../scrollReveal";
 import showCustomToast from "../components/ToastComponent";
@@ -15,7 +15,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { BiLeftArrowAlt } from "react-icons/bi";
 const Register = () => {
   useEffect(() => {
-    revealElements(); 
+    revealElements();
   }, []);
 
   const navigate = useNavigate();
@@ -24,22 +24,21 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const emailError =  auth?.error?.error?.includes("User already exists")
+  const emailError = auth?.error?.error?.includes("User already exists")
     ? "User already exists"
     : null;
 
+
+    const handleSubmit = async (values) => {
+      const isSuccess = await dispatch(register(values, navigate));
   
-  const handleSubmit = (values) => {
-    dispatch(register(values, navigate))
-      .then(() => {
-        if (auth?.error?.error) {
-          showCustomToast('Registration failed', 'error');
-        } else {
+      if (isSuccess) {
           showCustomToast('You are all set! Thanks for joining us!', 'success');
-        }
-      })
-    
+      } else {
+          showCustomToast(auth?.error?.error || "Registration failed", "error");
+      }
   };
+  
 
   return (
     <div className="w-full h-screen flex items-center ">
@@ -50,7 +49,7 @@ const Register = () => {
         />
       </div>
       <div className="h-full bg-[#f5f5f5] left flex flex-col lg:w-1/2 w-full px-[2rem] lg:px-[7rem] py-2 justify-around items-center">
-      <BiLeftArrowAlt className="absolute top-[7%] left-[2%] mb-[2%] cursor-pointer hover:text-primary" size={33} title="Back to Home" onClick={()=>navigate('/')}/>
+        <BiLeftArrowAlt className="absolute top-[7%] left-[2%] mb-[2%] cursor-pointer hover:text-primary" size={33} title="Back to Home" onClick={() => navigate('/')} />
         <div className="w-full flex flex-col max-w-[500px] mt-5">
           <div className="w-full flex flex-col mb-2">
             <h3 className="text-xl font-semibold mb-2">Sign Up and Share Your Recipes!</h3>

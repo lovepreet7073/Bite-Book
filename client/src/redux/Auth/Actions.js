@@ -16,28 +16,32 @@ import axios from 'axios'
 import { api } from '../../config/apiUrl';
 
 
-export const register = (userData,navigate) => async (dispatch) => {
-    dispatch({ type: REGISTER_REQUEST })
-    console.log('inside')
+// Action creator
+export const register = (userData, navigate) => async (dispatch) => {
+    dispatch({ type: REGISTER_REQUEST });
     try {
-        const res = await axios.post(`${API_BASE_URL}/auth/register`, userData)
+        const res = await axios.post(`${API_BASE_URL}/auth/register`, userData);
         const user = res?.data;
+
         if (user.jwt) {
-            localStorage.setItem("jwt", user.jwt)
+            localStorage.setItem("jwt", user.jwt);
         }
 
         dispatch({
             type: REGISTER_SUCCESS,
-            payload: user
-        })
-        navigate('/')
+            payload: user,
+        });
+        navigate('/');
+        return true; // Registration was successful
     } catch (error) {
         dispatch({
             type: REGISTER_FAILURE,
-            payload: error.response ? error.response.data : error.message
-        })
+            payload: error.response ? error.response.data : error.message,
+        });
+        return false; // Registration failed
     }
-}
+};
+
 
 
 export const login = (userData, navigate) => async (dispatch) => {
@@ -50,21 +54,26 @@ export const login = (userData, navigate) => async (dispatch) => {
             localStorage.setItem("jwt", user.jwt);
         }
 
-
         dispatch({
             type: LOGIN_SUCCESS,
             payload: user.jwt,
         });
-        navigate('/')
+        navigate('/');
 
+        // Return a resolved promise to indicate success
+        return Promise.resolve();
     } catch (error) {
-      console.log(error,"Error")
+        console.log(error, "Error");
         dispatch({
             type: LOGIN_FAILURE,
             payload: error.response ? error.response.data : error.message
         });
+
+        // Return a rejected promise to indicate failure
+        return Promise.reject();
     }
 };
+
 
 export const logout = () => (dispatch) => {
     dispatch({ type: LOGOUT, payload: null })
@@ -111,7 +120,7 @@ export const googlelogin = (userData, navigate) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: GOOGLE_LOGIN_FAILURE,
-            payload:error.message,
+            payload: error.message,
         });
 
 

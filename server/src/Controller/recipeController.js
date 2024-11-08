@@ -118,7 +118,6 @@ const userRecipes = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 const likeRecipe = async (req, res) => {
   try {
     const { recipeId, userId } = req.params;
@@ -131,27 +130,45 @@ const likeRecipe = async (req, res) => {
     }
 
     if (!user) {
-      return res.status(404).json({ message: "" });
-    }
-    const likedIndex = recipe.likedBy.indexOf(userId);
-    if (likedIndex !== -1) {
-      recipe.likedBy.splice(likedIndex, 1);
-      recipe.likes -= 1;
-    } else {
-      recipe.likedBy.push(userId);
-      recipe.likes += 1;
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const savedRecipe = await recipe.save();
-    await savedRecipe.populate("userId");
-    res.status(200).json(savedRecipe);
+    const likedIndex = recipe.likedBy.indexOf(userId);
+    let message;
+
+    if (likedIndex !== -1) {
+      // Remove the like
+      recipe.likedBy.splice(likedIndex, 1);
+      recipe.likes -= 1;
+
+      // Remove from user's favorites list
+      const favoriteIndex = user.favorites.indexOf(recipeId);
+      if (favoriteIndex !== -1) user.favorites.splice(favoriteIndex, 1);
+
+      message = "Recipe removed from favorites";
+    } else {
+      // Add the like
+      recipe.likedBy.push(userId);
+      recipe.likes += 1;
+
+      // Add to user's favorites list
+      user.favorites.push(recipeId);
+      message = "Recipe added to favorites";
+    }
+
+    await recipe.save();
+    await user.save();
+
+    // Populate favorites to include full recipe details
+    await user.populate("favorites")
+
+    res.status(200).json({ recipe, message, favorites: user.favorites });
   } catch (error) {
     console.error("Error liking recipe:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred while liking the recipe." });
+    res.status(500).json({ message: "An error occurred while liking the recipe." });
   }
 };
+
 
 const deleteRecipe = async (req, res) => {
   try {
@@ -187,52 +204,44 @@ const updateRecipe = async (req, res) => {
       description,
       ingredients,
       directions,
-      imageUrl,
       notes,
       cookTime,
       prepTime,
     } = req.body;
     const recipeId = req.params.recipeId;
-    console.log(imageUrl,"body")
-    let newImageUrls = [];
 
-    if (imageUrl) {
-      newImageUrls = imageUrl; // Map over the files to get their filenames
-    }
-    if (req.files && req.files.length > 0) {
-      newImageUrls = req.files.map((file) => file.filename); // Map over the files to get their filenames
-    }
- 
-    // const existingRecipe = await Recipe.findById(recipeId);
-    // if (!existingRecipe) {
-    //   return res.status(404).json({ message: "Recipe not found" });
-    // }
+    let newImageUrls = req.body.imageUrl ? JSON.parse(req.body.imageUrl) : [];
+    let newImages = req.files ? req.files.map((file) => file.filename) : [];
 
-    // If there are new images, append them to the existing imageUrl array
-    // const updatedImageUrls = [...existingRecipe.imageUrl, ...newImageUrls];
+    const updatedImageUrls = [...newImages, ...newImageUrls];
+    console.log(updatedImageUrls, " req.files")
 
-    // Update the recipe with the new fields, including the updated imageUrl array
     const updatedRecipe = await Recipe.findByIdAndUpdate(
-      recipeId, // Use the recipeId from params
+      recipeId,
       {
         title,
         cuisine,
         description,
-        ingredients,
-        directions,
-        imageUrl: newImageUrls ?? [],
+        ingredients: JSON.parse(ingredients),
+        directions: JSON.parse(directions),
+        imageUrl: updatedImageUrls,
         notes,
-        cookTime,
-        prepTime,
+        cookTime: JSON.parse(cookTime),
+        prepTime: JSON.parse(prepTime),
       },
       { new: true, runValidators: true }
     );
+
+    if (!updatedRecipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
 
     res.status(200).json(updatedRecipe);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 
 const postReview = async (req, res) => {

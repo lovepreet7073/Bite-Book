@@ -5,6 +5,8 @@ const MultipleImageUploadField = ({
   values,
   setFieldValue,
   existingImages = [],
+  error,
+  touched
 }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -25,7 +27,7 @@ const MultipleImageUploadField = ({
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    console.log(selectedImages,"files")
+    console.log(selectedImages, "files")
     if (files.length) {
       setSelectedImages((prev) => [...prev, ...files]);
       const newImagePreviews = files.map((file) => URL.createObjectURL(file));
@@ -42,11 +44,14 @@ const MultipleImageUploadField = ({
     const updatedPreviews = imagePreviews.filter(
       (_, index) => index !== indexToRemove
     );
-console.log(updatedImages,'updatedImages')
+    console.log(updatedImages, 'updatedImages')
+
     setSelectedImages(updatedImages);
     setImagePreviews(updatedPreviews);
     setFieldValue("imageUrl", updatedImages);
   };
+  console.log("Formik values (imageUrl):", values.imageUrl);
+  console.log("Errors:", error); // 
   return (
     <div className="flex flex-col items-center justify-center gap-3 w-full">
       <label
@@ -80,6 +85,7 @@ console.log(updatedImages,'updatedImages')
         accept="image/*"
         multiple
         onChange={handleImageChange}
+        name="imageUrl"
       />
       {imagePreviews.length > 0 && (
         <div className="w-full grid grid-cols-3 gap-4">
@@ -99,6 +105,9 @@ console.log(updatedImages,'updatedImages')
             </div>
           ))}
         </div>
+      )}
+      {error && touched && (
+        <p className="text-red-500 ">{error}</p>
       )}
     </div>
   );

@@ -3,10 +3,12 @@ import { IoSearchSharp } from "react-icons/io5";
 import { api } from '../../config/apiUrl';
 import { API_BASE_URL } from '../../config/apiUrl';
 import { useNavigate } from 'react-router-dom';
+
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const navigate = useNavigate();
+
   useEffect(() => {
     if (searchQuery.trim() === '') {
       setResults([]); // Clear results if query is empty
@@ -33,14 +35,14 @@ const SearchBar = () => {
 
   const handleSuggestionClick = (suggestion) => {
     console.log("Suggestion clicked:", suggestion);
-    navigate(`/user/recipe/${suggestion._id}`)
+    navigate(`/user/recipe/${suggestion._id}`);
     setSearchQuery('');
     setResults([]);
   };
 
   return (
     <div>
-      <div className="relative mx-4   lg:w-[27rem] flex border border-[#FF6216] rounded-md justify-between items-center p-2 lg:p-1">
+      <div className="relative mx-4 lg:w-[27rem] flex border border-[#FF6216] rounded-md justify-between items-center p-2 lg:p-1">
         <input
           type="text"
           placeholder="Search recipes or ingredients..."
@@ -48,11 +50,11 @@ const SearchBar = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)} // Trigger search on input change
         />
-        <IoSearchSharp size={22} className='text-[#FF6216]' onClick={handleSearch} />
+        <IoSearchSharp size={22} className='text-[#FF6216]'  />
       </div>
 
-      {results.length > 0 && (
-        <div className="absolute left-[23rem] right-0 top-[4.5rem] mt-2 bg-neutral-100 border border-gray-300 rounded-lg shadow-lg w-[27.5rem] z-10">
+      {results.length > 0 ? (
+        <div className="absolute left-[25.6rem] right-0 top-[3.5rem] mt-2 bg-neutral-100 border border-gray-300 rounded-lg shadow-lg w-[27rem] z-10 p-2  text-gray-700">
           {results.slice(0, 3).map((suggestion, index) => (
             <div
               key={index}
@@ -76,7 +78,6 @@ const SearchBar = () => {
                 <div className="w-12 h-12 bg-gray-200 rounded-md mr-2"></div> // Fallback if no image
               )}
 
-
               <div className="flex-1">
                 {/* Recipe Title */}
                 <p className="text-sm font-semibold">{suggestion.title}</p>
@@ -88,6 +89,10 @@ const SearchBar = () => {
               </div>
             </div>
           ))}
+        </div>
+      ) : searchQuery.trim() !== '' && (
+        <div className="absolute left-[25.6rem] right-0 top-[3.5rem] mt-2 bg-neutral-100 border border-gray-300 rounded-lg shadow-lg w-[27rem] z-10 p-2 text-center text-gray-500">
+          0 results found for your search.
         </div>
       )}
     </div>

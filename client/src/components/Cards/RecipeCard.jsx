@@ -7,16 +7,17 @@ import { useNavigate } from 'react-router-dom';
 import './recipe.css';
 import revealElements from '../../scrollReveal';
 import { likeRecipe } from '../../redux/Recipe/Actions';
-import showCustomToast from '../../components/ToastComponent'; // Import your custom toast function
+import showCustomToast from '../Shared/ToastComponent'; // Import your custom toast function
 import Rating from '@mui/material/Rating';
+
 export default function RecipeReviewCard({ recipe }) {
     const [isLiked, setIsLiked] = useState(false);
-    const [value, setValue] = React.useState(2);
+    const [value, setValue] = React.useState(2); // Default rating value
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { auth } = useSelector((store) => store);
     const token = localStorage.getItem('jwt');
-    console.log(auth, "auth")
+    console.log(auth, "auth");
 
     useEffect(() => {
         revealElements();
@@ -29,6 +30,16 @@ export default function RecipeReviewCard({ recipe }) {
             setIsLiked(false);
         }
     }, [recipe, auth]);
+
+    // Calculate average rating from reviews
+    useEffect(() => {
+        if (recipe?.reviews?.length > 0) {
+            const averageRating = recipe.reviews.reduce((acc, review) => acc + review.rating, 0) / recipe.reviews.length;
+            setValue(averageRating); // Set the average rating as the value for Rating component
+        } else {
+            setValue(0); // Set value to 0 if there are no reviews
+        }
+    }, [recipe]);
 
     const handleLikeClick = (event) => {
         event.stopPropagation();
@@ -85,13 +96,12 @@ export default function RecipeReviewCard({ recipe }) {
 
                 {/* Recipe Rating */}
                 <div disableSpacing className='p-0 flex items-center gap-1'>
-                    <Rating name="disabled" value={value} disabled />
+                    <Rating name="disabled" value={value} readOnly />
                     <p className='text-sm text-slate-500'>
                         {recipe?.reviews?.length
                             ? `${recipe.reviews.length} ${recipe.reviews.length === 1 ? 'rating' : 'ratings'}`
                             : 'No ratings yet'}
                     </p>
-
                 </div>
             </div>
         </div>

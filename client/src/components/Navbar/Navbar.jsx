@@ -6,7 +6,7 @@ import {
 import DropdownMenu from "./Dropdown";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
-import logo from '../../assets/2.png'
+import logo from '../../assets/images/2.png'
 import { useEffect } from "react";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
 import { GetRecipes } from "../../redux/Recipe/Actions";
@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/Auth/Actions";
 import { getUser } from "../../redux/Auth/Actions";
-import VariantAvatars from "../Avatar";
+import VariantAvatars from "./Avatar";
 import { useState } from "react";
 const navigation = [
   { name: "Home", id: "Home", current: true, hasDropdown: false },
@@ -284,12 +284,13 @@ export default function Navbar() {
               />
             ) : (
               <div
+              onClick={() => handleNavigation(item.id)}
                 key={item.name}
                 href={item.href}
                 aria-current={item.current ? "page" : undefined}
                 className={classNames(
                   item.current
-                    ? "text-[#FF6216] lg:border-b-[#FF6216] lg:border-b text-lg "
+                    ? "text-[#FF6216] lg:border-b-[#FF6216] lg:border-b text-lg cursor-pointer "
                     : "text-gray-300 hover:text-[#FF6216] hover:border-b-[#FF6216] hover:border-b-2",
                   " px-3 py-2 text-sm font-medium"
                 )}

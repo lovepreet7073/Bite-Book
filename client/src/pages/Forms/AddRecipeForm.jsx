@@ -13,20 +13,20 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import recipeValidationSchema from '../components/Validations/RecipeSchema'
+import recipeValidationSchema from '../../components/Validations/RecipeSchema'
 import { Formik, Field, Form, FieldArray, ErrorMessage } from "formik";
 import { RiMenuAddFill } from "react-icons/ri";
 import AddIcon from "@mui/icons-material/Add";
-import MultipleImageUploadField from "../components/ImageUploadField";
+import MultipleImageUploadField from "../../components/Shared/ImageUploadField";
 import { RxCross2 } from "react-icons/rx";
-import { addRecipe } from "../redux/Recipe/Actions";
+import { addRecipe } from "../../redux/Recipe/Actions";
 import { useDispatch, useSelector } from "react-redux";
 import FormControl from "@mui/material/FormControl";
 import NativeSelect from "@mui/material/NativeSelect";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import showCustomToast from "../components/ToastComponent";
+import showCustomToast from '../../components/Shared/ToastComponent';
 const AddRecipeForm = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation(); // Access location
@@ -118,7 +118,7 @@ const AddRecipeForm = () => {
 
         <RiMenuAddFill size={20} />
       </div>
-      <Formik initialValues={initialValues} validationSchema={recipeValidationSchema} onSubmit={handleSubmit}>
+      <Formik initialValues={initialValues} onSubmit={handleSubmit}>
         {({ values, handleChange, handleBlur, setFieldValue, errors, touched, }) => (
           <Form>
             <Grid container spacing={2}>
@@ -159,8 +159,7 @@ const AddRecipeForm = () => {
                 <MultipleImageUploadField
                   values={values}
                   setFieldValue={setFieldValue}
-                  error={errors.imageUrl}           // Pass the error for the imageUrl field
-                  touched={touched.imageUrl}
+
                 />
               </Grid>
               {/* Ingredients FieldArray */}

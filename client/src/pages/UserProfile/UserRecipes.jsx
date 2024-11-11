@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import showCustomToast from '../../components/ToastComponent';
+import showCustomToast from '../../components/Shared/ToastComponent';
 import { DeleteRecipe, userRecipes } from '../../redux/Recipe/Actions';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
@@ -55,7 +55,7 @@ const UserRecipes = () => {
                 {/* Render user's recipes */}
                 <div className='flex items-center justify-between'>
                     <div>
-                        <h1 className='text-3xl font-bold'>Bite Book Personal Recipes</h1>
+                        <h1 className='lg:text-3xl text-xl font-bold'>Bite Book Personal Recipes</h1>
                         <p className='text-md text-grey-400 mt-4'>Recipes you have created on Bite Book.</p>
                     </div>
                     <Button

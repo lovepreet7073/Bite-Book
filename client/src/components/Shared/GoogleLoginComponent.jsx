@@ -2,7 +2,7 @@ import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useDispatch } from 'react-redux';
-import { googlelogin } from '../redux/Auth/Actions';
+import { googlelogin } from '../../redux/Auth/Actions';
 import { useNavigate } from 'react-router-dom';
 import showCustomToast from './ToastComponent';
 const GoogleLoginComponent = () => {

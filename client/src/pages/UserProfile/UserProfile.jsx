@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Grid, Paper, TextField, Button, Typography } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import VariantAvatars from '../../components/Avatar';
+import VariantAvatars from '../../components/Navbar/Avatar';
 import { updateUser } from '../../redux/Auth/Actions';
-import showCustomToast from '../../components/ToastComponent';
+import showCustomToast from '../../components/Shared/ToastComponent';
 import UserRecipes from './UserRecipes';
 import { userRecipes } from '../../redux/Recipe/Actions';
 import SavedRecipes from './SavedRecipes';

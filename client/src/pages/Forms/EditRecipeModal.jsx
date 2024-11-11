@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
     TextField,
     Button,
@@ -16,8 +16,8 @@ import { Formik, Form, FieldArray, Field } from "formik";
 import { RiMenuAddFill } from "react-icons/ri"; // Ensure you have this import for the icon
 import { RxCross2 } from "react-icons/rx"; // Ensure you have this import for the icon
 import AddIcon from "@mui/icons-material/Add"; // Import AddIcon for the button
-import MultipleImageUploadField from "../../components/ImageUploadField";
-import showCustomToast from "../../components/ToastComponent";
+import MultipleImageUploadField from "../../components/Shared/ImageUploadField";
+import showCustomToast from "../../components/Shared/ToastComponent";
 
 const EditRecipeForm = () => {
     const location = useLocation();
@@ -241,7 +241,7 @@ const EditRecipeForm = () => {
                             </Grid>
 
                             {/* Prep Time */}
-                            <Grid item xs={6}>
+                            <Grid item xs={12} sm={6}>
                                 <div className="flex gap-5 items-center mt-5">
                                     <h1 className="text-md font-medium">Prep Time</h1>
                                     <TextField
@@ -268,7 +268,7 @@ const EditRecipeForm = () => {
                             </Grid>
 
                             {/* Cook Time */}
-                            <Grid item xs={6}>
+                            <Grid item xs={12} sm={6}>
                                 <div className="flex gap-5 items-center mt-2">
                                     <h1 className="text-md font-medium">Cook Time</h1>
                                     <TextField
@@ -294,7 +294,7 @@ const EditRecipeForm = () => {
                                 </div>
                             </Grid>
                             <hr className="w-full py-2 mt-5 mb-2" />
-                            <Grid item xs={6}>
+                            <Grid item xs={12} sm={6}>
                                 <div className="flex flex-col gap-10">
                                     <h1 className="text-md font-medium">Cuisine </h1>
                                     <FormControl fullWidth>
@@ -319,7 +319,7 @@ const EditRecipeForm = () => {
                                 </div>
                             </Grid>
                             {/* Notes */}
-                            <Grid item xs={6}>
+                            <Grid item xs={12} sm={6}>
                                 <div className=" flex gap-6 flex-col">
                                     <h1 className="text-md font-medium">
                                         Notes{" "}

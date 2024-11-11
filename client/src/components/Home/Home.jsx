@@ -32,11 +32,11 @@ const Home = () => {
         {/* Grid Layout for Recipes */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 p-4">
           {recipe?.allRecipes && recipe.allRecipes.length > 0 ? (
-            recipe.allRecipes.slice(0, 3).map((item) => (
+            recipe.allRecipes.slice(0, 6).map((item) => (
               <RecipeReviewCard key={item._id} recipe={item} />
             ))
           ) : (
-            <p>No recipes available.</p>
+            <p className='bg-red'>No recipes available.</p>
           )}
         </div>
 

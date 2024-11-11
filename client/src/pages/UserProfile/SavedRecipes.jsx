@@ -1,22 +1,22 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Typography } from '@mui/material'
+import { Button, Typography } from '@mui/material'
 import { API_BASE_URL } from '../../config/apiUrl'
-
+import { AiOutlineDelete } from "react-icons/ai";
 const SavedRecipes = () => {
     const { auth } = useSelector(store => store)
     const navigate = useNavigate();
-console.log(auth,"userFavorites")
+    console.log(auth, "userFavorites")
     return (
         <div>
-          <h1 className='text-3xl font-bold'>Recently Saved Recipes</h1>
+            <h1 className='text-3xl font-bold'>Recently Saved Recipes</h1>
             <div className="grid lg:grid-cols-3 gap-4 mt-[5%]">
                 {auth?.userFavorites?.length > 0 ? (
                     auth?.userFavorites.map((recipe) => {
                         // Check if imageUrl is an array and select the first image if so
-                        const imageUrl = Array.isArray(recipe.imageUrl) 
-                            ? recipe.imageUrl[0] 
+                        const imageUrl = Array.isArray(recipe.imageUrl)
+                            ? recipe.imageUrl[0]
                             : recipe.imageUrl;
 
                         return (
@@ -35,11 +35,14 @@ console.log(auth,"userFavorites")
                                     </div>
 
                                     {/* Recipe Title */}
-                                    <div className="px-1 bg-white">
+                                    <div className="px-1 bg-white flex justify-between items-center">
                                         <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900">
                                             {recipe.title}
                                         </h5>
+                                        {/* <AiOutlineDelete size={24} className='text-primary' title='remove from list'/> */}
+                                        {/* <Button variant='outlined'>Remove</Button> */}
                                     </div>
+
                                 </div>
                             </div>
                         );

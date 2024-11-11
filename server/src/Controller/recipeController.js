@@ -51,23 +51,26 @@ const getAllRecipes = async (req, res) => {
     const { ingredient, cuisine } = req.query;
     let query = {};
 
+    // Handle ingredient search (case-insensitive)
     if (ingredient) {
-      // Case-insensitive search for ingredients using $regex
       query.ingredients = { $in: [new RegExp(ingredient, "i")] };
     }
 
+    // Handle cuisine search (case-insensitive)
     if (cuisine) {
-      // Case-insensitive search using $regex
       query.cuisine = { $regex: new RegExp(cuisine, "i") };
     }
-    // Fetch the recipes based on the query
-    const recipes = await Recipe.find(query);
-    // Send the response
+
+    // Fetch the recipes based on the query and sort them by createdAt (descending)
+    const recipes = await Recipe.find(query).sort({ createdAt: -1 });
+
+    // Send the response with sorted recipes
     res.status(200).json(recipes);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
   }
 };
+
 
 const findRecipeById = async (req, res) => {
   const recipeId = req.params.id;
@@ -195,7 +198,6 @@ const deleteRecipe = async (req, res) => {
     });
   }
 };
-
 const updateRecipe = async (req, res) => {
   try {
     const {
@@ -210,12 +212,30 @@ const updateRecipe = async (req, res) => {
     } = req.body;
     const recipeId = req.params.recipeId;
 
-    let newImageUrls = req.body.imageUrl ? JSON.parse(req.body.imageUrl) : [];
-    let newImages = req.files ? req.files.map((file) => file.filename) : [];
+    // Collect all image URLs into an array, accounting for different formats
+    let newImageUrls = [];
+    if (req.body.imageUrl) {
+      if (Array.isArray(req.body.imageUrl)) {
+        newImageUrls = req.body.imageUrl;
+      } else {
+        newImageUrls = [req.body.imageUrl];
+      }
 
-    const updatedImageUrls = [...newImages, ...newImageUrls];
-    console.log(updatedImageUrls, " req.files")
+      // Extract filenames from any URLs present
+      newImageUrls = newImageUrls.map((url) => {
+        const urlParts = url.split('/');
+        return urlParts[urlParts.length - 1]; // Keep only the filename
+      });
+    }
 
+    // Get new images from uploaded files
+    const newImages = req.files ? req.files.map((file) => file.filename) : [];
+
+    // Combine existing and new image filenames
+    const updatedImageUrls = [...newImageUrls, ...newImages];
+    console.log(updatedImageUrls, "Updated Image Filenames Only");
+
+    // Update the recipe with the new data, storing only filenames in imageUrl
     const updatedRecipe = await Recipe.findByIdAndUpdate(
       recipeId,
       {
@@ -224,7 +244,7 @@ const updateRecipe = async (req, res) => {
         description,
         ingredients: JSON.parse(ingredients),
         directions: JSON.parse(directions),
-        imageUrl: updatedImageUrls,
+        imageUrl: updatedImageUrls,           // Store only filenames
         notes,
         cookTime: JSON.parse(cookTime),
         prepTime: JSON.parse(prepTime),
@@ -244,6 +264,8 @@ const updateRecipe = async (req, res) => {
 
 
 
+
+
 const postReview = async (req, res) => {
   const { rating, comment } = req.body;
   const userId = req.user.id;
@@ -252,22 +274,34 @@ const postReview = async (req, res) => {
     const recipe = await Recipe.findById(req.params.recipeId);
     if (!recipe) return res.status(404).json({ message: "Recipe not found" });
 
+    // Ensure that at least one of `rating` or `comment` is provided
+    if (!rating && !comment) {
+      return res.status(400).json({ message: "Please provide either a rating, a comment, or both." });
+    }
+
     const newReview = { userId, rating, comment };
     recipe.reviews.push(newReview);
     await recipe.save();
 
-    // Populate the `userId` field in the last review added
+    // Populate the `userId` field in all reviews, including the newly added review
     await recipe.populate({
       path: "reviews.userId",
       select: "fullName profile_pic"
     });
 
-    const populatedReview = recipe.reviews[recipe.reviews.length - 1]; // Get the newly added review
-    res.status(201).json(populatedReview); // Return populated review
+    // Separate the populated reviews and the full recipe
+    const populatedReviews = recipe.reviews;
+    const updatedRecipe = recipe;
+
+    res.status(201).json({
+      reviews: populatedReviews,
+      recipe: updatedRecipe
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 module.exports = {
   addRecipe,

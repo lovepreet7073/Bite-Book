@@ -5,8 +5,7 @@ const MultipleImageUploadField = ({
   values,
   setFieldValue,
   existingImages = [],
-  error,
-  touched
+
 }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -48,15 +47,15 @@ const MultipleImageUploadField = ({
 
     setSelectedImages(updatedImages);
     setImagePreviews(updatedPreviews);
+
     setFieldValue("imageUrl", updatedImages);
   };
-  console.log("Formik values (imageUrl):", values.imageUrl);
-  console.log("Errors:", error); // 
+  console.log(selectedImages, "selected")
   return (
     <div className="flex flex-col items-center justify-center gap-3 w-full">
       <label
         htmlFor="dropzone-file"
-        className="flex flex-col items-center justify-center w-full h-40 mt-4 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer"
+        className="flex flex-col items-center justify-center w-full lg:h-40 mt-4 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer"
       >
         <div className="flex flex-col items-center justify-center pt-5 pb-6">
           <svg
@@ -94,7 +93,7 @@ const MultipleImageUploadField = ({
               <img
                 src={preview}
                 alt={``}
-                className="w-full h-22 object-cover rounded-lg"
+                className="w-full lg:h-[10rem] h-[5rem] object-cover rounded-lg"
               />
               <MdCancel
                 size={32}
@@ -106,9 +105,7 @@ const MultipleImageUploadField = ({
           ))}
         </div>
       )}
-      {error && touched && (
-        <p className="text-red-500 ">{error}</p>
-      )}
+
     </div>
   );
 };

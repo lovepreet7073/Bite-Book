@@ -2,11 +2,11 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import UserProfile from '../pages/UserProfile/UserProfile';
-import AddRecipeForm from '../pages/AddRecipeForm';
+import AddRecipeForm from '../pages/Forms/AddRecipeForm';
 import RecipeDetailCard from '../components/Cards/RecipeDetailCard';
 import RecipeMain from '../components/Recipe/RecipeMain';
 import ProtectedRoute from './ProtecetdRoute';
-import EditRecipeForm from '../pages/UserProfile/EditRecipeModal';
+import EditRecipeForm from '../pages/Forms/EditRecipeModal';
 const CustomRoutes = () => {
     return (
         <div>

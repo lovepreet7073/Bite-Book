@@ -3,7 +3,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import './App.css';
 import Home from '../src/components/Home/Home';
 import { Toaster } from 'react-hot-toast';
-import Footer from './components/Footer';
+import Footer from './components/Home/Footer';
 import Navbar from './components/Navbar/Navbar';
 import AuthRoutes from './routes/AuthRoutes';  // Assuming this will have Auth-related routes
 import CustomRoutes from './routes/CustomRoutes';

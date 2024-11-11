@@ -9,41 +9,38 @@ import {
   Grid,
 } from "@mui/material";
 import moment from "moment";
-import { ReviewOnRecipe, findRecipeById } from "../../redux/Recipe/Actions";
-import VariantAvatars from "../Avatar";
-import showCustomToast from "../ToastComponent";
+import { ReviewOnRecipe } from "../../redux/Recipe/Actions";
+import showCustomToast from "../Shared/ToastComponent";
 
 const RecipeRatingReview = ({ recipeId, userReviews }) => {
   const dispatch = useDispatch();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
-  const { recipe } = useSelector((store) => store);
-  console.log(userReviews, "userReviews");
 
   const handleRatingChange = (event, newRating) => {
     setRating(newRating);
   };
 
   const handleSubmit = async () => {
+    if (rating === 0 && comment.trim() === "") {
+      showCustomToast('Add a rating or comment to submit.', 'error');
+      return;
+    }
+
     dispatch(ReviewOnRecipe(recipeId, rating, comment));
     showCustomToast('Thanks for adding your feedback', 'success');
     setRating(0);
     setComment("");
-    await dispatch(fetchRecipeById(recipeId));
   };
 
   return (
-    <div className=" mt-2">
+    <div className="mt-[10%]">
       <Grid container spacing={4}>
-        {/* Left Column: All Reviews */}
-
-        {/* Right Column: Review Form */}
         <Grid item xs={12} md={12} className="">
           <Box
-            className="p-8  border border-slate-200 rounded"
+            className="p-8 border border-slate-200 rounded"
             display="flex"
             flexDirection="column"
-            alignItems=""
             mb={3}
             gap={1}
           >

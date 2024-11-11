@@ -1,4 +1,4 @@
-import { ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS, RECIPE_LIKE_FAILURE, RECIPE_LIKE_REQUEST, USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS, RECIPE_LIKE_SUCCESS, DELETE_RECIPE_REQUEST, DELETE_RECIPE_FAILURE, DELETE_RECIPE_SUCCESS, UPDATE_RECIPE_FAILURE, UPDATE_RECIPE_REQUEST, UPDATE_RECIPE_SUCCESS, POST_REVIEW_REQUEST, POST_REVIEW_FAILURE ,POST_REVIEW_SUCCESS} from "./ActionTypes"
+import { ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS, RECIPE_LIKE_FAILURE, RECIPE_LIKE_REQUEST, USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS, RECIPE_LIKE_SUCCESS, DELETE_RECIPE_REQUEST, DELETE_RECIPE_FAILURE, DELETE_RECIPE_SUCCESS, UPDATE_RECIPE_FAILURE, UPDATE_RECIPE_REQUEST, UPDATE_RECIPE_SUCCESS, POST_REVIEW_REQUEST, POST_REVIEW_FAILURE, POST_REVIEW_SUCCESS } from "./ActionTypes"
 const initialState = {
     recipe: null,
     isLoading: false,
@@ -48,23 +48,30 @@ export const recipeReducer = (state = initialState, action) => {
             };
         }
         case UPDATE_RECIPE_SUCCESS:
-            return {
-                ...state,
-                updatedRecipe: action.payload,
-                loading: false,
-            }
-        case POST_REVIEW_SUCCESS:
-            console.log(action.payload,"action.payload")
+            const updatedRecipe = action.payload
+            console.log(action.payload, "action-payload")
 
             return {
                 ...state,
                 isLoading: false,
                 error: null,
-                recipe: {
-                    ...state.recipe,
-                    reviews: [...(state.recipe?.reviews || []), action.payload] 
-                }
-
+                recipe: updatedRecipe,  // Ensure the updated reviews are added to the recipe
+                allRecipes: state.allRecipes ? state.allRecipes.map(recipe =>
+                    recipe._id === updatedRecipe._id ? updatedRecipe : recipe
+                ) : null,
+            };
+        case POST_REVIEW_SUCCESS:
+            // Extract `recipe` and `reviews` from action.payload
+            const { recipe, reviews } = action.payload;
+            // Update the recipe in the state, and also update the allRecipes list
+            return {
+                ...state,
+                isLoading: false,
+                error: null,
+                recipe: { ...recipe, reviews },  // Ensure the updated reviews are added to the recipe
+                allRecipes: state.allRecipes.map((r) =>
+                    r._id === recipe._id ? { ...r, reviews } : r  // Ensure the updated reviews are added to allRecipes
+                ),
             };
 
         case ADD_RECIPE_FAILURE:

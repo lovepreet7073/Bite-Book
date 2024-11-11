@@ -24,8 +24,7 @@ const recipeValidationSchema = Yup.object().shape({
     cuisine: Yup.string()
         .required('Cuisine is required'),
 
-    imageUrl: Yup.array()
- .required('Image is required'),
+
     prepTime: Yup.string()
 
         .required('Preparation time is required'),

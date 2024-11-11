@@ -64,6 +64,7 @@ const recipeSchema = new mongoose.Schema({
     },
     imageUrl: {
         type: [String],
+        required: true,
         default: [], // Set default to empty array
     },
     reviews: [reviewSchema],

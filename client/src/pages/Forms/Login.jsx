@@ -6,12 +6,12 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import LoginSchema from "../components/Validations/LoginSchema";
+import LoginSchema from "../../components/Validations/LoginSchema";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../redux/Auth/Actions";
-import revealElements from "../scrollReveal";
-import showCustomToast from "../components/ToastComponent";
-import GoogleLoginComponent from "../components/GoogleLoginComponent";
+import { login } from "../../redux/Auth/Actions";
+import revealElements from "../../scrollReveal";
+import showCustomToast from "../../components/Shared/ToastComponent";
+import GoogleLoginComponent from "../../components/Shared/GoogleLoginComponent";
 const Login = () => {
     useEffect(() => {
         revealElements(); // Initialize ScrollReveal

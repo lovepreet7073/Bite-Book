@@ -4,7 +4,7 @@ import 'react-alice-carousel/lib/alice-carousel.css';
 import { Button } from '@mui/material';
 import { MdArrowForwardIos } from "react-icons/md";
 import { MdArrowBackIosNew } from "react-icons/md";
-import { API_BASE_URL } from '../config/apiUrl';
+import { API_BASE_URL } from '../../config/apiUrl';
 const Carousel = ({ data }) => {
 
     console.log(data, "datatatatat")
@@ -29,7 +29,7 @@ const Carousel = ({ data }) => {
         <img
             src={`${API_BASE_URL}/images/${item}`} // Update based on your image structure
             alt={`Recipe image ${index + 1}`}
-            className="object-cover  w-full h-full"
+            className="object-cover  w-full h-[22rem]"
         />
     ));
 

@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { findRecipeById } from '../../redux/Recipe/Actions';
 import moment from 'moment';
 import revealElements from '../../scrollReveal';
-import Carousel from '../Carousel'; // Import your Carousel component
+import Carousel from './Carousel'; // Import your Carousel component
 import RecipeRatingReview from './Rating';
 import Reviews from './Reviews';
 const RecipeDetailCard = () => {
@@ -98,7 +98,7 @@ const RecipeDetailCard = () => {
                     </div>
 
                 </section>
-                <section className="mt-1 px-4 lg:px-20 mb-20">
+                <section className="mt-5 px-4 lg:px-20 mb-20">
                     <RecipeRatingReview 
                         recipeId={params?.recipeId} 
                      

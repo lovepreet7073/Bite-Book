@@ -11,20 +11,18 @@ const ProtectedRoute = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Simulate a loading state or check any async logic here (like fetching user data)
-        setLoading(false); 
+        setLoading(false);
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>; // Display a loading message or skeleton screen while loading
+        return <div>Loading...</div>;
     }
 
     if (!jwt) {
-        // Redirect to the login page if the user is not authenticated
         return <Navigate to="/auth/login" />;
     }
 
-    return children; // If authenticated, render the children (protected routes)
+    return children;
 };
 
 export default ProtectedRoute;

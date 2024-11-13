@@ -25,7 +25,7 @@ const navigation = [
     current: false,
     hasDropdown: true,
     dropdownItems: [
-      { name: "Fruits", id: "Fruits" },
+      { name: "Fruit", id: "Fruit" },
       { name: "Vegetables", id: "Vegetables" },
       { name: "Dairy", id: "Dairy" },
       { name: "Cheese", id: "Cheese" },
@@ -97,20 +97,24 @@ export default function Navbar() {
       query.set("cuisine", selectedCuisine);
     }
 
-    const newUrl = `${window.location.pathname}?${query.toString()}`;
+    // Construct the new URL
+    const queryString = query.toString();
+    const newUrl = queryString
+      ? `${window.location.pathname}?${queryString}`
+      : window.location.pathname;
+
+    // Update the URL
     window.history.pushState(null, "", newUrl);
-    console.log(newUrl, "newUrl");
-    console.log(selectedIngredient, "selectedIngredient");
-    console.log(selectedCuisine, "selectedCuisine");
+
+
+
     if (selectedIngredient || selectedCuisine) {
       dispatch(GetRecipes({ ingredient: selectedIngredient, cuisine: selectedCuisine }));
-      navigate(`/user/recipes?${query.toString()}`);
+      navigate(`/user/recipes?${queryString}`);
     } else {
       dispatch(GetRecipes({}));
     }
-
-  }, [selectedIngredient, selectedCuisine, dispatch]);
-
+  }, [selectedIngredient, selectedCuisine, dispatch, navigate]);
 
 
 
@@ -130,10 +134,12 @@ export default function Navbar() {
     }
   }, [jwt, auth.jwt])
 
-  // Updated navigation with conditional navigation for Home
   const handleNavigation = (itemId) => {
     if (itemId === "Home" && location.pathname !== "/") {
       navigate("/");
+      setSelectedIngredient('')
+      setSelectedCuisine("");
+      // dispatch(GetRecipes({}));
     }
   };
 
@@ -163,7 +169,7 @@ export default function Navbar() {
                 src={logo}
                 className="lg:block h-[45px] w-[45px] object-cover object-top hidden cursor-pointer"
                 title="Bite Book"
-                onClick={()=>navigate('/')}
+                onClick={() => navigate('/')}
               />
             </div>
             <div className="hidden sm:ml-6 sm:block">
@@ -228,14 +234,23 @@ export default function Navbar() {
                   <MenuItem>
                     <button
                       className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 w-full text-left"
-                      onClick={() => navigate('/user/profile')}
+                      onClick={() => {
+                        navigate('/user/profile');
+                        setSelectedIngredient('');
+                        setSelectedCuisine('');
+                      }}
+
                     >
                       My Profile
                     </button>
                   </MenuItem>
                   <MenuItem>
                     <button
-                      onClick={() => navigate('/user/add-Recipe')}
+                      onClick={() => {navigate('/user/add-Recipe')
+                        setSelectedIngredient('');
+                        setSelectedCuisine('');
+                      }
+                      }
                       className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 w-full text-left"
                     >
                       Add a recipe
@@ -284,7 +299,7 @@ export default function Navbar() {
               />
             ) : (
               <div
-              onClick={() => handleNavigation(item.id)}
+                onClick={() => handleNavigation(item.id)}
                 key={item.name}
                 href={item.href}
                 aria-current={item.current ? "page" : undefined}
@@ -323,7 +338,7 @@ export default function Navbar() {
         onClose={cancelLogout}
         aria-labelledby="logout-dialog-title"
         aria-describedby="logout-dialog-description"
-   
+
       >
         <DialogTitle id="logout-dialog-title">Logout Confirmation</DialogTitle>
         <DialogContent>
@@ -338,11 +353,11 @@ export default function Navbar() {
             },
           }} onClick={cancelLogout} >Cancel</Button>
           <Button onClick={confirmLogout} variant="contained" sx={{
-                      bgcolor: "#FF6216", // Use the primary color from Tailwind config
-                      "&:hover": {
-                        bgcolor: "#E55A12", // Change to secondary color from Tailwind config on hover
-                      },
-                    }}>Confirm</Button>
+            bgcolor: "#FF6216", // Use the primary color from Tailwind config
+            "&:hover": {
+              bgcolor: "#E55A12", // Change to secondary color from Tailwind config on hover
+            },
+          }}>Confirm</Button>
         </DialogActions>
       </Dialog>
 

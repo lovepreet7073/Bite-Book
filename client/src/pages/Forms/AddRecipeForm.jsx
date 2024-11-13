@@ -5,7 +5,6 @@ import {
   Grid,
   IconButton,
   Box,
-  Divider,
   MenuItem,
   Dialog,
   DialogActions,
@@ -30,7 +29,7 @@ import showCustomToast from '../../components/Shared/ToastComponent';
 const AddRecipeForm = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation(); // Access location
-
+  const [error, setError] = useState("");
   const { recipe } = location.state || {}; // Get recipe from state
 
   const handleClickOpen = () => {
@@ -64,49 +63,59 @@ const AddRecipeForm = () => {
     title: '',
     description: '',
     imageUrl: [], // Array for image URLs
-    cuisine: '',
-    ingredients: [], // List of ingredients
-    directions: [], // List of steps for directions
+    cuisine: 'Indian',
+    ingredients: [''], // List of ingredients
+    directions: [''], // List of steps for directions
     notes: '',
     cookTime: {
       time: 0,  // Time in minutes (you could adjust if necessary)
       unit: "mins", // Could be "hours" or "mins"
     },
     prepTime: {
-      time: 0,  // Time in minutes (you could adjust if necessary)
+      time: 1,  // Time in minutes (you could adjust if necessary)
       unit: "mins", // Could be "hours" or "mins"
     },
   };
 
 
   const handleSubmit = (values) => {
-    console.log(values, "vaues-add")
+    // Set cuisine to "Indian" if none is selected
+    const recipeValues = {
+      ...values,
+      cuisine: values.cuisine || "Indian",
+    };
+
+    console.log(recipeValues, "values-add");
+
+    if (!recipeValues.imageUrl || recipeValues.imageUrl.length === 0) {
+      showCustomToast("At least one image is required", "error");
+      return; // Exit function early if no image is selected
+    }
+
     const formData = new FormData();
 
-    Object.keys(values).forEach((key) => {
+    Object.keys(recipeValues).forEach((key) => {
       if (key === "imageUrl") {
-        values[key].forEach((file) => formData.append("imageUrl", file));
-      } else if (typeof values[key] === "object" && values[key] !== null) {
-        formData.append(key, JSON.stringify(values[key]));
+        recipeValues[key].forEach((file) => formData.append("imageUrl", file));
+      } else if (typeof recipeValues[key] === "object" && recipeValues[key] !== null) {
+        formData.append(key, JSON.stringify(recipeValues[key]));
       } else {
-        formData.append(key, values[key]);
+        formData.append(key, recipeValues[key]);
       }
     });
 
-    console.log(...formData, "formdata")
-    dispatch(addRecipe(formData, navigate))
-      .then((response) => {
-        if (response && !response.error) {
-          showCustomToast("Recipe added successfully", "success");
-          navigate("/"); // Navigate to the home page on success
-        } else {
-          showCustomToast("Failed to add the recipe", "error");
-        }
-      })
-      .catch((error) => {
-        showCustomToast("An error occurred", "error");
-      });
+    console.log(...formData, "formdata");
+
+    dispatch(addRecipe(formData, navigate)).then((response) => {
+      if (response && !response.error) {
+        showCustomToast("Recipe added successfully", "success");
+        navigate("/"); // Navigate to the home page on success
+      } else {
+        showCustomToast("Failed to add the recipe", "error");
+      }
+    });
   };
+
 
   const dispatch = useDispatch();
   return (
@@ -118,11 +127,22 @@ const AddRecipeForm = () => {
 
         <RiMenuAddFill size={20} />
       </div>
-      <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-        {({ values, handleChange, handleBlur, setFieldValue, errors, touched, }) => (
+      <Formik
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+        validationSchema={recipeValidationSchema}
+      >
+        {({
+          values,
+          handleChange,
+          handleBlur,
+          setFieldValue,
+          errors,
+          touched,
+        }) => (
           <Form>
             <Grid container spacing={2}>
-              {/* Title */}
+
               <Grid item xs={12} sm={6}>
                 <div className=" flex gap-12 flex-col">
                   <TextField
@@ -135,23 +155,21 @@ const AddRecipeForm = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.title && Boolean(errors.title)} // Set error to true if the field is touched and there's an error
-                    helperText={touched.title && errors.title} // Display the error message if the field is touched
+                    helperText={touched.title && errors.title}
                   />
-
                   <TextField
                     id="outlined-multiline-flexible"
                     label="Recipe description"
                     multiline
                     fullWidth
+                    error={touched.description && Boolean(errors.description)} // Set error to true if the field is touched and there's an error
+                    helperText={touched.description && errors.description}
                     maxRows={4}
                     name="description"
                     value={values.description}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={touched.description && Boolean(errors.description)} // Set error to true if the field is touched and there's an error
-                    helperText={touched.description && errors.description} // Display the error message if the field is touched
                   />
-
                 </div>
               </Grid>
 
@@ -159,28 +177,20 @@ const AddRecipeForm = () => {
                 <MultipleImageUploadField
                   values={values}
                   setFieldValue={setFieldValue}
-
                 />
+                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               </Grid>
-              {/* Ingredients FieldArray */}
               <hr className="w-full py-2 mt-5 mb-2" />
               <Grid item xs={12}>
                 <h4 className="font-semibold text-xl">Ingredients</h4>
                 <p className="text-sm text-neutral-400 line-clamp-4 mt-2 mb-4">
                   Enter the ingredients for your recipe below, one per line.
-                  Include quantities and any special instructions <br />
-                  (e.g., chopped, sifted).{" "}
                 </p>
                 <FieldArray name="ingredients">
                   {({ push, remove }) => (
                     <>
                       {values.ingredients.map((ingredient, index) => (
-                        <Grid
-                          container
-                          key={index}
-                          spacing={2}
-                          alignItems="center"
-                        >
+                        <Grid container key={index} spacing={2} alignItems="center">
                           <Grid item xs={11}>
                             <Field
                               as={TextField}
@@ -195,23 +205,22 @@ const AddRecipeForm = () => {
                                 touched.ingredients &&
                                 touched.ingredients[index] &&
                                 Boolean(errors.ingredients && errors.ingredients[index])
-                              } // Sets error if the field is touched and there's an error for that index
+                              }
                               helperText={
                                 touched.ingredients &&
                                   touched.ingredients[index] &&
                                   errors.ingredients &&
-                                  errors.ingredients[index] ? (
                                   errors.ingredients[index]
-                                ) : null
-                              } // Displays the error message if it exists for that index
+                                  ? errors.ingredients[index]
+                                  : null
+                              }
                               sx={{ marginTop: 1 }}
                             />
-
                           </Grid>
                           <Grid item xs={1}>
                             <IconButton
-                              onClick={() => remove(index)} // Remove ingredient
-                              disabled={values.ingredients.length === 1} // Disable remove if only one ingredient
+                              onClick={() => remove(index)}
+                              disabled={values.ingredients.length === 1}
                             >
                               <RxCross2 />
                             </IconButton>
@@ -219,17 +228,16 @@ const AddRecipeForm = () => {
                         </Grid>
                       ))}
                       <Button
-                        required
                         variant="outlined"
                         startIcon={<AddIcon />}
                         onClick={() => push("")}
                         sx={{
                           bgcolor: "transparent",
                           borderColor: "#E55A12",
-                          color: "#E55A12", // Use the primary color from Tailwind config
+                          color: "#E55A12",
                           "&:hover": {
                             bgcolor: "#E55A12",
-                            color: "white", // Change text color to white on hover
+                            color: "white",
                           },
                           marginTop: "12px",
                         }}
@@ -240,23 +248,18 @@ const AddRecipeForm = () => {
                   )}
                 </FieldArray>
               </Grid>
-              <hr className="w-full py-2 mt-5 mb-2" />
-              {/* Directions FieldArray */}
+
+              {/* Directions Section */}
               <Grid item xs={12}>
                 <h4 className="font-semibold text-xl">Directions</h4>
                 <p className="text-sm text-neutral-400 line-clamp-4 mt-2 mb-4">
-                  Describe how to make your recipe{" "}
+                  Describe how to make your recipe.
                 </p>
                 <FieldArray name="directions">
                   {({ push, remove }) => (
                     <>
                       {values.directions.map((direction, index) => (
-                        <Grid
-                          container
-                          key={index}
-                          spacing={2}
-                          alignItems="center"
-                        >
+                        <Grid container key={index} spacing={2} alignItems="center">
                           <Grid item xs={11}>
                             <Field
                               as={TextField}
@@ -271,25 +274,22 @@ const AddRecipeForm = () => {
                                 touched.directions &&
                                 touched.directions[index] &&
                                 Boolean(errors.directions && errors.directions[index])
-                              } // Sets error if the specific field is touched and there's an error for that index
+                              }
                               helperText={
                                 touched.directions &&
                                   touched.directions[index] &&
                                   errors.directions &&
-                                  errors.directions[index] ? (
                                   errors.directions[index]
-                                ) : (
-                                  <ErrorMessage name={`directions[${index}]`} />
-                                )
-                              } // Displays the error message if it exists for that index
+                                  ? errors.directions[index]
+                                  : null
+                              }
                               sx={{ marginTop: 1 }}
                             />
-
                           </Grid>
                           <Grid item xs={1}>
                             <IconButton
-                              onClick={() => remove(index)} // Remove direction
-                              disabled={values.directions.length === 1} // Disable remove if only one direction
+                              onClick={() => remove(index)}
+                              disabled={values.directions.length === 1}
                             >
                               <RxCross2 />
                             </IconButton>
@@ -303,10 +303,10 @@ const AddRecipeForm = () => {
                         sx={{
                           bgcolor: "transparent",
                           borderColor: "#E55A12",
-                          color: "#E55A12", // Use the primary color from Tailwind config
+                          color: "#E55A12",
                           "&:hover": {
                             bgcolor: "#E55A12",
-                            color: "white", // Change text color to white on hover
+                            color: "white",
                           },
                           marginTop: "12px",
                         }}
@@ -326,24 +326,23 @@ const AddRecipeForm = () => {
                     name="prepTime.time"
                     type="number"
                     defaultValue={0}
-                    InputProps={{ inputProps: { min: 0 } }}
+                    InputProps={{ inputProps: { min: 1 } }} // min value set to 1 instead of 0
                     sx={{ width: 80 }}
-                    value={values.prepTime.time}
+                    value={values.prepTime?.time || ""} // Ensure the value is handled properly (empty string if undefined)
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    required
-                    error={touched.prepTime?.time && Boolean(errors.prepTime?.time)} // Set error if touched and there's an error
-                    helperText={touched.prepTime?.time && errors.prepTime?.time} // Display error message if any
+                    error={
+                      touched.prepTime?.time && Boolean(errors.prepTime?.time)
+                    } // Set error if touched and there's an error
+                    helperText={touched.prepTime?.time && errors.prepTime?.time}
                   />
+
                   <TextField
                     select
                     name="prepTime.unit"
                     value={values.prepTime.unit}
                     onChange={handleChange}
-                    onBlur={handleBlur}
                     sx={{ width: 100 }}
-                    error={touched.prepTime?.unit && Boolean(errors.prepTime?.unit)} // Error handling for the unit
-                    helperText={touched.prepTime?.unit && errors.prepTime?.unit} // Display error message if any
                   >
                     <MenuItem value="mins">mins</MenuItem>
                     <MenuItem value="hours">hours</MenuItem>
@@ -352,7 +351,6 @@ const AddRecipeForm = () => {
                 </div>
               </Grid>
 
-              {/* Cook Time */}
               <Grid item xs={12} sm={6}>
                 <div className="flex gap-5 items-center mt-2">
                   <h1 className="text-md font-medium">
@@ -369,19 +367,14 @@ const AddRecipeForm = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     defaultValue={0}
-                    error={touched.cookTime?.time && Boolean(errors.cookTime?.time)} // Set error if touched and there's an error
-                    helperText={touched.cookTime?.time && errors.cookTime?.time} // Display error message if any
                   />
                   <TextField
                     name="cookTime.unit"
                     select
                     value={values.cookTime.unit}
                     onChange={handleChange}
-                    onBlur={handleBlur}
                     defaultValue="mins"
                     sx={{ width: 100 }}
-                    error={touched.cookTime?.unit && Boolean(errors.cookTime?.unit)} // Error handling for the unit
-                    helperText={touched.cookTime?.unit && errors.cookTime?.unit} // Display error message if any
                   >
                     <MenuItem value="mins">mins</MenuItem>
                     <MenuItem value="hours">hours</MenuItem>
@@ -390,7 +383,6 @@ const AddRecipeForm = () => {
                 </div>
               </Grid>
 
-
               <hr className="w-full py-2 mt-5 mb-2" />
               <Grid item xs={12} sm={6}>
                 <div className="flex flex-col gap-10">
@@ -398,7 +390,7 @@ const AddRecipeForm = () => {
                   <FormControl fullWidth>
                     <NativeSelect
                       required
-                      value={values.cuisine}  // Ensure this reflects the value from Formik state
+                      value={values.cuisine} // Ensure this reflects the value from Formik state
                       name="cuisine"
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -412,7 +404,6 @@ const AddRecipeForm = () => {
                         </option>
                       ))}
                     </NativeSelect>
-
                   </FormControl>
                 </div>
               </Grid>
@@ -436,7 +427,6 @@ const AddRecipeForm = () => {
                 </div>
               </Grid>
               <hr className="w-full py-2 mt-5 mb-2" />
-              {/* Submit Button */}
               <Grid item xs={12}>
                 <Box display="flex" justifyContent="right" gap={2}>
                   <Button

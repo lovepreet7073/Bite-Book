@@ -19,11 +19,12 @@ import {
   DELETE_RECIPE_REQUEST,
   DELETE_RECIPE_SUCCESS,
   UPDATE_RECIPE_REQUEST,
-  UPDATE_RECIPE_SUCCESS,
+  UPDATE_RECIPE_SUCCESS, 
   UPDATE_RECIPE_FAILURE,
   POST_REVIEW_FAILURE,
   POST_REVIEW_REQUEST,
-  POST_REVIEW_SUCCESS
+  POST_REVIEW_SUCCESS,
+  REMOVE_FAVORITE_REQUEST, REMOVE_FAVORITE_SUCCESS, REMOVE_FAVORITE_FAILURE
 } from "./ActionTypes";
 import { API_BASE_URL } from "../../config/apiUrl";
 import { UPDATE_USER_FAVORITES_AND_LIKE } from "../Auth/ActionType";
@@ -132,7 +133,7 @@ export const DeleteRecipe = (recipeId) => async (dispatch) => {
       },
     });
 
-    dispatch({ type: DELETE_RECIPE_SUCCESS, payload: data });
+    dispatch({ type: DELETE_RECIPE_SUCCESS, payload: data.recipeId });
   } catch (error) {
     dispatch({
       type: DELETE_RECIPE_FAILURE,
@@ -144,33 +145,7 @@ export const DeleteRecipe = (recipeId) => async (dispatch) => {
   }
 };
 
-export const likeRecipe = (recipeId, userId) => async (dispatch) => {
-  dispatch({ type: RECIPE_LIKE_REQUEST });
 
-  try {
-    const res = await api.post(
-      `${API_BASE_URL}/api/user-recipe-like/${recipeId}/${userId}`
-    );
-
-    const { recipe, message, favorites } = res.data;
-
-    dispatch({
-      type: RECIPE_LIKE_SUCCESS,
-      payload: recipe,
-    });
-    dispatch({
-      type: UPDATE_USER_FAVORITES_AND_LIKE,
-      payload: { favorites },
-    });
-    // Optionally show a success message or update the UI based on `message`
-    console.log(message);
-  } catch (error) {
-    dispatch({
-      type: RECIPE_LIKE_FAILURE,
-      payload: error.response ? error.response.data : error.message,
-    });
-  }
-};
 
 
 export const UpdateRecipe = (recipeId, formData) => async (dispatch) => {
@@ -223,6 +198,59 @@ export const ReviewOnRecipe = (recipeId, rating, comment) => async (dispatch) =>
       payload: error.response && error.response.data.message
         ? error.response.data.message
         : error.message,
+    });
+  }
+};
+
+
+export const RemoveRecipeFavorites = (recipeId) => async (dispatch) => {
+  dispatch({ type: REMOVE_FAVORITE_REQUEST });
+  const jwt = localStorage.getItem("jwt");
+
+  try {
+    const   { data }  = await api.delete(`/api/remove-favorites/${recipeId}`, {
+      headers: {
+        'Authorization': `Bearer ${jwt}`, // Use the auth token for authorization
+      },
+    });
+
+
+    dispatch({
+      type: REMOVE_FAVORITE_SUCCESS,
+      payload: data.recipeId
+    });
+  } catch (error) {
+    dispatch({
+      type: REMOVE_FAVORITE_FAILURE,
+      payload: error.message || 'Server error',
+    });
+  }
+};
+
+export const likeRecipe = (recipeId, userId) => async (dispatch) => {
+  dispatch({ type: RECIPE_LIKE_REQUEST });
+
+  try {
+    const res = await api.post(
+      `${API_BASE_URL}/api/user-recipe-like/${recipeId}/${userId}`
+    );
+
+    const { recipe, message, favorites } = res.data;
+
+    dispatch({
+      type: RECIPE_LIKE_SUCCESS,
+      payload: recipe,
+    });
+    dispatch({
+      type: UPDATE_USER_FAVORITES_AND_LIKE,
+      payload: { favorites },
+    });
+    // Optionally show a success message or update the UI based on `message`
+    console.log(message);
+  } catch (error) {
+    dispatch({
+      type: RECIPE_LIKE_FAILURE,
+      payload: error.response ? error.response.data : error.message,
     });
   }
 };

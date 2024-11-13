@@ -16,7 +16,7 @@ import axios from 'axios'
 import { api } from '../../config/apiUrl';
 
 
-// Action creator
+
 export const register = (userData, navigate) => async (dispatch) => {
     dispatch({ type: REGISTER_REQUEST });
     try {
@@ -32,13 +32,13 @@ export const register = (userData, navigate) => async (dispatch) => {
             payload: user,
         });
         navigate('/');
-        return true; // Registration was successful
+        return true;
     } catch (error) {
         dispatch({
             type: REGISTER_FAILURE,
             payload: error.response ? error.response.data : error.message,
         });
-        return false; // Registration failed
+        return false;
     }
 };
 
@@ -81,27 +81,38 @@ export const logout = () => (dispatch) => {
 
 }
 
+
 export const getUser = (jwt) => async (dispatch) => {
-    dispatch({ type: GET_USER_REQUEST })
+    dispatch({ type: GET_USER_REQUEST });
+
     try {
         const res = await axios.get(`${API_BASE_URL}/api/user-profile`, {
             headers: {
-                "Authorization": `Bearer ${jwt}`
-            }
-        })
+                "Authorization": `Bearer ${jwt}`,
+            },
+        });
+        
         const user = res.data;
 
         dispatch({
             type: GET_USER_SUCCESS,
-            payload: user
-        })
+            payload: user,
+        });
     } catch (error) {
+        // if (error.response && error.response.data.error === 'jwt expired') {
+        //     // If the JWT is expired, perform logout
+        //     localStorage.removeItem('jwt');  // Remove JWT from localStorage
+          
+        // }
+
+        // // Dispatch failure action with the error message
         dispatch({
             type: GET_USER_FAILURE,
-            payload: error.message
-        })
+            payload: error.response ? error.response.data.error : 'An error occurred',
+        });
     }
-}
+};
+
 export const googlelogin = (userData, navigate) => async (dispatch) => {
     dispatch({ type: GOOGLE_LOGIN_REQUEST });
 

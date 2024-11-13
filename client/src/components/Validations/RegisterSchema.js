@@ -1,6 +1,5 @@
 import * as Yup from 'yup';
 
-// Validation schema using Yup with strong password and email regex
 const RegisterSchema = Yup.object({
     fullName: Yup.string()
     .required('Full name is required')

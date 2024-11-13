@@ -9,12 +9,11 @@ import { useNavigate } from 'react-router-dom';
 const Home = () => {
   const dispatch = useDispatch()
   const { recipe } = useSelector(store => store)
-  console.log(recipe, "recipe-home")
   const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(GetRecipes());
-}, [dispatch,recipe.recipeAdded]);
+  }, [dispatch, recipe]);
 
 
 

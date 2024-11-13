@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-
+import NotFound from '../pages/NotFound';
 import UserProfile from '../pages/UserProfile/UserProfile';
 import AddRecipeForm from '../pages/Forms/AddRecipeForm';
 import RecipeDetailCard from '../components/Cards/RecipeDetailCard';
@@ -51,6 +51,7 @@ const CustomRoutes = () => {
                         </ProtectedRoute>
                     }
                 />
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </div>
     );

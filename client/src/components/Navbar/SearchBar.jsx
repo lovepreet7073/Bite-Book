@@ -11,15 +11,14 @@ const SearchBar = () => {
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
-      setResults([]); // Clear results if query is empty
+      setResults([]);
       return;
     }
 
     const delayDebounceFn = setTimeout(() => {
-      handleSearch(); // Perform search after a short delay
-    }, 500); // Add debounce time (500ms) to prevent excessive API calls
-
-    return () => clearTimeout(delayDebounceFn); // Cleanup the timeout if query changes
+      handleSearch();
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
 
   const handleSearch = async () => {
@@ -50,7 +49,7 @@ const SearchBar = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)} // Trigger search on input change
         />
-        <IoSearchSharp size={22} className='text-[#FF6216]'  />
+        <IoSearchSharp size={22} className='text-[#FF6216]' />
       </div>
 
       {results.length > 0 ? (

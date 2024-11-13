@@ -20,15 +20,24 @@ export const recipeReducer = (state = initialState, action) => {
         case UPDATE_RECIPE_REQUEST:
             return { ...state, isLoading: true, error: null }
         case DELETE_RECIPE_SUCCESS:
+            console.log(action.payload, "action-pyalod")
             return {
                 ...state,
                 isLoading: false,
-                deletedRecipe: action.payload,
-                // Remove the deleted recipe from userRecipes
-                userRecipes: state.userRecipes ? state.userRecipes.filter(recipe => recipe._id !== action.payload._id) : null
+                deletedRecipe: action.payload,  // recipeId
+                allRecipes: state.allRecipes ? state.allRecipes.filter(recipe => recipe._id !== action.payload) : null,
+                userRecipes: state.userRecipes ? state.userRecipes.filter(recipe => recipe._id !== action.payload) : null,
             };
+
         case ADD_RECIPE_SUCCESS:
-            return { ...state, isLoading: false, error: null, recipe: action.payload.recipe, allRecipes: [...state.allRecipes, action.payload.recipe] }
+            return {
+                ...state,
+                isLoading: false,
+                error: null,
+                recipe: action.payload.recipe,
+                allRecipes: [action.payload.recipe, ...state.allRecipes] // Add the new recipe at the beginning
+            };
+
         case FIND_RECIPE_BY_ID_SUCCESS:
             return { ...state, isLoading: false, error: null, recipe: action.payload }
         case FIND_RECIPES_SUCCESS:

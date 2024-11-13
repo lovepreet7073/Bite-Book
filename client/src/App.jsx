@@ -5,28 +5,25 @@ import Home from '../src/components/Home/Home';
 import { Toaster } from 'react-hot-toast';
 import Footer from './components/Home/Footer';
 import Navbar from './components/Navbar/Navbar';
-import AuthRoutes from './routes/AuthRoutes';  // Assuming this will have Auth-related routes
+import AuthRoutes from './routes/AuthRoutes';
 import CustomRoutes from './routes/CustomRoutes';
 import NotFound from './pages/NotFound';
 function App() {
-  const location = useLocation();  // Get the current route
+  const location = useLocation();
 
-  // Check if the current route is for login or register
   const showNavbarFooter = location.pathname !== '/auth/login' && location.pathname !== '/auth/register';
 
   return (
     <div className="">
-      {/* Render Navbar and Footer only if the current route is not /auth/login or /auth/register */}
       {showNavbarFooter && <Navbar />}
 
       <div className="">
-      <Toaster />
+        <Toaster />
         <Routes>
-          {/* Define the public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/auth/*" element={<AuthRoutes />} />
           <Route path="/user/*" element={<CustomRoutes />} />
-          <Route path="*" element={<NotFound />}/>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
 

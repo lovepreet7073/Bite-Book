@@ -51,20 +51,16 @@ const getAllRecipes = async (req, res) => {
     const { ingredient, cuisine } = req.query;
     let query = {};
 
-    // Handle ingredient search (case-insensitive)
     if (ingredient) {
       query.ingredients = { $in: [new RegExp(ingredient, "i")] };
     }
 
-    // Handle cuisine search (case-insensitive)
     if (cuisine) {
       query.cuisine = { $regex: new RegExp(cuisine, "i") };
     }
 
-    // Fetch the recipes based on the query and sort them by createdAt (descending)
     const recipes = await Recipe.find(query).sort({ createdAt: -1 });
 
-    // Send the response with sorted recipes
     res.status(200).json(recipes);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
@@ -189,7 +185,9 @@ const deleteRecipe = async (req, res) => {
     await Recipe.findByIdAndDelete(recipeId);
 
     // Return success response
-    res.status(200).json({ message: "Recipe deleted successfully" });
+    // After deleting the recipe
+    res.status(200).json({ message: "Recipe deleted successfully", recipeId: recipeId });
+
   } catch (error) {
     // Handle any errors
     res.status(500).json({
@@ -302,6 +300,28 @@ const postReview = async (req, res) => {
   }
 };
 
+const deleteRecipeFavorites = async (req, res) => {
+  const { recipeId } = req.params;
+  const userId = req.user.id; // Assuming the user ID is available via the auth middleware
+
+  try {
+    // Find the user and remove the recipe from their favorites
+    const user = await userService.findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Remove the recipeId from the user's favorites list
+    user.favorites = user.favorites.filter((recipe) => recipe.toString() !== recipeId);
+
+    await user.save();
+    res.status(200).json({ message: "Recipe removed successfully", recipeId: recipeId });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
 
 module.exports = {
   addRecipe,
@@ -313,4 +333,5 @@ module.exports = {
   deleteRecipe,
   updateRecipe,
   postReview,
+  deleteRecipeFavorites
 };

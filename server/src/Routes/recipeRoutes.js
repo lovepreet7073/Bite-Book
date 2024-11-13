@@ -13,6 +13,7 @@ router.get('/recipes/search', recipeController.SearchRecipe)
 router.get('/user-recipe-get/:id', authenticate, recipeController.userRecipes)
 router.post('/user-recipe-like/:recipeId/:userId', authenticate, recipeController.likeRecipe)
 router.delete('/delete-recipe/:recipeId', authenticate, recipeController.deleteRecipe)
-router.put('/update-recipe/:recipeId',upload.array('imageUrl', 10) ,authenticate, recipeController.updateRecipe)
+router.put('/update-recipe/:recipeId', upload.array('imageUrl', 10), authenticate, recipeController.updateRecipe)
 router.post('/rate-recipe/:recipeId', authenticate, recipeController.postReview)
+router.delete('/remove-favorites/:recipeId', authenticate, recipeController.deleteRecipeFavorites)
 module.exports = router

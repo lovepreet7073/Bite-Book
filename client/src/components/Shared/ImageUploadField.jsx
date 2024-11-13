@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MdCancel } from "react-icons/md";
 
 const MultipleImageUploadField = ({
-  values,
+
   setFieldValue,
   existingImages = [],
 
@@ -26,7 +26,7 @@ const MultipleImageUploadField = ({
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    console.log(selectedImages, "files")
+    console.log(files, 'files')
     if (files.length) {
       setSelectedImages((prev) => [...prev, ...files]);
       const newImagePreviews = files.map((file) => URL.createObjectURL(file));
@@ -43,14 +43,14 @@ const MultipleImageUploadField = ({
     const updatedPreviews = imagePreviews.filter(
       (_, index) => index !== indexToRemove
     );
-    console.log(updatedImages, 'updatedImages')
 
     setSelectedImages(updatedImages);
     setImagePreviews(updatedPreviews);
 
     setFieldValue("imageUrl", updatedImages);
   };
-  console.log(selectedImages, "selected")
+  console.log(imagePreviews, 'imagePreviews')
+
   return (
     <div className="flex flex-col items-center justify-center gap-3 w-full">
       <label

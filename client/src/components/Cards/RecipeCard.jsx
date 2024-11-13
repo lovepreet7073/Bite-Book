@@ -17,7 +17,6 @@ export default function RecipeReviewCard({ recipe }) {
     const dispatch = useDispatch();
     const { auth } = useSelector((store) => store);
     const token = localStorage.getItem('jwt');
-    console.log(auth, "auth");
 
     useEffect(() => {
         revealElements();
@@ -57,7 +56,7 @@ export default function RecipeReviewCard({ recipe }) {
     };
 
     const firstImageUrl = recipe.imageUrl?.[0] ? `${API_BASE_URL}/images/${recipe.imageUrl[0]}` : null;
-
+    const isFavRecipe = auth.userFavorites.includes(recipe._id)
     return (
         <div
             title={!token ? 'Log in to access the recipe!' : ''}

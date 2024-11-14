@@ -19,12 +19,15 @@ import {
   DELETE_RECIPE_REQUEST,
   DELETE_RECIPE_SUCCESS,
   UPDATE_RECIPE_REQUEST,
-  UPDATE_RECIPE_SUCCESS, 
+  UPDATE_RECIPE_SUCCESS,
   UPDATE_RECIPE_FAILURE,
   POST_REVIEW_FAILURE,
   POST_REVIEW_REQUEST,
   POST_REVIEW_SUCCESS,
-  REMOVE_FAVORITE_REQUEST, REMOVE_FAVORITE_SUCCESS, REMOVE_FAVORITE_FAILURE
+  REMOVE_FAVORITE_REQUEST, REMOVE_FAVORITE_SUCCESS, REMOVE_FAVORITE_FAILURE,
+  UPDATE_REVIEW_REQUEST,
+  UPDATE_REVIEW_SUCCESS,
+  UPDATE_REVIEW_FAILURE
 } from "./ActionTypes";
 import { API_BASE_URL } from "../../config/apiUrl";
 import { UPDATE_USER_FAVORITES_AND_LIKE } from "../Auth/ActionType";
@@ -208,7 +211,7 @@ export const RemoveRecipeFavorites = (recipeId) => async (dispatch) => {
   const jwt = localStorage.getItem("jwt");
 
   try {
-    const   { data }  = await api.delete(`/api/remove-favorites/${recipeId}`, {
+    const { data } = await api.delete(`/api/remove-favorites/${recipeId}`, {
       headers: {
         'Authorization': `Bearer ${jwt}`, // Use the auth token for authorization
       },
@@ -251,6 +254,33 @@ export const likeRecipe = (recipeId, userId) => async (dispatch) => {
     dispatch({
       type: RECIPE_LIKE_FAILURE,
       payload: error.response ? error.response.data : error.message,
+    });
+  }
+};
+
+export const UpdateReview = ({ recipeId, rating, comment, reviewId }) => async (dispatch) => {
+  dispatch({ type: UPDATE_REVIEW_REQUEST });
+  const jwt = localStorage.getItem("jwt");
+
+  try {
+    // Make a PUT request to update the review
+    const { data } = await api.put(
+      `/api/update-review/${recipeId}/${reviewId}`, // Ensure that both recipeId and reviewId are passed correctly in the URL
+      { rating, comment },
+      {
+        headers: {
+          Authorization: `Bearer ${jwt}`, // Include JWT token in the header for authorization
+        },
+      }
+    );
+
+    // Dispatch success action with updated recipe and review
+    dispatch({ type: UPDATE_REVIEW_SUCCESS, payload: data });
+
+  } catch (error) {
+    dispatch({
+      type: UPDATE_REVIEW_FAILURE,
+      payload: error.message,
     });
   }
 };

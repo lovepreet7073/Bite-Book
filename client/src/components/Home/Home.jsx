@@ -13,7 +13,7 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(GetRecipes());
-  }, [dispatch, recipe]);
+  }, [dispatch]);
 
 
 

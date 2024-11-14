@@ -3,15 +3,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
 import { AiOutlineDelete } from "react-icons/ai";
-import { RemoveRecipeFavorites } from '../../redux/Recipe/Actions'; // Import the action
+import { RemoveRecipeFavorites } from '../../redux/Recipe/Actions'; 
 import { API_BASE_URL } from '../../config/apiUrl';
 const SavedRecipes = () => {
     const { auth } = useSelector(store => store);
-    const dispatch = useDispatch(); // Use dispatch to trigger actions
+    const dispatch = useDispatch(); 
     const navigate = useNavigate();
     const [selectedRecipe, setSelectedRecipe] = useState(null);
-    const [open, setOpen] = useState(false); // State to control dialog visibility
+    const [open, setOpen] = useState(false); 
     const handleOpenDialog = (recipe) => {
+        
         setSelectedRecipe(recipe._id);
         setOpen(true);
     };
@@ -23,12 +24,9 @@ const SavedRecipes = () => {
 
     const handleConfirmDelete = () => {
         setOpen(false);
-        console.log(`Deleting recipe with ID: ${selectedRecipe}`);
 
-        // Dispatch the action to remove the recipe from favorites
         dispatch(RemoveRecipeFavorites(selectedRecipe)); // Dispatch action here
     };
-    console.log(auth,"userFavorites")
 
     return (
         <div>
@@ -65,10 +63,10 @@ const SavedRecipes = () => {
                                             size={24}
                                             className="text-primary"
                                             title='remove from list'
-                                            // onClick={(e) => {
-                                            //     e.stopPropagation(); // Prevent navigation
-                                            //     handleOpenDialog(recipe); // Open confirmation dialog
-                                            // }}
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent navigation
+                                            handleOpenDialog(recipe); // Open confirmation dialog
+                                        }}
                                         />
                                     </div>
                                 </div>

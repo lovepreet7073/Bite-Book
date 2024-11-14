@@ -31,7 +31,6 @@ const MultipleImageUploadField = ({
       setSelectedImages((prev) => [...prev, ...files]);
       const newImagePreviews = files.map((file) => URL.createObjectURL(file));
       setImagePreviews((prev) => [...prev, ...newImagePreviews]);
-
       setFieldValue("imageUrl", [...selectedImages, ...files]);
     }
   };

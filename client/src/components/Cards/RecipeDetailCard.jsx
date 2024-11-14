@@ -4,9 +4,9 @@ import { useParams } from 'react-router-dom';
 import { findRecipeById } from '../../redux/Recipe/Actions';
 import moment from 'moment';
 import revealElements from '../../scrollReveal';
-import Carousel from './Carousel'; // Import your Carousel component
-import RecipeRatingReview from './Rating';
-import Reviews from './Reviews';
+import Carousel from '../Shared/Carousel'; // Import your Carousel component
+import RecipeRatingReview from '../Reviews/Rating';
+import Reviews from '../Reviews/Reviews';
 const RecipeDetailCard = () => {
     const params = useParams();
     const dispatch = useDispatch();
@@ -34,7 +34,9 @@ const RecipeDetailCard = () => {
                         <Carousel data={recipe?.recipe?.imageUrl || []} className='mb-3' /> {/* Use your images array */}
                         <Reviews
                             userReviews={recipe?.recipe?.reviews}
+                            recipeId={params?.recipeId}  // Pass recipeId from params
                         />
+
                     </div>
 
                     <div className="lg:col-span-1 max-auto right max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-7xl lg:px-8 lg:pb-24">
@@ -92,11 +94,11 @@ const RecipeDetailCard = () => {
                                         ))}
                                     </ol>
                                 </div>
-                                {recipe?.recipe?.notes ?    <p className='text-gray-600 mt-4'>
+                                {recipe?.recipe?.notes ? <p className='text-gray-600 mt-4'>
                                     <span className='text-primary font-bold text-lg italic'>Notes:-</span>
                                     <span className='italic'>{recipe?.recipe?.notes}</span>
-                                </p> :<></>  }
-                            
+                                </p> : <></>}
+
 
                             </div>
                         </div>

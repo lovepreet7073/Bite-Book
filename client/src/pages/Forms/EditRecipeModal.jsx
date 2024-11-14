@@ -118,13 +118,13 @@ const EditRecipeForm = () => {
                                 <MultipleImageUploadField
                                     values={values}
                                     setFieldValue={setFieldValue}
-                                    existingImages={recipe.imageUrl} // Pass the existing image URLs here
+                                    existingImages={recipe?.imageUrl} // Pass the existing image URLs here
                                 />
 
                                 {/* Optionally, show selected images */}
                                 {values.imageUrl &&
                                     Array.from(values.imageUrl).map((file, index) => (
-                                        <p key={index}>{file.name}</p>
+                                        <p key={index}>{file?.name}</p>
                                     ))}
                             </Grid>
 

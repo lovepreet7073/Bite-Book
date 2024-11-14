@@ -321,6 +321,44 @@ const deleteRecipeFavorites = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 }
+const UpdateReview = async (req, res) => {
+  const { rating, comment } = req.body;
+  const { recipeId, reviewId } = req.params; // Ensure both recipeId and reviewId are destructured from req.params
+  const userId = req.user.id; // Get the logged-in user ID from the request
+
+  try {
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) return res.status(404).json({ message: "Recipe not found" });
+
+    const review = recipe.reviews.id(reviewId);
+    if (!review) return res.status(404).json({ message: "Review not found" });
+
+    if (review.userId.toString() !== userId) {
+      return res.status(403).json({ message: "You can only update your own review" });
+    }
+
+    if (rating) review.rating = rating;
+    if (comment) review.comment = comment;
+
+    await recipe.save();
+
+    await recipe.populate({
+      path: "reviews.userId",
+      select: "fullName profile_pic"
+    });
+
+    const updatedReview = recipe.reviews.id(reviewId);
+
+    res.status(200).json({
+      message: "Review updated successfully",
+      review: updatedReview,
+      recipe: { ...recipe.toObject(), reviews: recipe.reviews }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 
 module.exports = {
@@ -333,5 +371,6 @@ module.exports = {
   deleteRecipe,
   updateRecipe,
   postReview,
-  deleteRecipeFavorites
+  deleteRecipeFavorites,
+  UpdateReview
 };

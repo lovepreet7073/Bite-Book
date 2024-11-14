@@ -11,7 +11,7 @@ const TrendingCard = () => {
             <div className="flex flex-col items-center bg-white  productCard  rounded-sm  md:flex-row md:max-w-xl hover:cursor-pointer"
             >
                 <img
-                    className="object-cover    md:h-auto md:w-48 w-full "
+                    className="object-cover  h-[12rem]  md:h-auto md:w-48 w-full "
                     src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHi7GCv2HdNaNwaXEd9tYGW3gvnD3QBlDHkw&s"
                     alt=""
                 />

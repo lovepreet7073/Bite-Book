@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const reviewSchema = require('./RatingModel')
+const reviewSchema = require('./ratingModel')
 const recipeSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,

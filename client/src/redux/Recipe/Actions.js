@@ -27,7 +27,10 @@ import {
   REMOVE_FAVORITE_REQUEST, REMOVE_FAVORITE_SUCCESS, REMOVE_FAVORITE_FAILURE,
   UPDATE_REVIEW_REQUEST,
   UPDATE_REVIEW_SUCCESS,
-  UPDATE_REVIEW_FAILURE
+  UPDATE_REVIEW_FAILURE,
+  FETCH_POPULAR_RECIPES_REQUEST,
+  FETCH_POPULAR_RECIPES_SUCCESS,
+  FETCH_POPULAR_RECIPES_FAILURE
 } from "./ActionTypes";
 import { API_BASE_URL } from "../../config/apiUrl";
 import { UPDATE_USER_FAVORITES_AND_LIKE } from "../Auth/ActionType";
@@ -280,6 +283,24 @@ export const UpdateReview = ({ recipeId, rating, comment, reviewId }) => async (
   } catch (error) {
     dispatch({
       type: UPDATE_REVIEW_FAILURE,
+      payload: error.message,
+    });
+  }
+};
+
+
+export const fetchPopularRecipes = (limit = 10) => async (dispatch) => {
+  dispatch({ type: FETCH_POPULAR_RECIPES_REQUEST });
+
+  try {
+    const { data } = await api.get(`/api/popular-recipes?limit=${limit}`);
+    dispatch({
+      type: FETCH_POPULAR_RECIPES_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: FETCH_POPULAR_RECIPES_FAILURE,
       payload: error.message,
     });
   }

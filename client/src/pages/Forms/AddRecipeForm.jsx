@@ -151,6 +151,7 @@ const AddRecipeForm = () => {
                     multiline
                     maxRows={4}
                     name="title"
+                    required
                     value={values.title}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -355,7 +356,7 @@ const AddRecipeForm = () => {
                 <div className="flex gap-5 items-center mt-2">
                   <h1 className="text-md font-medium">
                     Cook Time{" "}
-                    <span className="text-sm text-neutral-400">(optional)</span>
+                    {/* <span className="text-sm text-neutral-400">(optional)</span> */}
                   </h1>
                   <TextField
                     name="cookTime.time"

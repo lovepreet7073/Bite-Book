@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
+import { Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button,Paper } from '@mui/material';
 import { AiOutlineDelete } from "react-icons/ai";
-import { RemoveRecipeFavorites } from '../../redux/Recipe/Actions'; 
+import { RemoveRecipeFavorites } from '../../redux/Recipe/Actions';
 import { API_BASE_URL } from '../../config/apiUrl';
+import RecipeCardSkeleton from '../../components/Shared/RecipeCardSkeleton ';
+
 const SavedRecipes = () => {
     const { auth } = useSelector(store => store);
-    const dispatch = useDispatch(); 
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [selectedRecipe, setSelectedRecipe] = useState(null);
-    const [open, setOpen] = useState(false); 
+    const [open, setOpen] = useState(false);
+
     const handleOpenDialog = (recipe) => {
-        
         setSelectedRecipe(recipe._id);
         setOpen(true);
     };
@@ -24,16 +26,25 @@ const SavedRecipes = () => {
 
     const handleConfirmDelete = () => {
         setOpen(false);
-
         dispatch(RemoveRecipeFavorites(selectedRecipe)); // Dispatch action here
     };
 
     return (
         <div>
-            <h1 className='text-3xl font-bold'>Recently Saved Recipes</h1>
-            <div className="grid lg:grid-cols-3 gap-4 mt-[5%]">
-                {auth?.userFavorites?.length > 0 ? (
-                    auth?.userFavorites.map((recipe) => {
+            <Paper elevation={3} className="p-5 lg:mb-[8%] mb-[15%]">
+             
+            <h1 className='text-3xl font-bold'>My Saved Recipes & Collections </h1>
+            <h1 className='text-2xl font-semibold mt-5 mb-0 text-gray-500 ml-[4px]'>Recently Saved </h1>
+
+            <div className="grid lg:grid-cols-3 sm:grid-cols-1 gap-4 mt-[1%]">
+                {auth.isLoading ? (
+                    <div className="grid lg:grid-cols-3 sm:grid-cols-1 gap-5">
+                        {Array.from({ length: 6 }).map((_, idx) => (
+                            <RecipeCardSkeleton key={idx} />
+                        ))}
+                    </div>
+                ) : auth?.userFavorites?.length > 0 ? (
+                    auth.userFavorites.map((recipe) => {
                         const imageUrl = Array.isArray(recipe.imageUrl)
                             ? recipe.imageUrl[0]
                             : recipe.imageUrl;
@@ -63,10 +74,10 @@ const SavedRecipes = () => {
                                             size={24}
                                             className="text-primary"
                                             title='remove from list'
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // Prevent navigation
-                                            handleOpenDialog(recipe); // Open confirmation dialog
-                                        }}
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Prevent navigation
+                                                handleOpenDialog(recipe); // Open confirmation dialog
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -98,6 +109,7 @@ const SavedRecipes = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            </Paper>
         </div>
     );
 };

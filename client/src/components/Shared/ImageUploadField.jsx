@@ -31,7 +31,9 @@ const MultipleImageUploadField = ({
       setSelectedImages((prev) => [...prev, ...files]);
       const newImagePreviews = files.map((file) => URL.createObjectURL(file));
       setImagePreviews((prev) => [...prev, ...newImagePreviews]);
+      console.log(selectedImages,files,'test')
       setFieldValue("imageUrl", [...selectedImages, ...files]);
+      // setFieldValue("imageUrl", [...imagePreviews, ...newImagePreviews]);
     }
   };
 
@@ -91,7 +93,7 @@ const MultipleImageUploadField = ({
             <div key={index} className="relative">
               <img
                 src={preview}
-                alt={``}
+                alt={`Uploaded preview ${index + 1}`}
                 className="w-full lg:h-[10rem] h-[5rem] object-cover rounded-lg"
               />
               <MdCancel

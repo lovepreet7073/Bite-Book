@@ -20,7 +20,12 @@ const userSchema = new mongoose.Schema({
 
     },
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
-
+    collections: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Collection',
+        },
+    ],
     createdAt: {
         type: Date,
         default: Date.now()

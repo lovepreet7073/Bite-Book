@@ -11,6 +11,7 @@ import { MdLock } from "react-icons/md";
 import { FcLike } from "react-icons/fc";
 import { BsFillInfoCircleFill } from "react-icons/bs";
 import { BiSolidFoodMenu } from "react-icons/bi";
+import Collection from '../../components/Collection/Collection';
 const UserProfile = () => {
   const { auth, recipe } = useSelector((store) => store);
   const [userData, setUserData] = useState({
@@ -97,10 +98,12 @@ const UserProfile = () => {
 
         {/* Main content */}
         <Grid item xs={12} sm={9}>
-          <Paper elevation={3} className="p-5 lg:mb-[18%]">
+          
             {/* Conditionally render the content based on the active section */}
             {activeSection === 'personalInfo' ? (
               <>
+                <Paper elevation={3} className="p-5 lg:mb-[18%]">
+
                 <div className="flex justify-between items-center ">
                   <Typography variant="h5" gutterBottom>
                     Personal Info
@@ -151,13 +154,18 @@ const UserProfile = () => {
                     onChange={handleChange}
                   />
                 </form>
+                </Paper>
+
               </>
             ) : activeSection === 'myRecipes' ? (
               <UserRecipes />
             ) : (
-              <SavedRecipes />
+              <>
+               <SavedRecipes />
+               <Collection/>
+              </>
+             
             )}
-          </Paper>
         </Grid>
       </Grid>
     </Container>

@@ -30,18 +30,20 @@ export const authReducer = (state = initialState, action) => {
             return { ...state, isLoading: false, error: null, user: action.payload }
         case REMOVE_FAVORITE_SUCCESS:
             const recipeIdToRemove = action.payload;
-            {console.log(action.payload, "action.payload")}
-            {console.log(recipeIdToRemove, "payload")} // Get the recipeId from the payload
+            { console.log(action.payload, "action.payload") }
+            { console.log(recipeIdToRemove, "payload") } // Get the recipeId from the payload
             return {
                 ...state,
-                userFavorites: state.userFavorites.filter(favorite => favorite._id !== recipeIdToRemove), // 
+                userFavorites: state.userFavorites.filter(favorite => favorite._id !== recipeIdToRemove),
+                isLoading:false // 
             };
 
         case UPDATE_USER_FAVORITES_AND_LIKE:
             const { favorites } = action.payload;
             return {
                 ...state,
-                userFavorites: favorites, // Update favorites if any change occurs
+                userFavorites: favorites,
+                isLoading:false // Update favorites if any change occurs
             };
         case REGISTER_FAILURE:
         case UPDATE_USER_FAILURE:

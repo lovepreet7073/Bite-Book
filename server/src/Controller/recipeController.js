@@ -299,6 +299,53 @@ const postReview = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const UpdateReview = async (req, res) => {
+  const { rating, comment } = req.body;
+  const { recipeId, reviewId } = req.params; // Ensure both recipeId and reviewId are destructured from req.params
+  const userId = req.user.id; // Get the logged-in user ID from the request
+
+  try {
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) return res.status(404).json({ message: "Recipe not found" });
+
+    const review = recipe.reviews.id(reviewId);
+    if (!review) return res.status(404).json({ message: "Review not found" });
+
+    if (review.userId.toString() !== userId) {
+      return res.status(403).json({ message: "You can only update your own review" });
+    }
+
+    if (rating) review.rating = rating;
+    if (comment) review.comment = comment;
+
+    // Update `updatedAt` manually if timestamps are not automatically managed
+    review.updatedAt = new Date();
+
+    await recipe.save();
+
+    await recipe.populate({
+      path: "reviews.userId",
+      select: "fullName profile_pic",
+    });
+
+    // Sort reviews by `updatedAt` (descending)
+    const sortedReviews = recipe.reviews.sort((a, b) => {
+      const dateA = new Date(a.updatedAt || a.createdAt); // Fallback to `createdAt` if `updatedAt` is unavailable
+      const dateB = new Date(b.updatedAt || b.createdAt);
+      return dateB - dateA;
+    });
+
+    const updatedReview = sortedReviews.find((r) => r.id === reviewId);
+
+    res.status(200).json({
+      message: "Review updated successfully",
+      review: updatedReview,
+      recipe: { ...recipe.toObject(), reviews: sortedReviews },
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 const deleteRecipeFavorites = async (req, res) => {
   const { recipeId } = req.params;
@@ -321,48 +368,46 @@ const deleteRecipeFavorites = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 }
-const UpdateReview = async (req, res) => {
-  const { rating, comment } = req.body;
-  const { recipeId, reviewId } = req.params; // Ensure both recipeId and reviewId are destructured from req.params
-  const userId = req.user.id; // Get the logged-in user ID from the request
 
+
+//popular recipes
+
+const getPopularRecipes = async (req, res) => {
   try {
-    const recipe = await Recipe.findById(recipeId);
-    if (!recipe) return res.status(404).json({ message: "Recipe not found" });
+    // Use a default limit if not provided in the query parameters
+    const limit = parseInt(req.query.limit, 10) || 10;
 
-    const review = recipe.reviews.id(reviewId);
-    if (!review) return res.status(404).json({ message: "Review not found" });
+    const popularRecipes = await Recipe.aggregate([
+      {
+        $addFields: {
+          popularityScore: {
+            $add: [
+              { $multiply: [1, "$likes"] }, // Weight for likes
+              { $multiply: [10, { $size: "$reviews" }] } // Weight for reviews
+            ]
+          }
+        }
+      },
+      {
+        $sort: { popularityScore: -1 } // Sort by combined popularity score
+      },
+      {
+        $limit: limit // Limit the results
+      }
+    ]);
 
-    if (review.userId.toString() !== userId) {
-      return res.status(403).json({ message: "You can only update your own review" });
-    }
+    // popularityScore = (1 * likes) + (10 * reviews.length)
 
-    if (rating) review.rating = rating;
-    if (comment) review.comment = comment;
-
-    await recipe.save();
-
-    await recipe.populate({
-      path: "reviews.userId",
-      select: "fullName profile_pic"
-    });
-
-    const updatedReview = recipe.reviews.id(reviewId);
-
-    res.status(200).json({
-      message: "Review updated successfully",
-      review: updatedReview,
-      recipe: { ...recipe.toObject(), reviews: recipe.reviews }
-    });
+    res.status(200).json(popularRecipes);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error fetching popular recipes (combined):", error);
+    res.status(500).json({ message: "Failed to fetch popular recipes" });
   }
 };
 
-
-
 module.exports = {
   addRecipe,
+  getPopularRecipes,
   getAllRecipes,
   findRecipeById,
   SearchRecipe,

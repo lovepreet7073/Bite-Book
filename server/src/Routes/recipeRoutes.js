@@ -17,4 +17,5 @@ router.put('/update-recipe/:recipeId', upload.array('imageUrl', 10), authenticat
 router.post('/rate-recipe/:recipeId', authenticate, recipeController.postReview)
 router.put('/update-review/:recipeId/:reviewId', authenticate, recipeController.UpdateReview)
 router.delete('/remove-favorites/:recipeId', authenticate, recipeController.deleteRecipeFavorites)
+router.get('/popular-recipes', recipeController.getPopularRecipes)
 module.exports = router

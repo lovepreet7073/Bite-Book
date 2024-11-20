@@ -14,7 +14,9 @@ export default function RecipeReviewCard({ recipe }) {
     const dispatch = useDispatch();
     const { auth } = useSelector((store) => store);
     const token = localStorage.getItem('jwt');
-    console.log(auth, "auth")
+    console.log(isLiked, recipe._id, auth?.userFavorites)
+
+
     useEffect(() => {
         if (auth?.userFavorites?.some(favRecipe => favRecipe._id === recipe._id)) {
             setIsLiked(true);
@@ -23,6 +25,8 @@ export default function RecipeReviewCard({ recipe }) {
         }
     }, [auth?.userFavorites, recipe?._id]);
 
+
+    //Average rating function
     useEffect(() => {
         if (recipe?.reviews?.length > 0) {
             const averageRating = recipe.reviews.reduce((acc, review) => acc + review.rating, 0) / recipe.reviews.length;
@@ -47,7 +51,7 @@ export default function RecipeReviewCard({ recipe }) {
     return (
         <div
             title={!token ? 'Log in to access the recipe!' : ''}
-            className='hero-title productCard hover:cursor-pointer w-[23rem]'
+            className='hero-title productCard hover:cursor-pointer w-[23rem] relative'
             onClick={() => navigate(`/user/recipe/${recipe._id}`)}
         >
             <div key={recipe._id} className="mb-4 flex flex-col gap-2">
@@ -71,6 +75,7 @@ export default function RecipeReviewCard({ recipe }) {
                     className='w-10 h-10 bg-primary rounded-full top-[1%] right-[1%] flex justify-center items-center absolute hover:bg-secondary'
                     onClick={token ? handleLikeClick : null}
                 >
+
                     {isLiked ? (
                         <FaHeart className='text-white' size={20} />
                     ) : (

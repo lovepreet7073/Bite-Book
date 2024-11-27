@@ -3,20 +3,36 @@ import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../config/apiUrl';
-import { likeRecipe } from '../../redux/Recipe/Actions';
-import showCustomToast from '../Shared/ToastComponent';
 import Rating from '@mui/material/Rating';
+import AddCollectionDialog from '../Collection/AddCollectionDialog';
 
 export default function RecipeReviewCard({ recipe }) {
     const [isLiked, setIsLiked] = useState(false);
-    const [value, setValue] = React.useState(2);
+    const [dialogOpen, setDialogOpen] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { auth } = useSelector((store) => store);
     const token = localStorage.getItem('jwt');
     console.log(isLiked, recipe._id, auth?.userFavorites)
+    const [value, setValue] = React.useState(2);
 
+    useEffect(() => {
+        if (recipe?.reviews?.length > 0) {
+            const averageRating = recipe.reviews.reduce((acc, review) => acc + review.rating, 0) / recipe.reviews.length;
+            setValue(averageRating);
+        } else {
+            setValue(0);
+        }
+    }, [recipe]);
+    const handleOpenDialog = (event) => {
+        setDialogOpen(true);
+        event.stopPropagation();
+    };
 
+    // Close dialog handler
+    const handleCloseDialog = () => {
+        setDialogOpen(false);
+    };
     useEffect(() => {
         if (auth?.userFavorites?.some(favRecipe => favRecipe._id === recipe._id)) {
             setIsLiked(true);
@@ -27,24 +43,9 @@ export default function RecipeReviewCard({ recipe }) {
 
 
     //Average rating function
-    useEffect(() => {
-        if (recipe?.reviews?.length > 0) {
-            const averageRating = recipe.reviews.reduce((acc, review) => acc + review.rating, 0) / recipe.reviews.length;
-            setValue(averageRating);
-        } else {
-            setValue(0);
-        }
-    }, [recipe]);
 
-    const handleLikeClick = (event) => {
-        event.stopPropagation();
-        const newIsLiked = !isLiked;
-        setIsLiked(newIsLiked);
-        dispatch(likeRecipe(recipe?._id, auth?.user?._id));
-        const message = newIsLiked ? 'Recipe added to favorites!' : 'Recipe removed from favorites!';
-        const type = newIsLiked ? 'success' : 'info';
-        showCustomToast(message, type);
-    };
+
+
 
     const firstImageUrl = recipe.imageUrl?.[0] ? `${API_BASE_URL}/images/${recipe.imageUrl[0]}` : null;
 
@@ -52,9 +53,10 @@ export default function RecipeReviewCard({ recipe }) {
         <div
             title={!token ? 'Log in to access the recipe!' : ''}
             className='hero-title productCard hover:cursor-pointer w-[23rem] relative'
-            onClick={() => navigate(`/user/recipe/${recipe._id}`)}
+
         >
-            <div key={recipe._id} className="mb-4 flex flex-col gap-2">
+            <div key={recipe._id} className="mb-4 flex flex-col gap-2" onClick={() => navigate(`/user/recipe/${recipe._id}`)
+            }>
                 {firstImageUrl && (
                     <div className='lg:h-[15rem] h-[13rem]'>
                         <img className='h-full imghover w-full object-cover object-top' src={firstImageUrl} alt={recipe.title} />
@@ -73,7 +75,7 @@ export default function RecipeReviewCard({ recipe }) {
                 <div
                     title={!token ? 'Log in to like the recipe!' : ''}
                     className='w-10 h-10 bg-primary rounded-full top-[1%] right-[1%] flex justify-center items-center absolute hover:bg-secondary'
-                    onClick={token ? handleLikeClick : null}
+                    onClick={handleOpenDialog}
                 >
 
                     {isLiked ? (
@@ -92,6 +94,8 @@ export default function RecipeReviewCard({ recipe }) {
                     </p>
                 </div>
             </div>
+            {/* Collection Dialog */}
+            <AddCollectionDialog open={dialogOpen} onClose={handleCloseDialog} recipe={recipe} />
         </div>
     );
 }

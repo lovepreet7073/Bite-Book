@@ -5,16 +5,7 @@ const recipeSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
     },
-    likes: {
-        type: Number,
-        default: 0
-    },
-    likedBy: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "users",
-        }
-    ],
+ 
 
     title: {
         type: String,

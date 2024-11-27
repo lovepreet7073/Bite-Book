@@ -9,9 +9,7 @@ import {
   FIND_RECIPES_FAILURE,
   FIND_RECIPES_REQUEST,
   FIND_RECIPES_SUCCESS,
-  RECIPE_LIKE_FAILURE,
-  RECIPE_LIKE_REQUEST,
-  RECIPE_LIKE_SUCCESS,
+
   USER_RECIPES_FAILURE,
   USER_RECIPES_REQUEST,
   USER_RECIPES_SUCCESS,
@@ -33,7 +31,6 @@ import {
   FETCH_POPULAR_RECIPES_FAILURE
 } from "./ActionTypes";
 import { API_BASE_URL } from "../../config/apiUrl";
-import { UPDATE_USER_FAVORITES_AND_LIKE } from "../Auth/ActionType";
 export const addRecipe = (recipeData, navigate) => async (dispatch) => {
   dispatch({ type: ADD_RECIPE_REQUEST });
   const jwt = localStorage.getItem("jwt"); // Get the latest token from localStorage
@@ -233,33 +230,6 @@ export const RemoveRecipeFavorites = (recipeId) => async (dispatch) => {
   }
 };
 
-export const likeRecipe = (recipeId, userId) => async (dispatch) => {
-  dispatch({ type: RECIPE_LIKE_REQUEST });
-
-  try {
-    const res = await api.post(
-      `${API_BASE_URL}/api/user-recipe-like/${recipeId}/${userId}`
-    );
-
-    const { recipe, message, favorites } = res.data;
-
-    dispatch({
-      type: RECIPE_LIKE_SUCCESS,
-      payload: recipe,
-    });
-    dispatch({
-      type: UPDATE_USER_FAVORITES_AND_LIKE,
-      payload: { favorites },
-    });
-    // Optionally show a success message or update the UI based on `message`
-    console.log(message);
-  } catch (error) {
-    dispatch({
-      type: RECIPE_LIKE_FAILURE,
-      payload: error.response ? error.response.data : error.message,
-    });
-  }
-};
 
 export const UpdateReview = ({ recipeId, rating, comment, reviewId }) => async (dispatch) => {
   dispatch({ type: UPDATE_REVIEW_REQUEST });

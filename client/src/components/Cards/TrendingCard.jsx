@@ -34,14 +34,14 @@ const TrendingCard = ({ item }) => {
 
     return (
         <div
-            className="productcard p-[4%]"
+            className="productcard lg:p-[4%] "
             onClick={() => navigate(`/user/recipe/${item._id}`)}
         >
-            <div className="flex flex-col items-center bg-white productCard rounded-sm md:flex-row md:max-w-xl hover:cursor-pointer">
+            <div className="flex flex-col  bg-white productCard rounded-sm md:flex-row md:max-w-xl hover:cursor-pointer ">
                 {/* Image */}
                 <div className="lg:h-[15rem] h-[10rem] w-[20rem]">
                     <img
-                        className="h-full imghover w-full object-cover object-top"
+                        className="h-full img hover w-full object-cover object-top"
                         src={firstImageUrl}
                         alt={item.title}
                     />

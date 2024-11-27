@@ -117,56 +117,7 @@ const userRecipes = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-const likeRecipe = async (req, res) => {
-  try {
-    const { recipeId, userId } = req.params;
 
-    const recipe = await Recipe.findById(recipeId);
-    const user = await userService.findUserById(userId);
-
-    if (!recipe) {
-      return res.status(404).json({ message: "Recipe not found" });
-    }
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const likedIndex = recipe.likedBy.indexOf(userId);
-    let message;
-
-    if (likedIndex !== -1) {
-      // Remove the like
-      recipe.likedBy.splice(likedIndex, 1);
-      recipe.likes -= 1;
-
-      // Remove from user's favorites list
-      const favoriteIndex = user.favorites.indexOf(recipeId);
-      if (favoriteIndex !== -1) user.favorites.splice(favoriteIndex, 1);
-
-      message = "Recipe removed from favorites";
-    } else {
-      // Add the like
-      recipe.likedBy.push(userId);
-      recipe.likes += 1;
-
-      // Add to user's favorites list
-      user.favorites.push(recipeId);
-      message = "Recipe added to favorites";
-    }
-
-    await recipe.save();
-    await user.save();
-
-    // Populate favorites to include full recipe details
-    await user.populate("favorites")
-
-    res.status(200).json({ recipe, message, favorites: user.favorites });
-  } catch (error) {
-    console.error("Error liking recipe:", error);
-    res.status(500).json({ message: "An error occurred while liking the recipe." });
-  }
-};
 
 
 const deleteRecipe = async (req, res) => {
@@ -323,29 +274,25 @@ const UpdateReview = async (req, res) => {
 
     await recipe.save();
 
+    // Populate the user details for the review
     await recipe.populate({
       path: "reviews.userId",
       select: "fullName profile_pic",
     });
 
-    // Sort reviews by `updatedAt` (descending)
-    const sortedReviews = recipe.reviews.sort((a, b) => {
-      const dateA = new Date(a.updatedAt || a.createdAt); // Fallback to `createdAt` if `updatedAt` is unavailable
-      const dateB = new Date(b.updatedAt || b.createdAt);
-      return dateB - dateA;
-    });
-
-    const updatedReview = sortedReviews.find((r) => r.id === reviewId);
+    // Return the updated review along with the recipe and its reviews
+    const updatedReview = recipe.reviews.id(reviewId);
 
     res.status(200).json({
       message: "Review updated successfully",
       review: updatedReview,
-      recipe: { ...recipe.toObject(), reviews: sortedReviews },
+      recipe: recipe.toObject(),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 const deleteRecipeFavorites = async (req, res) => {
   const { recipeId } = req.params;
@@ -380,27 +327,22 @@ const getPopularRecipes = async (req, res) => {
     const popularRecipes = await Recipe.aggregate([
       {
         $addFields: {
-          popularityScore: {
-            $add: [
-              { $multiply: [1, "$likes"] }, // Weight for likes
-              { $multiply: [10, { $size: "$reviews" }] } // Weight for reviews
-            ]
-          }
+          popularityScore: { $size: "$reviews" }, // Count the number of reviews
         }
       },
       {
-        $sort: { popularityScore: -1 } // Sort by combined popularity score
+        $sort: { popularityScore: -1 } // Sort by popularity score in descending order
       },
       {
         $limit: limit // Limit the results
       }
     ]);
 
-    // popularityScore = (1 * likes) + (10 * reviews.length)
+    // popularityScore = reviews.length
 
     res.status(200).json(popularRecipes);
   } catch (error) {
-    console.error("Error fetching popular recipes (combined):", error);
+    console.error("Error fetching popular recipes:", error);
     res.status(500).json({ message: "Failed to fetch popular recipes" });
   }
 };
@@ -412,7 +354,6 @@ module.exports = {
   findRecipeById,
   SearchRecipe,
   userRecipes,
-  likeRecipe,
   deleteRecipe,
   updateRecipe,
   postReview,

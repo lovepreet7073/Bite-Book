@@ -1,6 +1,6 @@
 import { api } from "../../config/apiUrl";
 import { API_BASE_URL } from "../../config/apiUrl";
-import { CREATE_COLLECTION_SUCCESS, CREATE_COLLECTION_FAILURE, CREATE_COLLECTION_REQUEST, GET_ALL_COLLECTION_REQUEST, GET_ALL_COLLECTION_FAILURE, GET_ALL_COLLECTION_SUCCESS } from "./ActionTypes";
+import { CREATE_COLLECTION_SUCCESS, CREATE_COLLECTION_FAILURE, CREATE_COLLECTION_REQUEST, GET_ALL_COLLECTION_REQUEST, GET_ALL_COLLECTION_FAILURE, GET_ALL_COLLECTION_SUCCESS, ADDRECIPE_COLLECTION_SUCCESS, ADDRECIPE_COLLECTION_FAILURE, ADDRECIPE_COLLECTION_REQUEST } from "./ActionTypes";
 
 export const createCollection = (recipeData) => async (dispatch) => {
     dispatch({ type: CREATE_COLLECTION_REQUEST });
@@ -52,3 +52,29 @@ export const getAllCollections = (recipeData) => async (dispatch) => {
 
     }
 };
+
+export const addRecipeToCollection = (recipeData) => async (dispatch) => {
+    dispatch({ type: ADDRECIPE_COLLECTION_REQUEST });
+    const jwt = localStorage.getItem("jwt");
+    try {
+        const res = await api.post(`${API_BASE_URL}/api/add-recipe-collection`, recipeData, {
+            headers: {
+                Authorization: `Bearer ${jwt}`, // Set the token dynamically
+            },
+        });
+
+        const data = res?.data;
+        dispatch({
+            type: ADDRECIPE_COLLECTION_SUCCESS,
+            payload: data,
+        });
+        return data; // Return data if successful-+
+    } catch (error) {
+        dispatch({
+            type: ADDRECIPE_COLLECTION_FAILURE,
+            payload: error.message,
+        });
+
+    }
+};
+

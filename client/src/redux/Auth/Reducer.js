@@ -1,5 +1,5 @@
 import { REMOVE_FAVORITE_SUCCESS, REMOVE_FAVORITE_REQUEST, REMOVE_FAVORITE_FAILURE } from "../Recipe/ActionTypes"
-import { LOGIN_FAILURE, LOGIN_REQUEST, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS, LOGIN_SUCCESS, LOGOUT, GET_USER_FAILURE, GET_USER_REQUEST, GET_USER_SUCCESS, GOOGLE_LOGIN_REQUEST, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, UPDATE_USER_REQUEST, UPDATE_USER_SUCCESS, UPDATE_USER_FAILURE, UPDATE_USER_FAVORITES_AND_LIKE } from "./ActionType"
+import { LOGIN_FAILURE, LOGIN_REQUEST, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS, LOGIN_SUCCESS, LOGOUT, GET_USER_FAILURE, GET_USER_REQUEST, GET_USER_SUCCESS, GOOGLE_LOGIN_REQUEST, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, UPDATE_USER_REQUEST, UPDATE_USER_SUCCESS, UPDATE_USER_FAILURE } from "./ActionType"
 const initialState = {
     user: null,
     isLoading: false,
@@ -38,13 +38,7 @@ export const authReducer = (state = initialState, action) => {
                 isLoading:false // 
             };
 
-        case UPDATE_USER_FAVORITES_AND_LIKE:
-            const { favorites } = action.payload;
-            return {
-                ...state,
-                userFavorites: favorites,
-                isLoading:false // Update favorites if any change occurs
-            };
+        
         case REGISTER_FAILURE:
         case UPDATE_USER_FAILURE:
         case LOGIN_FAILURE:

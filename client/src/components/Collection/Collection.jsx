@@ -15,8 +15,6 @@ const Collection = () => {
         dispatch(getAllCollections());
     }, [dispatch]);
 
-    console.log(collection, "collection")
-    // Open dialog handler
     const handleOpenDialog = () => {
         setDialogOpen(true);
     };
@@ -28,10 +26,14 @@ const Collection = () => {
 
     return (
         <div>
-
             <Paper elevation={3} className="p-5 lg:mb-[8%]">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold">Collections</h1>
+                    <h1 className="text-3xl font-bold">
+                        {collection?.allCollection?.length === 0
+                            ? ""
+                            : `${collection?.allCollection?.length} ${collection?.allCollection?.length === 1 ? "Collection" : "Collections"}`}
+                    </h1>
+
                     <Button
                         variant="outlined"
                         onClick={handleOpenDialog}

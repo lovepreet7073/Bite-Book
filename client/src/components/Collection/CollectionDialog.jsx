@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
     Typography,
     Dialog,
@@ -6,34 +6,55 @@ import {
     DialogContent,
     DialogTitle,
     Button,
-    TextField
-} from '@mui/material';
-import { useDispatch } from 'react-redux';
-import { createCollection } from '../../redux/Collection/Actions';
-const CollectionDialog = ({ open, onClose }) => {
-    const [collectionName, setCollectionName] = useState('');
-    const [description, setDescription] = useState('');
+    TextField,
+} from "@mui/material";
+import { useDispatch } from "react-redux";
+import { RxCross2 } from "react-icons/rx";
+import { createCollection, updateCollection } from "../../redux/Collection/Actions"; // Import the update action
+
+const CollectionDialog = ({ open, onClose, initialData }) => {
+    const [collectionName, setCollectionName] = useState("");
+    const [description, setDescription] = useState("");
     const dispatch = useDispatch();
-    const handleCreateCollection = () => {
-        console.log({
-            collectionName,
-            description,
-        });
-        const data = {
-            name: collectionName,
-            description: description,
+
+    // Populate fields with initial data when dialog opens
+    useEffect(() => {
+        if (initialData) {
+            setCollectionName(initialData.name || "");
+            setDescription(initialData.description || "");
+        } else {
+            setCollectionName("");
+            setDescription("");
         }
-        dispatch(createCollection(data))
-        setCollectionName('');
-        setDescription('');
-        onClose();
+    }, [initialData]);
+
+    const handleSaveCollection = () => {
+        if (collectionName.trim()) {
+            const data = {
+                name: collectionName,
+                description: description,
+            };
+            if (initialData) {
+                dispatch(updateCollection(initialData._id, data));
+            } else {
+                dispatch(createCollection(data));
+            }
+            onClose();
+        }
     };
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>
-                <Typography variant="h6" fontWeight="bold">
-                    New Collection
+                <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                >
+                    {initialData ? "Edit Collection" : "New Collection"}
+                    <span onClick={onClose} className="cursor-pointer">
+                        <RxCross2 />
+                    </span>
                 </Typography>
             </DialogTitle>
             <DialogContent>
@@ -48,7 +69,6 @@ const CollectionDialog = ({ open, onClose }) => {
                     onChange={(e) => setCollectionName(e.target.value)}
                     sx={{ marginBottom: 3 }}
                 />
-
                 <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
                     Description (optional)
                 </Typography>
@@ -66,7 +86,7 @@ const CollectionDialog = ({ open, onClose }) => {
                     variant="caption"
                     display="block"
                     align="right"
-                    sx={{ color: '#888', marginTop: 1 }}
+                    sx={{ color: "#888", marginTop: 1 }}
                 >
                     {description.length}/120 characters
                 </Typography>
@@ -76,15 +96,15 @@ const CollectionDialog = ({ open, onClose }) => {
                     Cancel
                 </Button>
                 <Button
-                    onClick={handleCreateCollection}
+                    onClick={handleSaveCollection}
                     variant="contained"
                     disabled={!collectionName.trim()}
                     sx={{
-                        bgcolor: '#FF6216',
-                        '&:hover': { bgcolor: '#E55A12' },
+                        bgcolor: "#FF6216",
+                        "&:hover": { bgcolor: "#E55A12" },
                     }}
                 >
-                    Create
+                    {initialData ? "Update" : "Create"}
                 </Button>
             </DialogActions>
         </Dialog>

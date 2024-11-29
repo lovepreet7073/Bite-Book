@@ -11,7 +11,6 @@ const RecipeDetailCard = () => {
     const params = useParams();
     const dispatch = useDispatch();
     const { recipe } = useSelector(store => store);
-    console.log(recipe, "details");
 
     useEffect(() => {
         revealElements(); // Initialize ScrollReveal
@@ -20,7 +19,6 @@ const RecipeDetailCard = () => {
     useEffect(() => {
         const token = localStorage.getItem('jwt');
         const data = { recipeId: params?.recipeId };
-        console.log(data, "data");
         dispatch(findRecipeById(data, token));
     }, [params?.recipeId]);
 

@@ -8,27 +8,31 @@ import {
     Button,
     Checkbox,
     FormControlLabel,
-    TextField,
     Grid,
     Divider,
     Box,
 } from "@mui/material";
 import { MdDeleteOutline } from "react-icons/md";
 import { FaHeart } from "react-icons/fa";
+import { RxCross2 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
-import { createCollection } from "../../redux/Collection/Actions";
+import { createCollection, addRecipeToCollection } from "../../redux/Collection/Actions";
 import { API_BASE_URL } from "../../config/apiUrl";
-import { addRecipeToCollection } from "../../redux/Collection/Actions";
+import CollectionDialog from "./CollectionDialog";
+
 const AddCollectionDialog = ({ open, onClose, recipe }) => {
-    const { collection } = useSelector(store => store)
-    console.log(collection, 'collections')
+    const { collection } = useSelector((store) => store);
+    console.log(collection, "collection")
+    const filteredNames = collection.allCollection.map(coll => coll.name);
+    const suggestions = ["Keepers", "Want to Try", "Weeknight Ideas"];
+    const filteredSuggestions = suggestions.filter(suggestion => {
+        return !filteredNames.includes(suggestion); // Filter suggestions that are not in filteredNames
+    });
     const [dialogStep, setDialogStep] = useState("main"); // Tracks current dialog step
     const [selectedCollections, setSelectedCollections] = useState([]);
-    const [collectionName, setCollectionName] = useState("");
-    const [description, setDescription] = useState("");
-    const dispatch = useDispatch();
+    console.log(selectedCollections, "selectedCollections")
 
-    // Handle checkbox selection
+    const dispatch = useDispatch();
     const handleCollectionChange = (event) => {
         const { value, checked } = event.target;
         setSelectedCollections((prev) =>
@@ -36,22 +40,33 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
         );
     };
 
-
-    const handleCreateCollection = () => {
-        const data = {
-            name: collectionName,
-            description: description,
-        };
-        dispatch(createCollection(data));
-        setCollectionName("");
-        setDescription("");
-        setDialogStep("main"); // Go back to the main dialog
+    const handleAddRecipe = async () => {
+        try {
+            const collectionsToCreate = selectedCollections.filter(
+                (name) => !collection.allCollection.some((col) => col.name === name)
+            );
+            const createdCollections = await Promise.all(
+                collectionsToCreate.map((name) =>
+                    dispatch(createCollection({ name, description: "" })))
+            );
+            const collectionIds = selectedCollections.map((name) => {
+                const existing = collection.allCollection.find((col) => col.name === name);
+                return existing ? existing._id : createdCollections.find((col) => col.name === name)._id;
+            });
+            await dispatch(addRecipeToCollection({
+                recipeId: recipe._id,
+                selectedCollections: collectionIds,
+            })
+            );
+            onClose(); // Close dialog on success
+        } catch (error) {
+            console.error("Failed to add recipe to collections:", error);
+        }
     };
 
-    // Main dialog: Saved Recipes
     const renderMainDialog = () => (
         <>
-            <DialogTitle>
+            <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <Typography
                     variant="h6"
                     sx={{
@@ -63,17 +78,17 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
                     <FaHeart className="text-primary" size={20} />
                     Added to Saved Recipes
                 </Typography>
+                <RxCross2 onClick={onClose} className="cursor-pointer" />
             </DialogTitle>
             <DialogContent>
                 <Grid container alignItems="center">
-                    {/* Left Section: Recipe Image and Title */}
                     <Grid item xs={5}>
                         <div className="border rounded">
                             <img
                                 src={`${API_BASE_URL}/images/${recipe.imageUrl[0]}`}
                                 className="lg:h-[15rem] w-full object-cover object-top"
+                                alt="Recipe"
                                 style={{
-
                                     marginBottom: "16px",
                                 }}
                             />
@@ -92,7 +107,7 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
                     />
 
                     {/* Right Section: Add to Collections */}
-                    <Grid item xs={6} >
+                    <Grid item xs={6}>
                         <Typography variant="h6" sx={{ marginBottom: "16px" }}>
                             Add to collections
                         </Typography>
@@ -101,50 +116,55 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
                                 display: "flex",
                                 flexDirection: "column",
                                 alignItems: "left",
-                                overflowY: "auto", 
-                                height:'200px' // Enable vertical scrolling
+                                overflowY: "auto", // Enable vertical scrolling
+                                height: "200px",
                             }}
                         >
-                            {/* Dynamically Render Checkboxes */}
-                            {collection?.allCollection?.map((col) => (
-                                <FormControlLabel
-                                    key={col._id}
-                                    control={
-                                        <Checkbox
-                                            value={col.name}
-                                            onChange={handleCollectionChange}
-                                            checked={selectedCollections.includes(col.name)}
-                                        />
-                                    }
-                                    label={col.name}
-                                />
-                            ))}
+                            {collection?.allCollection?.map((col) => {
+                                const isSelected = col.recipes?.some((r) => {
+                                    return r._id === recipe?._id; // Compare the _id of the recipe object
+                                });
+                                return (
+                                    <FormControlLabel
+                                        key={col._id}
+                                        control={
+                                            <Checkbox
+                                                value={col.name}
+                                                onChange={handleCollectionChange}
+                                                checked={isSelected}
+                                            />
+                                        }
+                                        label={col.name}
+                                    />
+                                );
+                            })}
 
 
-                            {["Keepers", "Want to Try", "Weeknight Ideas"].map((suggestion) => (
-                                <FormControlLabel
-                                    key={suggestion}
-                                    control={
-                                        <Checkbox
-                                            value={suggestion}
-                                            onChange={handleCollectionChange}
-                                            checked={selectedCollections.includes(suggestion)}
-                                        />
-                                    }
-                                    label={
-                                        <Typography>
-                                            {suggestion} <span style={{ color: "grey" }}>(suggested)</span>
-                                        </Typography>
-                                    }
-                                />
-                            ))}
+
+                            {
+                                filteredSuggestions.map((suggestion) => (
+                                    <FormControlLabel
+                                        key={suggestion}
+                                        control={
+                                            <Checkbox
+                                                value={suggestion}
+                                                onChange={handleCollectionChange}
+                                                checked={selectedCollections.includes(suggestion)}
+                                            />
+                                        }
+                                        label={
+                                            <Typography>
+                                                {suggestion} <span style={{ color: "grey" }}>(suggested)</span>
+                                            </Typography>
+                                        }
+                                    />
+                                ))}
                         </Box>
-                        <Button 
+                        <Button
                             onClick={() => setDialogStep("create")} // Transition to create collection
                             sx={{
                                 color: "#E55A12",
-                                marginTop:'20px',
-                                // border:'1px solid #E55A12',
+                                marginTop: "20px",
                                 "&:hover": {
                                     borderColor: "#E55A12",
                                 },
@@ -167,9 +187,7 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
                         color: "black",
                     }}
                 >
-                    <span>
-                        <MdDeleteOutline size={20} />
-                    </span>
+                    <MdDeleteOutline size={20} />
                     Remove
                 </Button>
                 <Button
@@ -190,114 +208,15 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
         </>
     );
 
-
-    // Create collection dialog
-    const renderCreateCollectionDialog = () => (
-        <>
-            <DialogTitle>
-                <Typography variant="h6" fontWeight="bold">
-                    New Collection
-                </Typography>
-            </DialogTitle>
-            <DialogContent>
-                <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
-                    Collection Name
-                </Typography>
-                <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="Lunch, Dinner, Dessert..."
-                    value={collectionName}
-                    onChange={(e) => setCollectionName(e.target.value)}
-                    sx={{ marginBottom: 3 }}
-                />
-
-                <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
-                    Description (optional)
-                </Typography>
-                <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="How would you describe this collection?"
-                    multiline
-                    rows={3}
-                    inputProps={{ maxLength: 120 }}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                />
-                <Typography
-                    variant="caption"
-                    display="block"
-                    align="right"
-                    sx={{ color: "#888", marginTop: 1 }}
-                >
-                    {description.length}/120 characters
-                </Typography>
-            </DialogContent>
-            <DialogActions>
-                <Button
-                    onClick={() => setDialogStep("main")} // Go back to the main dialog
-                    color="primary"
-                    sx={{ marginRight: 2 }}
-                >
-                    Cancel
-                </Button>
-                <Button
-                    onClick={handleCreateCollection}
-                    variant="contained"
-                    disabled={!collectionName.trim()}
-                    sx={{
-                        bgcolor: "#FF6216",
-                        "&:hover": { bgcolor: "#E55A12" },
-                    }}
-                >
-                    Create
-                </Button>
-            </DialogActions>
-        </>
-    );
-
-    const handleAddRecipe = async () => {
-        try {
-            // Extract selected collections from suggestions
-            const collectionsToCreate = selectedCollections.filter(
-                (name) => !collection.allCollection.some((col) => col.name === name)
-            );
-
-            // Create missing collections
-            const createdCollections = await Promise.all(
-                collectionsToCreate.map((name) => {
-                    const data = { name, description: "" }; // Assuming no description for suggestions
-                    return dispatch(createCollection(data)).then((response) => response.payload);
-                })
-            );
-
-            // Combine existing and newly created collection IDs
-            const collectionIds = selectedCollections.map((name) => {
-                const existing = collection.allCollection.find((col) => col.name === name);
-                return existing ? existing._id : createdCollections.find((col) => col.name === name)._id;
-            });
-
-            // Prepare data for adding recipe to collections
-            const data = {
-                recipeId: recipe._id,
-                selectedCollections: collectionIds,
-            };
-
-            // Dispatch action to add the recipe to collections
-            await dispatch(addRecipeToCollection(data));
-            onClose(); // Close dialog on success
-        } catch (error) {
-            console.error("Failed to add recipe to collections:", error);
-        }
-    };
-
-
-
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             {dialogStep === "main" && renderMainDialog()}
-            {dialogStep === "create" && renderCreateCollectionDialog()}
+            {dialogStep === "create" && (
+                <CollectionDialog
+                    open={dialogStep === "create"}
+                    onClose={() => setDialogStep("main")}
+                />
+            )}
         </Dialog>
     );
 };

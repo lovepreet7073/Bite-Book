@@ -5,15 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../config/apiUrl';
 import Rating from '@mui/material/Rating';
 import AddCollectionDialog from '../Collection/AddCollectionDialog';
+import { getAllCollections } from '../../redux/Collection/Actions';
 
 export default function RecipeReviewCard({ recipe }) {
     const [isLiked, setIsLiked] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { auth } = useSelector((store) => store);
+    const { auth, collection } = useSelector((store) => store);
     const token = localStorage.getItem('jwt');
-    console.log(isLiked, recipe._id, auth?.userFavorites)
     const [value, setValue] = React.useState(2);
 
     useEffect(() => {
@@ -24,8 +24,10 @@ export default function RecipeReviewCard({ recipe }) {
             setValue(0);
         }
     }, [recipe]);
+
     const handleOpenDialog = (event) => {
         setDialogOpen(true);
+        dispatch(getAllCollections());
         event.stopPropagation();
     };
 
@@ -33,19 +35,21 @@ export default function RecipeReviewCard({ recipe }) {
     const handleCloseDialog = () => {
         setDialogOpen(false);
     };
+
     useEffect(() => {
-        if (auth?.userFavorites?.some(favRecipe => favRecipe._id === recipe._id)) {
+        // Check if the recipe is in user's favorites
+        const isFavorite = auth?.userFavorites?.some(favRecipe => favRecipe._id === recipe._id);
+
+        // Check if the recipe is in user's collections
+        const isInCollection = collection?.allCollection?.some(col => col.recipes?.some(r => r._id === recipe._id));
+
+        // If it's either in favorites or collections, set `isLiked` to true
+        if (isFavorite || isInCollection) {
             setIsLiked(true);
         } else {
             setIsLiked(false);
         }
-    }, [auth?.userFavorites, recipe?._id]);
-
-
-    //Average rating function
-
-
-
+    }, [auth?.userFavorites, collection?.allCollection, recipe._id]);
 
     const firstImageUrl = recipe.imageUrl?.[0] ? `${API_BASE_URL}/images/${recipe.imageUrl[0]}` : null;
 
@@ -53,10 +57,8 @@ export default function RecipeReviewCard({ recipe }) {
         <div
             title={!token ? 'Log in to access the recipe!' : ''}
             className='hero-title productCard hover:cursor-pointer w-[23rem] relative'
-
         >
-            <div key={recipe._id} className="mb-4 flex flex-col gap-2" onClick={() => navigate(`/user/recipe/${recipe._id}`)
-            }>
+            <div key={recipe._id} className="mb-4 flex flex-col gap-2" onClick={() => navigate(`/user/recipe/${recipe._id}`)}>
                 {firstImageUrl && (
                     <div className='lg:h-[15rem] h-[13rem]'>
                         <img className='h-full imghover w-full object-cover object-top' src={firstImageUrl} alt={recipe.title} />
@@ -77,7 +79,6 @@ export default function RecipeReviewCard({ recipe }) {
                     className='w-10 h-10 bg-primary rounded-full top-[1%] right-[1%] flex justify-center items-center absolute hover:bg-secondary'
                     onClick={handleOpenDialog}
                 >
-
                     {isLiked ? (
                         <FaHeart className='text-white' size={20} />
                     ) : (

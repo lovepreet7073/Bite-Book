@@ -65,9 +65,7 @@ export const recipeReducer = (state = initialState, action) => {
                 ) : null,
             };
         case POST_REVIEW_SUCCESS:
-            // Extract `recipe` and `reviews` from action.payload
             const { recipe, reviews } = action.payload;
-            // Update the recipe in the state, and also update the allRecipes list
             return {
                 ...state,
                 isLoading: false,

@@ -1,5 +1,6 @@
 import { REMOVE_FAVORITE_SUCCESS, REMOVE_FAVORITE_REQUEST, REMOVE_FAVORITE_FAILURE } from "../Recipe/ActionTypes"
 import { LOGIN_FAILURE, LOGIN_REQUEST, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS, LOGIN_SUCCESS, LOGOUT, GET_USER_FAILURE, GET_USER_REQUEST, GET_USER_SUCCESS, GOOGLE_LOGIN_REQUEST, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, UPDATE_USER_REQUEST, UPDATE_USER_SUCCESS, UPDATE_USER_FAILURE } from "./ActionType"
+import { ADDRECIPE_COLLECTION_SUCCESS } from "../Collection/ActionTypes"
 const initialState = {
     user: null,
     isLoading: false,
@@ -28,6 +29,13 @@ export const authReducer = (state = initialState, action) => {
             };
         case UPDATE_USER_SUCCESS:
             return { ...state, isLoading: false, error: null, user: action.payload }
+        case ADDRECIPE_COLLECTION_SUCCESS:
+            const updatedFavorites = action.payload; // Assuming the response includes the updated favorites
+            return {
+                ...state,
+                isLoading: false,
+                userFavorites: updatedFavorites, // Update the favorites list in the state
+            };
         case REMOVE_FAVORITE_SUCCESS:
             const recipeIdToRemove = action.payload;
             { console.log(action.payload, "action.payload") }
@@ -35,10 +43,10 @@ export const authReducer = (state = initialState, action) => {
             return {
                 ...state,
                 userFavorites: state.userFavorites.filter(favorite => favorite._id !== recipeIdToRemove),
-                isLoading:false // 
+                isLoading: false // 
             };
 
-        
+
         case REGISTER_FAILURE:
         case UPDATE_USER_FAILURE:
         case LOGIN_FAILURE:

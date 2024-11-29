@@ -297,9 +297,7 @@ const UpdateReview = async (req, res) => {
 const deleteRecipeFavorites = async (req, res) => {
   const { recipeId } = req.params;
   const userId = req.user.id; // Assuming the user ID is available via the auth middleware
-
   try {
-    // Find the user and remove the recipe from their favorites
     const user = await userService.findUserById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

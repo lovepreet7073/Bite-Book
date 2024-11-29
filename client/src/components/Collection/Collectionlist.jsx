@@ -33,9 +33,7 @@ const Collectionlist = () => {
                                     <div className="h-[13rem]">
                                         <img
                                             className="h-full w-full object-cover object-top"
-                                            //  src={`${API_BASE_URL}/images/${imageUrl}`}
                                             src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPp10aHkpxqVtEbAG2h4KEej6q1hPmr_W0o5FIVCnArdPHlScfOtMz7thYLsHuGxS7YJk&usqp=CAU'
-                                        //  alt={recipe.title}
                                         />
                                     </div>
 

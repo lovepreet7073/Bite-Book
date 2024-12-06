@@ -2,7 +2,6 @@
 import { toast } from 'react-hot-toast';
 
 const showCustomToast = (message, type = 'success') => {
-  // Define default style and icon
   const toastOptions = {
     duration: 2000, // Default duration
     position: 'top-right', // Default position
@@ -22,20 +21,18 @@ const showCustomToast = (message, type = 'success') => {
     },
   };
 
-  // Adjust styles based on toast type
   if (type === 'error') {
-    toastOptions.style.borderColor = '#dc3545'; // Red for error
+    toastOptions.style.borderColor = '#dc3545';
     toastOptions.icon = '❌';
-    toastOptions.style.color = '#dc3545'; // Red text for error
+    toastOptions.style.color = '#dc3545';
   } else if (type === 'info') {
-    toastOptions.style.borderColor = '#17a2b8'; // Blue for info
+    toastOptions.style.borderColor = '#17a2b8';
     toastOptions.icon = 'ℹ️';
   } else if (type === 'warning') {
-    toastOptions.style.borderColor = '#ffc107'; // Yellow for warning
+    toastOptions.style.borderColor = '#ffc107';
     toastOptions.icon = '⚠️';
   }
 
-  // Show the toast
   toast(message, toastOptions);
 };
 

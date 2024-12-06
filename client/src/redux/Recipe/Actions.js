@@ -1,90 +1,52 @@
 import { api } from "../../config/apiUrl";
 import {
-  ADD_RECIPE_FAILURE,
-  ADD_RECIPE_REQUEST,
-  ADD_RECIPE_SUCCESS,
-  FIND_RECIPE_BY_ID_FAILURE,
-  FIND_RECIPE_BY_ID_REQUEST,
-  FIND_RECIPE_BY_ID_SUCCESS,
-  FIND_RECIPES_FAILURE,
-  FIND_RECIPES_REQUEST,
-  FIND_RECIPES_SUCCESS,
-
-  USER_RECIPES_FAILURE,
-  USER_RECIPES_REQUEST,
-  USER_RECIPES_SUCCESS,
-  DELETE_RECIPE_FAILURE,
-  DELETE_RECIPE_REQUEST,
-  DELETE_RECIPE_SUCCESS,
-  UPDATE_RECIPE_REQUEST,
-  UPDATE_RECIPE_SUCCESS,
-  UPDATE_RECIPE_FAILURE,
-  POST_REVIEW_FAILURE,
-  POST_REVIEW_REQUEST,
-  POST_REVIEW_SUCCESS,
-  REMOVE_FAVORITE_REQUEST, REMOVE_FAVORITE_SUCCESS, REMOVE_FAVORITE_FAILURE,
-  UPDATE_REVIEW_REQUEST,
-  UPDATE_REVIEW_SUCCESS,
-  UPDATE_REVIEW_FAILURE,
-  FETCH_POPULAR_RECIPES_REQUEST,
-  FETCH_POPULAR_RECIPES_SUCCESS,
-  FETCH_POPULAR_RECIPES_FAILURE
+  ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS, USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS, DELETE_RECIPE_FAILURE, DELETE_RECIPE_REQUEST, DELETE_RECIPE_SUCCESS, UPDATE_RECIPE_REQUEST, UPDATE_RECIPE_SUCCESS, UPDATE_RECIPE_FAILURE, POST_REVIEW_FAILURE, POST_REVIEW_REQUEST,
+  POST_REVIEW_SUCCESS, REMOVE_FAVORITE_REQUEST, REMOVE_FAVORITE_SUCCESS, REMOVE_FAVORITE_FAILURE,
+  UPDATE_REVIEW_REQUEST, UPDATE_REVIEW_SUCCESS, UPDATE_REVIEW_FAILURE, FETCH_POPULAR_RECIPES_REQUEST, FETCH_POPULAR_RECIPES_SUCCESS, FETCH_POPULAR_RECIPES_FAILURE
 } from "./ActionTypes";
 import { API_BASE_URL } from "../../config/apiUrl";
-export const addRecipe = (recipeData, navigate) => async (dispatch) => {
-  dispatch({ type: ADD_RECIPE_REQUEST });
-  const jwt = localStorage.getItem("jwt"); // Get the latest token from localStorage
 
+//ADD RECIPE ACTION
+export const addRecipe = (recipeData) => async (dispatch) => {
+  dispatch({ type: ADD_RECIPE_REQUEST });
+  const jwt = localStorage.getItem("jwt");
   try {
     const res = await api.post(`${API_BASE_URL}/api/add-recipe`, recipeData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${jwt}`, // Set the token dynamically
+        Authorization: `Bearer ${jwt}`,
       },
     });
-
     const data = res?.data;
     dispatch({
       type: ADD_RECIPE_SUCCESS,
       payload: data,
     });
     dispatch(GetRecipes());
-    return data; // Return data if successful-+
+    return data;
   } catch (error) {
     dispatch({
       type: ADD_RECIPE_FAILURE,
-      payload: error.response ? error.response.data : error.message,
+      payload: error.message || "An error occurred while fetching recipes.",
     });
-
-    return { error: error.message }; // Return error
   }
 };
 
+
+//GET RECIPES
 export const GetRecipes = (filters) => async (dispatch) => {
   dispatch({ type: FIND_RECIPES_REQUEST });
-
   try {
-    // Remove filters with empty values (filters that are falsy like "", null, etc.)
     const filteredParams = Object.fromEntries(
-      Object.entries(filters).filter(([key, value]) => value) // Remove empty values
+      Object.entries(filters).filter(([key, value]) => value)
     );
-
-    // Create query string based on filters
     const queryString = new URLSearchParams(filteredParams).toString();
-
-    console.log("Filtered Params:", filteredParams); // Debug: check if filters are being correctly passed
-
-    // Make the API request with query parameters for filtering
     const { data } = await api.get(`/api/all-recipes?${queryString}`);
-
-    // Dispatch success action with the data payload
     dispatch({
       type: FIND_RECIPES_SUCCESS,
       payload: data,
     });
-    console.log(data, "data-GetRecipes");
   } catch (error) {
-    // Dispatch failure action if an error occurs
     dispatch({
       type: FIND_RECIPES_FAILURE,
       payload: error.message || "An error occurred while fetching recipes.",
@@ -92,11 +54,11 @@ export const GetRecipes = (filters) => async (dispatch) => {
   }
 };
 
+
+//FIND RECIPE BY ID
 export const findRecipeById = (reqData, jwt) => async (dispatch) => {
   dispatch({ type: FIND_RECIPE_BY_ID_REQUEST });
-
   const { recipeId } = reqData;
-
   try {
     const { data } = await api.get(`/api/recipe-get/${recipeId}`, {
       headers: {
@@ -109,16 +71,15 @@ export const findRecipeById = (reqData, jwt) => async (dispatch) => {
   }
 };
 
+//USER RECIPES
 export const userRecipes = (userId, jwt) => async (dispatch) => {
   dispatch({ type: USER_RECIPES_REQUEST });
-
   try {
     const { data } = await api.get(`/api/user-recipe-get/${userId}`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
     });
-    console.log(data, "data-user-recipes")
     dispatch({ type: USER_RECIPES_SUCCESS, payload: data });
   } catch (error) {
     dispatch({ type: USER_RECIPES_FAILURE, payload: error.message });
@@ -148,76 +109,59 @@ export const DeleteRecipe = (recipeId) => async (dispatch) => {
   }
 };
 
-
-
-
+//UPDATE RECIPE
 export const UpdateRecipe = (recipeId, formData) => async (dispatch) => {
   dispatch({ type: UPDATE_RECIPE_REQUEST });
   const jwt = localStorage.getItem("jwt");
   try {
-    // Send the formData in the PUT request
     const { data } = await api.put(`/api/update-recipe/${recipeId}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${jwt}`, // Set the token dynamically
       },
     });
-
-
     dispatch({ type: UPDATE_RECIPE_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
       type: UPDATE_RECIPE_FAILURE,
-      payload:
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message,
+      payload: error.message,
     });
   }
 };
 
-
-
+//ADD REVIEW ON RECIPE
 export const ReviewOnRecipe = (recipeId, rating, comment) => async (dispatch) => {
   dispatch({ type: POST_REVIEW_REQUEST });
   const jwt = localStorage.getItem("jwt");
-
   try {
-    // Make a POST request to submit the review
     const { data } = await api.post(
       `/api/rate-recipe/${recipeId}`,
-      { rating, comment }, // Send rating and comment in the request body
+      { rating, comment },
       {
         headers: {
-          Authorization: `Bearer ${jwt}`, // Include the token in headers
+          Authorization: `Bearer ${jwt}`,
         },
       }
     );
-
     dispatch({ type: POST_REVIEW_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
       type: POST_REVIEW_FAILURE,
-      payload: error.response && error.response.data.message
-        ? error.response.data.message
-        : error.message,
+      payload: error.message,
     });
   }
 };
 
-
+//REMOVE RECIPE FROM SAVED
 export const RemoveRecipeFavorites = (recipeId) => async (dispatch) => {
   dispatch({ type: REMOVE_FAVORITE_REQUEST });
   const jwt = localStorage.getItem("jwt");
-
   try {
     const { data } = await api.delete(`/api/remove-favorites/${recipeId}`, {
       headers: {
-        'Authorization': `Bearer ${jwt}`, // Use the auth token for authorization
+        'Authorization': `Bearer ${jwt}`,
       },
     });
-
-
     dispatch({
       type: REMOVE_FAVORITE_SUCCESS,
       payload: data.recipeId
@@ -230,26 +174,21 @@ export const RemoveRecipeFavorites = (recipeId) => async (dispatch) => {
   }
 };
 
-
+//UPDATE REVIEW
 export const UpdateReview = ({ recipeId, rating, comment, reviewId }) => async (dispatch) => {
   dispatch({ type: UPDATE_REVIEW_REQUEST });
   const jwt = localStorage.getItem("jwt");
-
   try {
-    // Make a PUT request to update the review
     const { data } = await api.put(
-      `/api/update-review/${recipeId}/${reviewId}`, // Ensure that both recipeId and reviewId are passed correctly in the URL
+      `/api/update-review/${recipeId}/${reviewId}`,
       { rating, comment },
       {
         headers: {
-          Authorization: `Bearer ${jwt}`, // Include JWT token in the header for authorization
+          Authorization: `Bearer ${jwt}`,
         },
       }
     );
-
-    // Dispatch success action with updated recipe and review
     dispatch({ type: UPDATE_REVIEW_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({
       type: UPDATE_REVIEW_FAILURE,
@@ -258,10 +197,9 @@ export const UpdateReview = ({ recipeId, rating, comment, reviewId }) => async (
   }
 };
 
-
+//GET POPULAR RECIPES
 export const fetchPopularRecipes = (limit = 10) => async (dispatch) => {
   dispatch({ type: FETCH_POPULAR_RECIPES_REQUEST });
-
   try {
     const { data } = await api.get(`/api/popular-recipes?limit=${limit}`);
     dispatch({

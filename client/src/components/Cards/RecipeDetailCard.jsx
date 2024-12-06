@@ -13,7 +13,7 @@ const RecipeDetailCard = () => {
     const { recipe } = useSelector(store => store);
 
     useEffect(() => {
-        revealElements(); // Initialize ScrollReveal
+        revealElements(); 
     }, []);
 
     useEffect(() => {
@@ -24,19 +24,15 @@ const RecipeDetailCard = () => {
 
     return (
         <div className="bg-white lg:px-20">
-
             <div className="pt-6">
                 <section className='grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 px-4 pt-10'>
                     <div className=" rounded-lg max-w-[430rem] max-h-[89rem]">
-                        {/* Carousel for Recipe Images */}
                         <Carousel data={recipe?.recipe?.imageUrl || []} className='mb-3' /> {/* Use your images array */}
                         <Reviews
                             userReviews={recipe?.recipe?.reviews}
                             recipeId={params?.recipeId}  // Pass recipeId from params
                         />
-
                     </div>
-
                     <div className="lg:col-span-1 max-auto right max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-7xl lg:px-8 lg:pb-24">
                         <div className="lg:col-span-2">
                             <h1 className="text-xl lg:text-4xl font-bold text-gray-900 tracking-wider mb-2">{recipe?.recipe?.title}</h1>
@@ -101,13 +97,10 @@ const RecipeDetailCard = () => {
                             </div>
                         </div>
                     </div>
-
                 </section>
                 <section className="mt-5 px-4 lg:px-20 mb-20">
                     <RecipeRatingReview
                         recipeId={params?.recipeId}
-
-                    // onSubmitReview={handleSubmitReview} 
                     />
                 </section>
             </div>

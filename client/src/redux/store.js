@@ -1,4 +1,3 @@
-
 import { applyMiddleware, combineReducers, createStore } from "redux";
 import { thunk } from "redux-thunk";
 import { authReducer } from './Auth/Reducer'
@@ -9,8 +8,5 @@ const rootReducers = combineReducers({
     recipe:recipeReducer,
     collection:collectionReducer
 })
-
 const store = createStore(rootReducers, applyMiddleware(thunk));
-
-
 export default store;

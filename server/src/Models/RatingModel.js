@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 const reviewSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'users', // Assuming you have a User model
+    ref: 'users',
     required: true,
   },
   rating: {
     type: Number,
-    max: 5, // Assuming ratings are from 1 to 5
+    max: 5, 
   },
   comment: {
     type: String,
@@ -20,4 +20,4 @@ const reviewSchema = new mongoose.Schema({
   },
 } ,{ timestamps: true });
 
-module.exports = reviewSchema; // Export the schema, not the model
+module.exports = reviewSchema; 

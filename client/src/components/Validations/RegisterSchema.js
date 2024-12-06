@@ -8,14 +8,12 @@ const RegisterSchema = Yup.object({
     .required('Email is required')
     .matches(
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-      'Invalid email format'
-    ),
+      'Invalid email format' ),
   password: Yup.string()
     .required('Password is required')
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character'
-    ),
+      'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character' ),
     confirmPassword: Yup.string()
     .oneOf([Yup.ref('password'), null], 'Passwords must match') // Ensures confirmPassword matches password
     .required('Please confirm your password'),

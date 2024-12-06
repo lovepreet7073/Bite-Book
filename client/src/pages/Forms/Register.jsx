@@ -17,28 +17,25 @@ const Register = () => {
   useEffect(() => {
     revealElements();
   }, []);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { auth } = useSelector(store => store);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const emailError = auth?.error?.error?.includes("User already exists")
     ? "User already exists"
     : null;
 
-
-    const handleSubmit = async (values) => {
-      const isSuccess = await dispatch(register(values, navigate));
-  
-      if (isSuccess) {
-          showCustomToast('You are all set! Thanks for joining us!', 'success');
-      } else {
-          showCustomToast(auth?.error?.error || "Registration failed", "error");
-      }
+//SUBMIT FORM LOGIC
+  const handleSubmit = async (values) => {
+    const isSuccess = await dispatch(register(values, navigate));
+    if (isSuccess) {
+      showCustomToast('You are all set! Thanks for joining us!', 'success');
+    } else {
+      showCustomToast(auth?.error?.error || "Registration failed", "error");
+    }
   };
-  
+
 
   return (
     <div className="w-full h-screen flex items-center ">

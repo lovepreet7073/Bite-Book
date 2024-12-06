@@ -14,6 +14,12 @@ import {
   UPDATE_COLLECTION_REQUEST,
   UPDATE_COLLECTION_SUCCESS,
   UPDATE_COLLECTION_FAILURE,
+  FIND_COLLECTION_BY_ID_REQUEST,
+  FIND_COLLECTION_BY_ID_FAILURE,
+  FIND_COLLECTION_BY_ID_SUCCESS,
+  REMOVE_RECIPE_COLLECTION_REQUEST,
+  REMOVE_RECIPE_COLLECTION_SUCCESS,
+  REMOVE_RECIPE_COLLECTION_FAILURE,
 } from "./ActionTypes";
 
 const initialState = {
@@ -28,6 +34,7 @@ export const collectionReducer = (state = initialState, action) => {
     case CREATE_COLLECTION_REQUEST:
     case ADDRECIPE_COLLECTION_REQUEST:
     case UPDATE_COLLECTION_REQUEST:
+    case FIND_COLLECTION_BY_ID_REQUEST:
       return { ...state, isLoading: true, error: null };
     case CREATE_COLLECTION_SUCCESS:
       return {
@@ -51,6 +58,12 @@ export const collectionReducer = (state = initialState, action) => {
         isLoading: false,
         allCollection: action.payload, // Update the collections with the new data
       };
+    case FIND_COLLECTION_BY_ID_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        collection: action.payload,
+      };
     case ADDRECIPE_COLLECTION_FAILURE:
       return { ...state, isLoading: false, error: action.payload };
     case DELETE_COLLECTION_REQUEST:
@@ -64,9 +77,7 @@ export const collectionReducer = (state = initialState, action) => {
         ),
       };
     case UPDATE_COLLECTION_SUCCESS:
-      const updated = action.payload;
-      console.log(action.payload, "action-payload");
-
+      const updated = action.payload.data;
       return {
         ...state,
         isLoading: false,
@@ -82,7 +93,30 @@ export const collectionReducer = (state = initialState, action) => {
 
     case UPDATE_COLLECTION_FAILURE:
     case DELETE_COLLECTION_FAILURE:
+    case FIND_COLLECTION_BY_ID_FAILURE:
       return { ...state, isLoading: false, error: action.payload };
+    case REMOVE_RECIPE_COLLECTION_REQUEST:
+      return { ...state, isLoading: true, error: null };
+    case REMOVE_RECIPE_COLLECTION_SUCCESS:
+      const recipeIdToRemove = action.payload;
+      console.log(action.payload, "action.payload");
+      console.log(recipeIdToRemove, "payload");
+      return {
+        ...state,
+        collection: {
+          ...state.collection,
+          recipes: state.collection.recipes.filter((rec) => rec._id !== recipeIdToRemove),
+        },
+        allCollection: state.allCollection.map((collection) => ({
+          ...collection,
+          recipes: collection.recipes.filter((rec) => rec._id !== recipeIdToRemove),
+        })),
+        isLoading: false,
+      };
+
+    case REMOVE_RECIPE_COLLECTION_FAILURE:
+      return { ...state, isLoading: false, error: action.payload };
+
     default:
       return state;
   }

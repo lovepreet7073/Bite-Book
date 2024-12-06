@@ -1,4 +1,4 @@
-const jwtProvider = require('../config/jwtProvider');
+const jwtProvider = require('../Config/jwtProvider');
 const userService = require('../Services/userService');
 
 const authenticate = async (req, res, next) => {
@@ -7,13 +7,9 @@ const authenticate = async (req, res, next) => {
         if (!token) {
             return res.status(404).send({ error: "Token not found" });
         }
-
         const userId = jwtProvider.getUserIdByToken(token);
-        // Await the Promise here to get the actual user object
-        const user = await userService.findUserById(userId); // Ensure this function is async
-
+        const user = await userService.findUserById(userId);
         req.user = user;
-      
     } catch (error) {
         return res.status(500).send({ error: error.message });
     }
@@ -24,5 +20,4 @@ const authenticate = async (req, res, next) => {
 
 module.exports = {
     authenticate,
-   
 };

@@ -8,12 +8,10 @@ import { useNavigate } from 'react-router-dom';
 const TrendingCard = ({ item }) => {
     const [value, setValue] = useState(2);
     const navigate = useNavigate();
-
     useEffect(() => {
-        revealElements(); // Initialize ScrollReveal
+        revealElements(); 
     }, []);
 
-    // Average rating function
     useEffect(() => {
         if (item?.reviews?.length > 0) {
             const averageRating = item.reviews.reduce((acc, review) => acc + review.rating, 0) / item.reviews.length;
@@ -25,7 +23,7 @@ const TrendingCard = ({ item }) => {
 
     const firstImageUrl = item.imageUrl?.[0] ? `${API_BASE_URL}/images/${item.imageUrl[0]}` : null;
 
-    // Limit description to 100 characters
+  
     const maxDescriptionLength = 200;
     const truncatedDescription =
         item?.description?.length > maxDescriptionLength

@@ -4,7 +4,6 @@ import RecipeReviewCard from '../Cards/RecipeCard';
 
 const RecipeMain = () => {
   const { recipe } = useSelector((store) => store);
-  console.log(recipe.allRecipes, "recipe.allRecipes");
 
   return (
     <div className='flex flex-col justify-center items-center px-10 py-6 lg:mb-[10%]'>

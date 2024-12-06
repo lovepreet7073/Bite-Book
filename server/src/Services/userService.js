@@ -2,9 +2,8 @@ const User = require("../Models/userModel");
 const bcrypt = require("bcrypt")
 const jwtProvider = require("../Config/jwtProvider")
 
-const Register = async (userData) => {
+const createUser = async (userData) => {
     try {
-
         const { fullName, email, password } = userData;
         const isUserExist = await User.findOne({ email });
         if (isUserExist) {
@@ -16,7 +15,6 @@ const Register = async (userData) => {
             email,
             password: hashedPassword,  // Use hashed password
         });
-
         return user;
     } catch (error) {
         console.error('Error creating user:', error.message);
@@ -63,7 +61,7 @@ const findUserById = async (userId) => {
 
 
 module.exports = {
-    Register,
+    createUser,
     getUserByEmail,
     getUserByToken,
     findUserById

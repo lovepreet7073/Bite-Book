@@ -1,39 +1,43 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../../config/apiUrl';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography,Paper } from '@mui/material';
+import { Button, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import showCustomToast from '../../components/Shared/ToastComponent';
 import { DeleteRecipe, userRecipes } from '../../redux/Recipe/Actions';
 import RecipeCardSkeleton from '../../components/Shared/RecipeCardSkeleton ';
+import ConfirmationDialog from '../../components/Shared/ConfirmationDialog';
 
 const UserRecipes = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { recipe, auth } = useSelector((store) => store);
     const [openDialog, setOpenDialog] = useState(false);
-    const [selectedRecipeId, setSelectedRecipeId] = useState(null);
+    const [selectedRecipe, setSelectedRecipe] = useState(null); // Updated to store the selected recipe object
+
     const token = localStorage.getItem('jwt');
     const userId = auth?.user?._id;
     const isLoading = recipe.isLoading;
 
-    const handleDeleteClick = (event, recipeId) => {
+    const handleDeleteClick = (event, recipeItem) => {
         event.stopPropagation();
-        setSelectedRecipeId(recipeId);
+        setSelectedRecipe(recipeItem); // Store the selected recipe object
         setOpenDialog(true);
     };
 
     const handleConfirmDelete = () => {
-        dispatch(DeleteRecipe(selectedRecipeId))
-            .then(() => {
-                showCustomToast('Recipe deleted successfully', 'success');
-                setOpenDialog(false);
-                dispatch(userRecipes(userId, token));
-            })
-            .catch((err) => {
-                showCustomToast('Failed to delete recipe', 'error');
-                setOpenDialog(false);
-            });
+        if (selectedRecipe) {
+            dispatch(DeleteRecipe(selectedRecipe._id))
+                .then(() => {
+                    showCustomToast('Recipe deleted successfully', 'success');
+                    setOpenDialog(false);
+                    dispatch(userRecipes(userId, token));
+                })
+                .catch(() => {
+                    showCustomToast('Failed to delete recipe', 'error');
+                    setOpenDialog(false);
+                });
+        }
     };
 
     const handleCancelDelete = () => {
@@ -47,8 +51,7 @@ const UserRecipes = () => {
 
     return (
         <div>
-             <div>
-             <Paper elevation={3} className="p-5 lg:mb-[18%]">
+            <Paper elevation={3} className="p-5 lg:mb-[18%]">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="lg:text-3xl text-xl font-bold">Bite Book Personal Recipes</h1>
@@ -69,11 +72,11 @@ const UserRecipes = () => {
                 </div>
                 <hr className="w-full mt-2 mb-2" />
                 {isLoading ? (
-                   <div className="grid lg:grid-cols-3 sm:grid-cols-1 gap-5">
-                   {Array.from({ length: 6 }).map((_, idx) => (
-                       <RecipeCardSkeleton key={idx} />
-                   ))}
-               </div>
+                    <div className="grid lg:grid-cols-3 sm:grid-cols-1 gap-5">
+                        {Array.from({ length: 6 }).map((_, idx) => (
+                            <RecipeCardSkeleton key={idx} />
+                        ))}
+                    </div>
                 ) : recipe?.userRecipes?.length > 0 ? (
                     <div className="grid lg:grid-cols-3 mt-[5%]">
                         {recipe.userRecipes.map((recipeItem) => (
@@ -110,7 +113,7 @@ const UserRecipes = () => {
                                                     </Button>
                                                     <Button
                                                         variant="contained"
-                                                        onClick={(event) => handleDeleteClick(event, recipeItem._id)}
+                                                        onClick={(event) => handleDeleteClick(event, recipeItem)}
                                                         sx={{
                                                             bgcolor: '#FF6216',
                                                             padding: '4px',
@@ -152,7 +155,7 @@ const UserRecipes = () => {
                                                     </Button>
                                                     <Button
                                                         variant="contained"
-                                                        onClick={(event) => handleDeleteClick(event, recipeItem._id)}
+                                                        onClick={(event) => handleDeleteClick(event, recipeItem)}
                                                         sx={{
                                                             bgcolor: '#FF6216',
                                                             padding: '4px',
@@ -180,38 +183,14 @@ const UserRecipes = () => {
                 ) : (
                     <Typography>No recipes found.</Typography>
                 )}
-                <Dialog
+                <ConfirmationDialog
                     open={openDialog}
-                    onClose={handleCancelDelete}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
-                    <DialogTitle id="alert-dialog-title">{"Are you sure?"}</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            Are you sure you want to delete this recipe?
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleCancelDelete} color="primary">
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={handleConfirmDelete}
-                            variant="contained"
-                            sx={{
-                                bgcolor: '#FF6216',
-                                '&:hover': {
-                                    bgcolor: '#E55A12',
-                                },
-                            }}
-                        >
-                            Delete
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-                </Paper>
-            </div>
+                    title="Delete Recipe"
+                    message={`Are you sure you want to delete the recipe "${selectedRecipe?.title}"?`}
+                    onConfirm={handleConfirmDelete}
+                    onCancel={handleCancelDelete}
+                />
+            </Paper>
         </div>
     );
 };

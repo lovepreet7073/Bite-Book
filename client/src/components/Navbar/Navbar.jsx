@@ -1,11 +1,6 @@
-import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-} from "@headlessui/react";
+import { Disclosure, DisclosureButton, DisclosurePanel, } from "@headlessui/react";
 import DropdownMenu from "./Dropdown";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import logo from '../../assets/images/2.png'
 import { useEffect } from "react";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
@@ -17,6 +12,7 @@ import { logout } from "../../redux/Auth/Actions";
 import { getUser } from "../../redux/Auth/Actions";
 import VariantAvatars from "./Avatar";
 import { useState } from "react";
+import ConfirmationDialog from "../Shared/ConfirmationDialog";
 const navigation = [
   { name: "Home", id: "Home", current: true, hasDropdown: false },
   {
@@ -59,9 +55,9 @@ function classNames(...classes) {
 export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { auth } = useSelector(store => store)
   const [selectedIngredient, setSelectedIngredient] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("");
-
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false); // State for controlling dialog visibility
 
   const handleLogout = () => {
@@ -87,27 +83,20 @@ export default function Navbar() {
     }
   };
 
+  //QUERY LOGIC FOR FILTERS
   useEffect(() => {
     const query = new URLSearchParams();
-
     if (selectedIngredient) {
       query.set("ingredient", selectedIngredient);
     }
     if (selectedCuisine) {
       query.set("cuisine", selectedCuisine);
     }
-
-    // Construct the new URL
     const queryString = query.toString();
     const newUrl = queryString
       ? `${window.location.pathname}?${queryString}`
       : window.location.pathname;
-
-    // Update the URL
     window.history.pushState(null, "", newUrl);
-
-
-
     if (selectedIngredient || selectedCuisine) {
       dispatch(GetRecipes({ ingredient: selectedIngredient, cuisine: selectedCuisine }));
       navigate(`/user/recipes?${queryString}`);
@@ -118,8 +107,6 @@ export default function Navbar() {
 
 
 
-
-  const { auth } = useSelector(store => store)
   const handleLoginBtn = () => {
     navigate('/auth/login')
   }
@@ -128,6 +115,8 @@ export default function Navbar() {
   }
 
   const jwt = localStorage.getItem('jwt')
+
+  //GET USER PROFILE
   useEffect(() => {
     if (jwt) {
       dispatch(getUser(jwt))
@@ -139,7 +128,6 @@ export default function Navbar() {
       navigate("/");
       setSelectedIngredient('')
       setSelectedCuisine("");
-      // dispatch(GetRecipes({}));
     }
   };
 
@@ -208,16 +196,6 @@ export default function Navbar() {
 
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-
-
-
-
-
-
-
-
-
-
             {isAuthenticate ?
               <Menu as="div" className="relative ml-3">
                 <div>
@@ -246,7 +224,8 @@ export default function Navbar() {
                   </MenuItem>
                   <MenuItem>
                     <button
-                      onClick={() => {navigate('/user/add-Recipe')
+                      onClick={() => {
+                        navigate('/user/add-Recipe')
                         setSelectedIngredient('');
                         setSelectedCuisine('');
                       }
@@ -279,13 +258,11 @@ export default function Navbar() {
               </div>
 
             }
-
-
-            {/* */}
           </div>
         </div>
       </div>
 
+      {/* mobile view navbar */}
       <DisclosurePanel className="sm:hidden flex ">
         <div className="space-y-1 px-2 pb-3 pt-2 flex flex-col text-lg ">
           {navigation.map((item) =>
@@ -320,47 +297,21 @@ export default function Navbar() {
                 <button className="text-white hover:border hover:text-[#FF6216] hover:border-[#FF6216] rounded py-1 px-2 font-semibold transition duration-900 ease-in-out mr-2" onClick={handleLoginBtn}>
                   Login
                 </button>
-
                 <span className="text-white mr-2">|</span>
-
                 <button className="text-white border border-neutral-100 rounded py-1 px-2" onClick={handleRegisterBtn}>
                   Register
                 </button>
               </div>
             ) : null}</>
         </div>
-
-
-
       </DisclosurePanel>
-      <Dialog
+      <ConfirmationDialog
         open={openLogoutDialog}
-        onClose={cancelLogout}
-        aria-labelledby="logout-dialog-title"
-        aria-describedby="logout-dialog-description"
-
-      >
-        <DialogTitle id="logout-dialog-title">Logout Confirmation</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="logout-dialog-description">
-            Are you sure you want to log out?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button sx={{
-            "&:hover": {
-              borderBottomColor: "#E55A12", // Change to secondary color from Tailwind config on hover
-            },
-          }} onClick={cancelLogout} >Cancel</Button>
-          <Button onClick={confirmLogout} variant="contained" sx={{
-            bgcolor: "#FF6216", // Use the primary color from Tailwind config
-            "&:hover": {
-              bgcolor: "#E55A12", // Change to secondary color from Tailwind config on hover
-            },
-          }}>Confirm</Button>
-        </DialogActions>
-      </Dialog>
-
+        title="Logout Confirmation"
+        message={`Are you sure you want to log out?`}
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
     </Disclosure>
   );
 }

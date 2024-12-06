@@ -1,21 +1,12 @@
 import React from "react";
-import {
-    TextField,
-    Button,
-    Grid,
-    IconButton,
-    Box,
-    FormControl,
-    MenuItem,
-    NativeSelect,
-} from "@mui/material";
+import { TextField,Button, Grid,IconButton,Box,FormControl,MenuItem,NativeSelect,} from "@mui/material";
 import { useDispatch } from "react-redux";
 import { UpdateRecipe } from "../../redux/Recipe/Actions";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Formik, Form, FieldArray, Field } from "formik";
-import { RiMenuAddFill } from "react-icons/ri"; // Ensure you have this import for the icon
-import { RxCross2 } from "react-icons/rx"; // Ensure you have this import for the icon
-import AddIcon from "@mui/icons-material/Add"; // Import AddIcon for the button
+import { RiMenuAddFill } from "react-icons/ri"; 
+import { RxCross2 } from "react-icons/rx"; 
+import AddIcon from "@mui/icons-material/Add"; 
 import MultipleImageUploadField from "../../components/Shared/ImageUploadField";
 import showCustomToast from "../../components/Shared/ToastComponent";
 
@@ -35,7 +26,6 @@ const EditRecipeForm = () => {
         { value: "japanese", label: "Japanese" },
         // Add more cuisines as needed
     ];
-    // Initial form values
     const initialValues = {
         title: recipe?.title || "",
         cuisine: recipe?.cuisine || "",
@@ -48,9 +38,9 @@ const EditRecipeForm = () => {
         prepTime: recipe?.prepTime || { time: 0, unit: "mins" },
     };
 
+    //SUBMIT FORM
     const handleSubmit = (values, { setSubmitting }) => {
         const formData = new FormData();
-
         Object.keys(values).forEach((key) => {
             if (key === "imageUrl") {
                 values.imageUrl.forEach((file) => formData.append("imageUrl", file));
@@ -62,7 +52,6 @@ const EditRecipeForm = () => {
                 formData.append(key, values[key]);
             }
         });
-
         dispatch(UpdateRecipe(recipe._id, formData))
             .then(() => {
                 navigate('/');
@@ -73,8 +62,6 @@ const EditRecipeForm = () => {
             })
             .finally(() => setSubmitting(false));
     };
-
-
 
 
     return (
@@ -89,7 +76,6 @@ const EditRecipeForm = () => {
                 {({ values, handleChange, handleBlur, setFieldValue }) => (
                     <Form>
                         <Grid container spacing={2}>
-                            {/* Title and Description */}
                             <Grid item xs={12} sm={6}>
                                 <div className="flex gap-12 flex-col">
                                     <TextField
@@ -338,7 +324,6 @@ const EditRecipeForm = () => {
                                 </div>
                             </Grid>
 
-                            {/* Buttons */}
                             <hr className="w-full py-2 mt-5 mb-2" />
                             {/* Submit Button */}
                             <Grid item xs={12}>

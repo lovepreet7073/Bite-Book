@@ -1,8 +1,6 @@
 import * as Yup from 'yup';
 
-// Validation schema using Yup with strong password and email regex
 const LoginSchema = Yup.object({
-
     email: Yup.string()
         .required('Email is required')
         .matches(

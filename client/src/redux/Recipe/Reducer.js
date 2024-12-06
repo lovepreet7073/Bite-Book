@@ -1,5 +1,5 @@
 import {
-    ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS,  USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS, DELETE_RECIPE_REQUEST, DELETE_RECIPE_FAILURE, DELETE_RECIPE_SUCCESS, UPDATE_RECIPE_FAILURE, UPDATE_RECIPE_REQUEST, UPDATE_RECIPE_SUCCESS, POST_REVIEW_REQUEST, POST_REVIEW_FAILURE, POST_REVIEW_SUCCESS, UPDATE_REVIEW_SUCCESS, UPDATE_REVIEW_REQUEST, UPDATE_REVIEW_FAILURE, FETCH_POPULAR_RECIPES_REQUEST,
+    ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS, USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS, DELETE_RECIPE_REQUEST, DELETE_RECIPE_FAILURE, DELETE_RECIPE_SUCCESS, UPDATE_RECIPE_FAILURE, UPDATE_RECIPE_REQUEST, UPDATE_RECIPE_SUCCESS, POST_REVIEW_REQUEST, POST_REVIEW_FAILURE, POST_REVIEW_SUCCESS, UPDATE_REVIEW_SUCCESS, UPDATE_REVIEW_REQUEST, UPDATE_REVIEW_FAILURE, FETCH_POPULAR_RECIPES_REQUEST,
     FETCH_POPULAR_RECIPES_SUCCESS,
     FETCH_POPULAR_RECIPES_FAILURE
 } from "./ActionTypes"
@@ -34,7 +34,6 @@ export const recipeReducer = (state = initialState, action) => {
                 allRecipes: state.allRecipes ? state.allRecipes.filter(recipe => recipe._id !== action.payload) : null,
                 userRecipes: state.userRecipes ? state.userRecipes.filter(recipe => recipe._id !== action.payload) : null,
             };
-
         case ADD_RECIPE_SUCCESS:
             return {
                 ...state,
@@ -43,18 +42,15 @@ export const recipeReducer = (state = initialState, action) => {
                 recipe: action.payload.recipe,
                 allRecipes: [action.payload.recipe, ...state.allRecipes] // Add the new recipe at the beginning
             };
-
         case FIND_RECIPE_BY_ID_SUCCESS:
             return { ...state, isLoading: false, error: null, recipe: action.payload }
         case FIND_RECIPES_SUCCESS:
             return { ...state, isLoading: false, error: null, allRecipes: action.payload }
         case USER_RECIPES_SUCCESS:
             return { ...state, isLoading: false, error: null, userRecipes: action.payload }
-  
         case UPDATE_RECIPE_SUCCESS:
             const updatedRecipe = action.payload
             console.log(action.payload, "action-payload")
-
             return {
                 ...state,
                 isLoading: false,
@@ -70,51 +66,42 @@ export const recipeReducer = (state = initialState, action) => {
                 ...state,
                 isLoading: false,
                 error: null,
-                recipe: { ...recipe, reviews },  // Ensure the updated reviews are added to the recipe
+                recipe: { ...recipe, reviews },
                 allRecipes: state.allRecipes.map((r) =>
-                    r._id === recipe._id ? { ...r, reviews } : r  // Ensure the updated reviews are added to allRecipes
+                    r._id === recipe._id ? { ...r, reviews } : r
                 ),
             };
             case UPDATE_REVIEW_SUCCESS: {
                 const { recipe, review } = action.payload;
-                console.log(action.payload, "payload");
-            
                 return {
                     ...state,
                     isLoading: false,
                     error: null,
-                    // Update the main recipe with the new review at the top
                     recipe: {
                         ...state.recipe,
-                        ...recipe,
-                        reviews: [
-                            review, // Place the updated review first
-                            ...state.recipe.reviews.filter((r) => r._id !== review._id), // Add the rest of the reviews
-                        ]
+                        reviews: state.recipe.reviews.map((r) =>
+                            r._id === review._id ? review : r
+                        ),
                     },
-                    // Update the specific recipe in the allRecipes array with the updated review
                     allRecipes: state.allRecipes.map((r) =>
                         r._id === recipe._id
                             ? {
-                                ...r,
-                                reviews: [
-                                    review, // Place the updated review first
-                                    ...r.reviews.filter((rev) => rev._id !== review._id), // Add the rest of the reviews
-                                ]
-                            }
+                                  ...r,
+                                  reviews: r.reviews.map((rev) =>
+                                      rev._id === review._id ? review : rev
+                                  ),
+                              }
                             : r
                     ),
                 };
             }
             
-
-
         case FETCH_POPULAR_RECIPES_SUCCESS:
             return {
                 ...state,
                 isLoading: false,
                 error: null,
-                popularRecipes: action.payload  // Save the popular recipes in state
+                popularRecipes: action.payload
             };
         case ADD_RECIPE_FAILURE:
         case FETCH_POPULAR_RECIPES_FAILURE:
@@ -126,8 +113,6 @@ export const recipeReducer = (state = initialState, action) => {
         case POST_REVIEW_FAILURE:
         case UPDATE_REVIEW_FAILURE:
             return { ...state, isLoading: false, error: action.payload }
-
-
         default:
             return state;
     }

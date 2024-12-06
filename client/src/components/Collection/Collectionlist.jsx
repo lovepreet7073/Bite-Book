@@ -1,15 +1,20 @@
-import { Paper, Typography } from '@mui/material'
-import React from 'react'
+import { Typography } from '@mui/material'
+import React,{useEffect} from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector,useDispatch } from 'react-redux'
+import { getAllCollections } from '../../redux/Collection/Actions';
 import RecipeCardSkeleton from '../Shared/RecipeCardSkeleton '
 const Collectionlist = () => {
-    const { collection } = useSelector(store => store)
+    const { collection } = useSelector(store => store);
+    const dispatch = useDispatch();
+    // useEffect(() => {
+    //     console.log('hello');
+    //       dispatch(getAllCollections());
+    //   }, [dispatch]);
+    console.log(collection,"collection")
     const navigate = useNavigate()
     return (
         <div>
-
-
             <div className="grid lg:grid-cols-3 sm:grid-cols-1 gap-4 mt-[1%]">
                 {collection.isLoading ? (
                     <div className="grid lg:grid-cols-3 sm:grid-cols-1 gap-5">
@@ -19,15 +24,11 @@ const Collectionlist = () => {
                     </div>
                 ) : collection?.allCollection?.length > 0 ? (
                     collection?.allCollection.map((item) => {
-
-
                         return (
                             <div
                                 key={item._id}
                                 className="hover:cursor-pointer w-[16rem] px-2 py-4"
-                                onClick={() => navigate(`/user/collection/${item._id}`, { state: { collectionData: item } })}
-
-
+                                onClick={() => navigate(`/user/collection/${item._id}`)}
                             >
                                 <div className="mb-4 flex flex-col gap-2 border">
                                     <div className="h-[13rem]">
@@ -36,14 +37,10 @@ const Collectionlist = () => {
                                             src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPp10aHkpxqVtEbAG2h4KEej6q1hPmr_W0o5FIVCnArdPHlScfOtMz7thYLsHuGxS7YJk&usqp=CAU'
                                         />
                                     </div>
-
-                                    {/* Recipe Title */}
                                     <div className="px-1 bg-white flex justify-between">
                                         <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900 break-words w-48">
                                             {item.name}
                                         </h5>
-
-
                                     </div>
                                 </div>
                             </div>
@@ -53,8 +50,6 @@ const Collectionlist = () => {
                     <Typography>No colllection found.</Typography>
                 )}
             </div>
-
-
         </div>
     )
 }

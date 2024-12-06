@@ -14,7 +14,6 @@ const SearchBar = () => {
       setResults([]);
       return;
     }
-
     const delayDebounceFn = setTimeout(() => {
       handleSearch();
     }, 500);
@@ -26,7 +25,7 @@ const SearchBar = () => {
       const response = await api.get(`/api/recipes/search`, {
         params: { query: searchQuery }
       });
-      setResults(response.data); // Set search results in state
+      setResults(response.data);
     } catch (error) {
       console.error("Error fetching search results:", error);
     }

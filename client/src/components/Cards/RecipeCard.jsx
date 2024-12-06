@@ -9,13 +9,15 @@ import { getAllCollections } from '../../redux/Collection/Actions';
 
 export default function RecipeReviewCard({ recipe }) {
     const [isLiked, setIsLiked] = useState(false);
+    const [value, setValue] = React.useState(2);
     const [dialogOpen, setDialogOpen] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { auth, collection } = useSelector((store) => store);
     const token = localStorage.getItem('jwt');
-    const [value, setValue] = React.useState(2);
 
+
+    //AVERAGE RATING LOGIC
     useEffect(() => {
         if (recipe?.reviews?.length > 0) {
             const averageRating = recipe.reviews.reduce((acc, review) => acc + review.rating, 0) / recipe.reviews.length;
@@ -31,19 +33,14 @@ export default function RecipeReviewCard({ recipe }) {
         event.stopPropagation();
     };
 
-    // Close dialog handler
     const handleCloseDialog = () => {
         setDialogOpen(false);
     };
 
     useEffect(() => {
-        // Check if the recipe is in user's favorites
         const isFavorite = auth?.userFavorites?.some(favRecipe => favRecipe._id === recipe._id);
-
-        // Check if the recipe is in user's collections
         const isInCollection = collection?.allCollection?.some(col => col.recipes?.some(r => r._id === recipe._id));
 
-        // If it's either in favorites or collections, set `isLiked` to true
         if (isFavorite || isInCollection) {
             setIsLiked(true);
         } else {

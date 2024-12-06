@@ -1,9 +1,7 @@
-// File: server.js
 const app = require('.');
-const connectDB = require('./Config/db');  // No curly braces needed
+const connectDB = require('./Config/db'); 
 
 const PORT = 5454;
-
 const startServer = async () => {
   await connectDB(); 
   app.listen(PORT, () => {

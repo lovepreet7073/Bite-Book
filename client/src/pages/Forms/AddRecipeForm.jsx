@@ -1,48 +1,37 @@
 import React from "react";
-import {
-  Button,
-  TextField,
-  Grid,
-  IconButton,
-  Box,
-  MenuItem,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from "@mui/material";
+import { Button, TextField, Grid, IconButton, Box, MenuItem, } from "@mui/material";
 import recipeValidationSchema from '../../components/Validations/RecipeSchema'
-import { Formik, Field, Form, FieldArray, ErrorMessage } from "formik";
+import { Formik, Field, Form, FieldArray } from "formik";
 import { RiMenuAddFill } from "react-icons/ri";
 import AddIcon from "@mui/icons-material/Add";
 import MultipleImageUploadField from "../../components/Shared/ImageUploadField";
 import { RxCross2 } from "react-icons/rx";
 import { addRecipe } from "../../redux/Recipe/Actions";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import FormControl from "@mui/material/FormControl";
 import NativeSelect from "@mui/material/NativeSelect";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import showCustomToast from '../../components/Shared/ToastComponent';
+import ConfirmationDialog from "../../components/Shared/ConfirmationDialog";
+
+
 const AddRecipeForm = () => {
   const [open, setOpen] = useState(false);
-  const location = useLocation(); // Access location
-  const [error, setError] = useState("");
-  const { recipe } = location.state || {}; // Get recipe from state
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleClickOpen = () => {
-    setOpen(true); // Open the dialog
+    setOpen(true);
   };
 
   const handleClose = () => {
-    setOpen(false); // Close the dialog without navigating
+    setOpen(false);
   };
 
   const handleConfirm = () => {
-    setOpen(false); // Close the dialog
-    navigate("/"); // Navigate to home or the desired route
+    setOpen(false);
+    navigate("/");
   };
   const cuisineOptions = [
     { value: "italian", label: "Italian" },
@@ -55,45 +44,36 @@ const AddRecipeForm = () => {
     { value: "japanese", label: "Japanese" },
     // Add more cuisines as needed
   ];
-  const navigate = useNavigate();
-  console.log(recipe, "recipe");
 
-  // Update the initial values to reflect the passed recipe data
   const initialValues = {
     title: '',
     description: '',
-    imageUrl: [], // Array for image URLs
+    imageUrl: [],
     cuisine: 'Indian',
-    ingredients: [''], // List of ingredients
-    directions: [''], // List of steps for directions
+    ingredients: [''],
+    directions: [''],
     notes: '',
     cookTime: {
-      time: 0,  // Time in minutes (you could adjust if necessary)
-      unit: "mins", // Could be "hours" or "mins"
+      time: 0,
+      unit: "mins",
     },
     prepTime: {
-      time: 1,  // Time in minutes (you could adjust if necessary)
-      unit: "mins", // Could be "hours" or "mins"
+      time: 1,
+      unit: "mins",
     },
   };
 
-
+  //SUBMIT FORM FUNC
   const handleSubmit = (values) => {
-    // Set cuisine to "Indian" if none is selected
     const recipeValues = {
       ...values,
       cuisine: values.cuisine || "Indian",
     };
-
-    console.log(recipeValues, "values-add");
-
     if (!recipeValues.imageUrl || recipeValues.imageUrl.length === 0) {
       showCustomToast("At least one image is required", "error");
-      return; // Exit function early if no image is selected
+      return;
     }
-
     const formData = new FormData();
-
     Object.keys(recipeValues).forEach((key) => {
       if (key === "imageUrl") {
         recipeValues[key].forEach((file) => formData.append("imageUrl", file));
@@ -103,13 +83,10 @@ const AddRecipeForm = () => {
         formData.append(key, recipeValues[key]);
       }
     });
-
-    console.log(...formData, "formdata");
-
     dispatch(addRecipe(formData, navigate)).then((response) => {
       if (response && !response.error) {
         showCustomToast("Recipe added successfully", "success");
-        navigate("/"); // Navigate to the home page on success
+        navigate("/");
       } else {
         showCustomToast("Failed to add the recipe", "error");
       }
@@ -117,14 +94,12 @@ const AddRecipeForm = () => {
   };
 
 
-  const dispatch = useDispatch();
   return (
     <div className="lg:px-[12rem] px-10 py-12 flex justify-center flex-col mx-auto">
       <div className="flex items-center gap-3">
         <h1 className="text-3xl font-bold text-slate-800 mt-2 mb-4">
           Add a Recipe{" "}
         </h1>
-
         <RiMenuAddFill size={20} />
       </div>
       <Formik
@@ -132,17 +107,9 @@ const AddRecipeForm = () => {
         onSubmit={handleSubmit}
         validationSchema={recipeValidationSchema}
       >
-        {({
-          values,
-          handleChange,
-          handleBlur,
-          setFieldValue,
-          errors,
-          touched,
-        }) => (
+        {({ values, handleChange, handleBlur, setFieldValue, errors, touched, }) => (
           <Form>
             <Grid container spacing={2}>
-
               <Grid item xs={12} sm={6}>
                 <div className=" flex gap-12 flex-col">
                   <TextField
@@ -155,7 +122,7 @@ const AddRecipeForm = () => {
                     value={values.title}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={touched.title && Boolean(errors.title)} // Set error to true if the field is touched and there's an error
+                    error={touched.title && Boolean(errors.title)} 
                     helperText={touched.title && errors.title}
                   />
                   <TextField
@@ -179,8 +146,9 @@ const AddRecipeForm = () => {
                   values={values}
                   setFieldValue={setFieldValue}
                 />
-                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               </Grid>
+
+
               <hr className="w-full py-2 mt-5 mb-2" />
               <Grid item xs={12}>
                 <h4 className="font-semibold text-xl">Ingredients</h4>
@@ -356,7 +324,6 @@ const AddRecipeForm = () => {
                 <div className="flex gap-5 items-center mt-2">
                   <h1 className="text-md font-medium">
                     Cook Time{" "}
-                    {/* <span className="text-sm text-neutral-400">(optional)</span> */}
                   </h1>
                   <TextField
                     name="cookTime.time"
@@ -442,38 +409,14 @@ const AddRecipeForm = () => {
                   >
                     cancel
                   </Button>
-                  <Dialog
+                  <ConfirmationDialog
                     open={open}
-                    onClose={handleClose}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                  >
-                    <DialogTitle id="alert-dialog-title">
-                      {"Are you sure you want to leave?"}
-                    </DialogTitle>
-                    <DialogContent>
-                      <DialogContentText id="alert-dialog-description">
-                        If you leave now, any unsaved changes will be lost.
-                      </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={handleClose} color="primary">
-                        No, Stay
-                      </Button>
-                      <Button
-                        onClick={handleConfirm}
-                        variant="contained"
-                        sx={{
-                          bgcolor: "#FF6216", // Use the primary color from Tailwind config
-                          "&:hover": {
-                            bgcolor: "#E55A12", // Change to secondary color from Tailwind config on hover
-                          },
-                        }}
-                      >
-                        Yes, Leave
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
+                    title="Are you sure you want to leave?"
+                    message={` If you leave now, any unsaved changes will be lost.`}
+                    onConfirm={handleConfirm}
+                    onCancel={handleClose}
+                  />
+
                   <Button
                     variant="contained"
                     color="primary"

@@ -3,12 +3,16 @@ import { Route, Routes } from 'react-router-dom';
 import Login from '../pages/Forms/Login';  // Assuming you have a Login component
 import Register from '../pages/Forms/Register';
 import NotFound from '../pages/NotFound';
+import ForgotPassword from '../pages/Forms/Forgotpassword';
+import ResetPassword from '../pages/Forms/ResetPassword';
 const AuthRoutes = () => {
   return (
     <div>
       <Routes>
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password/:token" element={<ResetPassword />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

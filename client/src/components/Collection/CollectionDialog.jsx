@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-    Typography,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Button,
-    TextField,
-} from "@mui/material";
+import {Typography,Dialog,DialogActions,DialogContent,DialogTitle,Button,TextField,} from "@mui/material";
 import { useDispatch } from "react-redux";
 import { RxCross2 } from "react-icons/rx";
 import { createCollection, updateCollection } from "../../redux/Collection/Actions"; // Import the update action
@@ -16,8 +8,6 @@ const CollectionDialog = ({ open, onClose, initialData }) => {
     const [collectionName, setCollectionName] = useState("");
     const [description, setDescription] = useState("");
     const dispatch = useDispatch();
-
-    // Populate fields with initial data when dialog opens
     useEffect(() => {
         if (initialData) {
             setCollectionName(initialData.name || "");
@@ -63,6 +53,7 @@ const CollectionDialog = ({ open, onClose, initialData }) => {
                 </Typography>
                 <TextField
                     fullWidth
+                    required
                     variant="outlined"
                     placeholder="Lunch, Dinner, Dessert..."
                     value={collectionName}

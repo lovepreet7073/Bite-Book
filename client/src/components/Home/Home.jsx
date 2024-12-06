@@ -15,7 +15,6 @@ import RecipeCardSkeleton from '../Shared/RecipeCardSkeleton ';
 const Home = () => {
   const dispatch = useDispatch();
   const { allRecipes, popularRecipes, isLoading } = useSelector(store => store.recipe);
-  console.log(allRecipes, "allRecipes")
   const navigate = useNavigate();
 
   const responsiveOptions = [
@@ -36,6 +35,7 @@ const Home = () => {
 
   return (
     <div className='flex flex-col justify-center items-center lg:px-8 lg:py-3'>
+      {/* RECIPES */}
       <section className='mb-3'>
         <div className='flex justify-between lg:p-4 items-center'>
           <h1 className='mt-3 mb-2 text-4xl font-bold text-slate-700 flex items-center gap-2'>
@@ -66,7 +66,8 @@ const Home = () => {
       </section>
 
       <hr className='w-full py-2 mt-5 mb-2' />
-
+      
+      {/* POPULAR_RECIPES */}
       <section className='mb-[3%] px-8'>
         <h1 className='mt-3 mb-8 text-4xl font-bold text-slate-700 flex items-center gap-2 ml-[1%]'>
           Popular Recipes

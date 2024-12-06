@@ -6,15 +6,9 @@ const path = require('path');
 app.use(express.json())
 app.use(cors())
 require('./')
-
-// Serve static files from the "uploads" directory
-
 require('dotenv').config();
-app.get('/', (req, res) => {
-    return res.status(200).send({ message: "welcome to api", status: true })
-})
 
-//auth-routes
+
 const authRouter = require('./Routes/authRoutes')
 app.use('/auth', authRouter)
 
@@ -30,6 +24,7 @@ app.use('/api', recipeRouter)
 const CollectionRouter = require('./Routes/collectionRoutes')
 app.use('/api', CollectionRouter)
 
+//static file for store images
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 

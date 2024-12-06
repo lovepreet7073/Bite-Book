@@ -8,16 +8,29 @@ import Navbar from './components/Navbar/Navbar';
 import AuthRoutes from './routes/AuthRoutes';
 import CustomRoutes from './routes/CustomRoutes';
 import NotFound from './pages/NotFound';
+
 function App() {
   const location = useLocation();
 
-  const showNavbarFooter = location.pathname !== '/auth/login' && location.pathname !== '/auth/register';
+  // Paths where Navbar and Footer should not be displayed
+  const excludedPaths = [
+    '/auth/login',
+    '/auth/register',
+    '/auth/forgot-password',
+  ];
+
+  // Check if the current path matches the excluded paths or starts with `/auth/reset-password`
+  const isExcludedPath =
+    excludedPaths.includes(location.pathname) ||
+    location.pathname.startsWith('/auth/reset-password');
+
+  const showNavbarFooter = !isExcludedPath;
 
   return (
-    <div className="">
+    <div>
       {showNavbarFooter && <Navbar />}
 
-      <div className="">
+      <div>
         <Toaster />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -27,7 +40,7 @@ function App() {
         </Routes>
       </div>
 
-      {/* Render Footer only if Navbar is rendered (i.e., showNavbarFooter is true) */}
+      {/* Render Footer only if Navbar is rendered */}
       {showNavbarFooter && <Footer />}
     </div>
   );

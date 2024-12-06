@@ -1,17 +1,5 @@
 import React, { useState } from "react";
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Typography,
-    Button,
-    Checkbox,
-    FormControlLabel,
-    Grid,
-    Divider,
-    Box,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Typography, Button, Checkbox, Divider, FormControlLabel, Grid, Box } from "@mui/material";
 import { MdDeleteOutline } from "react-icons/md";
 import { FaHeart } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
@@ -19,20 +7,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { createCollection, addRecipeToCollection } from "../../redux/Collection/Actions";
 import { API_BASE_URL } from "../../config/apiUrl";
 import CollectionDialog from "./CollectionDialog";
-
+import showCustomToast from '../Shared/ToastComponent'
 const AddCollectionDialog = ({ open, onClose, recipe }) => {
+    console.log(recipe, 'recipe')
     const { collection } = useSelector((store) => store);
-    console.log(collection, "collection")
+    const dispatch = useDispatch();
+    const [dialogStep, setDialogStep] = useState("main"); // Tracks current dialog step
+    const [selectedCollections, setSelectedCollections] = useState([]);
     const filteredNames = collection.allCollection.map(coll => coll.name);
     const suggestions = ["Keepers", "Want to Try", "Weeknight Ideas"];
     const filteredSuggestions = suggestions.filter(suggestion => {
         return !filteredNames.includes(suggestion); // Filter suggestions that are not in filteredNames
     });
-    const [dialogStep, setDialogStep] = useState("main"); // Tracks current dialog step
-    const [selectedCollections, setSelectedCollections] = useState([]);
-    console.log(selectedCollections, "selectedCollections")
 
-    const dispatch = useDispatch();
     const handleCollectionChange = (event) => {
         const { value, checked } = event.target;
         setSelectedCollections((prev) =>
@@ -59,6 +46,7 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
             })
             );
             onClose(); // Close dialog on success
+            showCustomToast('Recipe added to collection', 'success')
         } catch (error) {
             console.error("Failed to add recipe to collections:", error);
         }
@@ -85,7 +73,7 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
                     <Grid item xs={5}>
                         <div className="border rounded">
                             <img
-                                src={`${API_BASE_URL}/images/${recipe.imageUrl[0]}`}
+                                src={`${API_BASE_URL}/images/${recipe?.imageUrl[0]}`}
                                 className="lg:h-[15rem] w-full object-cover object-top"
                                 alt="Recipe"
                                 style={{
@@ -121,9 +109,10 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
                             }}
                         >
                             {collection?.allCollection?.map((col) => {
-                                const isSelected = col.recipes?.some((r) => {
-                                    return r._id === recipe?._id; // Compare the _id of the recipe object
-                                });
+                                const isSelected =
+                                    col.recipes?.some((r) => r._id === recipe?._id) ||
+                                    selectedCollections.includes(col.name); // Check if user selected this collection in the dialog
+                                { console.log(collection?.allCollection, "isSelected") }
                                 return (
                                     <FormControlLabel
                                         key={col._id}
@@ -181,7 +170,7 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
                     gap: "23%",
                 }}
             >
-                <Button
+                {/* <Button
                     onClick={onClose}
                     sx={{
                         color: "black",
@@ -189,7 +178,7 @@ const AddCollectionDialog = ({ open, onClose, recipe }) => {
                 >
                     <MdDeleteOutline size={20} />
                     Remove
-                </Button>
+                </Button> */}
                 <Button
                     sx={{
                         bgcolor: "#FF6216",

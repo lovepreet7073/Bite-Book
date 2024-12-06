@@ -5,8 +5,6 @@ const recipeSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
     },
- 
-
     title: {
         type: String,
         required: true,
@@ -30,12 +28,10 @@ const recipeSchema = new mongoose.Schema({
     prepTime: {
         time: {
             type: Number,
-            // required: true,
         },
         unit: {
             type: String,
             enum: ['mins', 'hours', 'days'],
-            // required: true,
         }
     },
     cookTime: {
@@ -46,7 +42,6 @@ const recipeSchema = new mongoose.Schema({
         unit: {
             type: String,
             enum: ['mins', 'hours', 'days'],
-            // default: 'mins',
         }
     },
     notes: {
@@ -56,7 +51,7 @@ const recipeSchema = new mongoose.Schema({
     imageUrl: {
         type: [String],
         required: true,
-        default: [], // Set default to empty array
+        default: [],
     },
     reviews: [reviewSchema],
 }, { timestamps: true });

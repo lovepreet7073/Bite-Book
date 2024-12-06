@@ -10,4 +10,6 @@ router.get('/all-collection', authenticate, collectionController.getAllCollectio
 router.post('/add-recipe-collection', authenticate, collectionController.addRecipeToCollectionOrSave)
 router.delete('/delete-collection/:id', authenticate, collectionController.DeleteCollection)
 router.put('/update-collection/:id', authenticate, collectionController.UpdateCollection)
+router.get('/collection-get/:id', authenticate, collectionController.findCollectionById)
+router.delete('/collections/:collectionId/recipes/:recipeId', authenticate, collectionController.RemoveRecipeFromCollection)
 module.exports = router

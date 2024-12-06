@@ -14,13 +14,15 @@ import showCustomToast from "../../components/Shared/ToastComponent";
 import GoogleLoginComponent from "../../components/Shared/GoogleLoginComponent";
 const Login = () => {
     useEffect(() => {
-        revealElements(); // Initialize ScrollReveal
+        revealElements(); 
     }, []);
     const auth = useSelector(state => state.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [showPassword, setShowPassword] = useState(false);
     const [initialErrors, setInitialErrors] = useState({ email: '', password: '' });
+    
+    //SUBMIT FORM
     const handleSubmit = (values) => {
         const userData = {
             email: values.email,
@@ -29,17 +31,15 @@ const Login = () => {
 
         dispatch(login(userData, navigate))
             .then(() => {
-                // Only show success toast if login is successful
                 showCustomToast('Login successfully', 'success');
             })
             .catch((error) => {
-                // Show failure toast if there is an error
                 showCustomToast('Login failed! Please try again.', 'error');
             });
     };
 
 
-
+    //ERROR HANDLING FOR EMAIL AND PASSWORD
     useEffect(() => {
         if (auth?.error) {
             const emailError = auth?.error?.error?.includes("User not found with email")
@@ -131,7 +131,7 @@ const Login = () => {
                                     helperText={touched.password && (errors.password || initialErrors.password)}
                                 />
                                 <div className="w-full">
-                                    <p className="text-sm underline underline-offset-2 text-right font-medium cursor-pointer whitespace-nowrap">
+                                    <p className="text-sm underline underline-offset-2 text-right font-medium cursor-pointer whitespace-nowrap" onClick={()=>navigate('/auth/forgot-password')}>
                                         Forgot password?
                                     </p>
                                 </div>

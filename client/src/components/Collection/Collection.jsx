@@ -9,21 +9,20 @@ import { useEffect } from 'react';
 const Collection = () => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const { collection } = useSelector((store) => store);
+    console.log(collection,'collection')
     const dispatch = useDispatch();
 
     useEffect(() => {
+      console.log('hello');
         dispatch(getAllCollections());
     }, [dispatch]);
 
     const handleOpenDialog = () => {
         setDialogOpen(true);
     };
-
-    // Close dialog handler
     const handleCloseDialog = () => {
         setDialogOpen(false);
     };
-
     return (
         <div>
             <Paper elevation={3} className="p-5 lg:mb-[8%]">
@@ -33,7 +32,6 @@ const Collection = () => {
                             ? ""
                             : `${collection?.allCollection?.length} ${collection?.allCollection?.length === 1 ? "Collection" : "Collections"}`}
                     </h1>
-
                     <Button
                         variant="outlined"
                         onClick={handleOpenDialog}
@@ -80,11 +78,7 @@ const Collection = () => {
                         </Button>
                     </div>
                 )}
-
             </Paper>
-
-
-            {/* Collection Dialog */}
             <CollectionDialog open={dialogOpen} onClose={handleCloseDialog} />
         </div>
     );

@@ -1,32 +1,22 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  Rating,
-  Button,
-  TextField,
-  Typography,
-  Box,
-  Grid,
-} from "@mui/material";
-import moment from "moment";
+import { useDispatch } from "react-redux";
+import { Rating, Button, TextField, Typography, Box, Grid, } from "@mui/material";
 import { ReviewOnRecipe } from "../../redux/Recipe/Actions";
 import showCustomToast from "../Shared/ToastComponent";
 
-const RecipeRatingReview = ({ recipeId, userReviews }) => {
+const RecipeRatingReview = ({ recipeId }) => {
   const dispatch = useDispatch();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
-  const handleRatingChange = (event, newRating) => {
+  const handleRatingChange = (newRating) => {
     setRating(newRating);
   };
-
   const handleSubmit = async () => {
     if (rating === 0 && comment.trim() === "") {
       showCustomToast('Add a rating or comment to submit.', 'error');
       return;
     }
-
     dispatch(ReviewOnRecipe(recipeId, rating, comment));
     showCustomToast('Thanks for adding your feedback', 'success');
     setRating(0);

@@ -3,7 +3,6 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 export default function DropdownMenu({ title, items, filterType, onFilterChange }) {
   const handleFilter = (name, id) => {
-    console.log(name, id, "datataa")
     onFilterChange(filterType, id);
   };
 

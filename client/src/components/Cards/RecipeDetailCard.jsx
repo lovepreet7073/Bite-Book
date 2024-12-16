@@ -7,33 +7,67 @@ import revealElements from '../../scrollReveal';
 import Carousel from '../Shared/Carousel'; // Import your Carousel component
 import RecipeRatingReview from '../Reviews/Rating';
 import Reviews from '../Reviews/Reviews';
+import { getAllReviews } from '../../redux/Reviews/Actions';
+import { IoIosShareAlt } from "react-icons/io";
+import { api, API_BASE_URL } from '../../config/apiUrl';
 const RecipeDetailCard = () => {
     const params = useParams();
-    const dispatch = useDispatch();
-    const { recipe } = useSelector(store => store);
+    const recipeId = params?.recipeId;
+    const handleShareOnFacebook = async () => {
+        try {
+            // Call the backend to get the shareable link
+            const { data } = await api.post(`/api/share-link-recipe`, { recipeId });
+ 
+            const shareUrl = data.shareUrl;
+            window.open(
+                `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+                '_blank'
+            );
+        } catch (error) {
+            console.log('Error sharing recipe:', error);
+        }
+    };
 
+    const dispatch = useDispatch();
+    const { recipe, auth, review } = useSelector(store => store);
+    const loggedInUserId = auth?.user?._id
     useEffect(() => {
-        revealElements(); 
+        revealElements();
     }, []);
 
     useEffect(() => {
         const token = localStorage.getItem('jwt');
         const data = { recipeId: params?.recipeId };
         dispatch(findRecipeById(data, token));
+        dispatch(getAllReviews(params.recipeId));
     }, [params?.recipeId]);
+
+    // Check if the current user is the owner of the recipe
+    const isOwner = recipe?.recipe?.userId?._id === loggedInUserId;
 
     return (
         <div className="bg-white lg:px-20">
             <div className="pt-6">
                 <section className='grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-10 px-4 pt-10'>
-                    <div className=" rounded-lg max-w-[430rem] max-h-[89rem]">
+                    <div className="rounded-lg max-w-[430rem] max-h-[89rem]">
                         <Carousel data={recipe?.recipe?.imageUrl || []} className='mb-3' /> {/* Use your images array */}
+                        <p
+                            className="flex gap-2 items-center text-lg text-primary hover:font-bold hover:cursor-pointer hover:border-b border-primary w-[80px] ml-[78%]"
+                            onClick={handleShareOnFacebook}
+                        >
+                            Share <span><IoIosShareAlt /></span>
+                        </p>
+
+                        {/* Show reviews only if the user is not the owner */}
+
                         <Reviews
-                            userReviews={recipe?.recipe?.reviews}
+                            allReviews={review?.recipeAllReviews}
                             recipeId={params?.recipeId}  // Pass recipeId from params
                         />
+
                     </div>
                     <div className="lg:col-span-1 max-auto right max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-7xl lg:px-8 lg:pb-24">
+
                         <div className="lg:col-span-2">
                             <h1 className="text-xl lg:text-4xl font-bold text-gray-900 tracking-wider mb-2">{recipe?.recipe?.title}</h1>
                             <h1 className="text-lg lg:text-xl font-normal text-gray-900 mt-4 tracking-wider leading-18">{recipe?.recipe?.description}</h1>
@@ -92,16 +126,17 @@ const RecipeDetailCard = () => {
                                     <span className='text-primary font-bold text-lg italic'>Notes:-</span>
                                     <span className='italic'>{recipe?.recipe?.notes}</span>
                                 </p> : <></>}
-
-
                             </div>
                         </div>
                     </div>
                 </section>
                 <section className="mt-5 px-4 lg:px-20 mb-20">
-                    <RecipeRatingReview
-                        recipeId={params?.recipeId}
-                    />
+                    {/* Show rating/review component only if the user is not the owner */}
+                    {!isOwner && (
+                        <RecipeRatingReview
+                            recipeId={params?.recipeId}
+                        />
+                    )}
                 </section>
             </div>
         </div>

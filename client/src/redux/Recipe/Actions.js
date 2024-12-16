@@ -1,8 +1,8 @@
 import { api } from "../../config/apiUrl";
 import {
-  ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS, USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS, DELETE_RECIPE_FAILURE, DELETE_RECIPE_REQUEST, DELETE_RECIPE_SUCCESS, UPDATE_RECIPE_REQUEST, UPDATE_RECIPE_SUCCESS, UPDATE_RECIPE_FAILURE, POST_REVIEW_FAILURE, POST_REVIEW_REQUEST,
-  POST_REVIEW_SUCCESS, REMOVE_FAVORITE_REQUEST, REMOVE_FAVORITE_SUCCESS, REMOVE_FAVORITE_FAILURE,
-  UPDATE_REVIEW_REQUEST, UPDATE_REVIEW_SUCCESS, UPDATE_REVIEW_FAILURE, FETCH_POPULAR_RECIPES_REQUEST, FETCH_POPULAR_RECIPES_SUCCESS, FETCH_POPULAR_RECIPES_FAILURE
+  ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS, USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS, DELETE_RECIPE_FAILURE, DELETE_RECIPE_REQUEST, DELETE_RECIPE_SUCCESS, UPDATE_RECIPE_REQUEST, UPDATE_RECIPE_SUCCESS, UPDATE_RECIPE_FAILURE,
+   REMOVE_FAVORITE_REQUEST, REMOVE_FAVORITE_SUCCESS, REMOVE_FAVORITE_FAILURE,
+   FETCH_POPULAR_RECIPES_REQUEST, FETCH_POPULAR_RECIPES_SUCCESS, FETCH_POPULAR_RECIPES_FAILURE
 } from "./ActionTypes";
 import { API_BASE_URL } from "../../config/apiUrl";
 
@@ -129,28 +129,6 @@ export const UpdateRecipe = (recipeId, formData) => async (dispatch) => {
   }
 };
 
-//ADD REVIEW ON RECIPE
-export const ReviewOnRecipe = (recipeId, rating, comment) => async (dispatch) => {
-  dispatch({ type: POST_REVIEW_REQUEST });
-  const jwt = localStorage.getItem("jwt");
-  try {
-    const { data } = await api.post(
-      `/api/rate-recipe/${recipeId}`,
-      { rating, comment },
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
-    dispatch({ type: POST_REVIEW_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({
-      type: POST_REVIEW_FAILURE,
-      payload: error.message,
-    });
-  }
-};
 
 //REMOVE RECIPE FROM SAVED
 export const RemoveRecipeFavorites = (recipeId) => async (dispatch) => {
@@ -174,28 +152,8 @@ export const RemoveRecipeFavorites = (recipeId) => async (dispatch) => {
   }
 };
 
-//UPDATE REVIEW
-export const UpdateReview = ({ recipeId, rating, comment, reviewId }) => async (dispatch) => {
-  dispatch({ type: UPDATE_REVIEW_REQUEST });
-  const jwt = localStorage.getItem("jwt");
-  try {
-    const { data } = await api.put(
-      `/api/update-review/${recipeId}/${reviewId}`,
-      { rating, comment },
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
-    dispatch({ type: UPDATE_REVIEW_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({
-      type: UPDATE_REVIEW_FAILURE,
-      payload: error.message,
-    });
-  }
-};
+// //UPDATE REVIEW
+
 
 //GET POPULAR RECIPES
 export const fetchPopularRecipes = (limit = 10) => async (dispatch) => {

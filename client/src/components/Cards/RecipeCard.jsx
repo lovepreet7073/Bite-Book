@@ -6,6 +6,7 @@ import { API_BASE_URL } from '../../config/apiUrl';
 import Rating from '@mui/material/Rating';
 import AddCollectionDialog from '../Collection/AddCollectionDialog';
 import { getAllCollections } from '../../redux/Collection/Actions';
+import showCustomToast from '../Shared/ToastComponent';
 
 export default function RecipeReviewCard({ recipe }) {
     const [isLiked, setIsLiked] = useState(false);
@@ -16,7 +17,7 @@ export default function RecipeReviewCard({ recipe }) {
     const { auth, collection } = useSelector((store) => store);
     const token = localStorage.getItem('jwt');
 
-
+console.log(recipe,"value")
     //AVERAGE RATING LOGIC
     useEffect(() => {
         if (recipe?.reviews?.length > 0) {
@@ -28,9 +29,14 @@ export default function RecipeReviewCard({ recipe }) {
     }, [recipe]);
 
     const handleOpenDialog = (event) => {
-        setDialogOpen(true);
-        dispatch(getAllCollections());
         event.stopPropagation();
+        if(!token){
+            navigate('/auth/login')
+        }else{
+            setDialogOpen(true);
+            dispatch(getAllCollections());
+        }
+      
     };
 
     const handleCloseDialog = () => {
@@ -49,13 +55,15 @@ export default function RecipeReviewCard({ recipe }) {
     }, [auth?.userFavorites, collection?.allCollection, recipe._id]);
 
     const firstImageUrl = recipe.imageUrl?.[0] ? `${API_BASE_URL}/images/${recipe.imageUrl[0]}` : null;
-
+    const isOwner = auth?.user?._id === recipe.userId
     return (
         <div
             title={!token ? 'Log in to access the recipe!' : ''}
             className='hero-title productCard hover:cursor-pointer w-[23rem] relative'
         >
-            <div key={recipe._id} className="mb-4 flex flex-col gap-2" onClick={() => navigate(`/user/recipe/${recipe._id}`)}>
+            <div key={recipe._id} className="mb-4 flex flex-col gap-2" onClick={() =>
+                navigate(`/user/recipe/${recipe._id}`)
+            }>
                 {firstImageUrl && (
                     <div className='lg:h-[15rem] h-[13rem]'>
                         <img className='h-full imghover w-full object-cover object-top' src={firstImageUrl} alt={recipe.title} />
@@ -70,18 +78,21 @@ export default function RecipeReviewCard({ recipe }) {
                         {recipe.title}
                     </h5>
                 </div>
+                {!isOwner && (
+                    <div
+                        title={!token ? 'Log in to like the recipe!' : ''}
+                        className='w-10 h-10 bg-primary rounded-full top-[1%] right-[1%] flex justify-center items-center absolute hover:bg-secondary'
+                        onClick={handleOpenDialog}
+                    >
+                        {isLiked ? (
+                            <FaHeart className='text-white' size={20} />
+                        ) : (
+                            <FaRegHeart className='text-white' size={20} />
+                        )}
+                    </div>
+                )}
 
-                <div
-                    title={!token ? 'Log in to like the recipe!' : ''}
-                    className='w-10 h-10 bg-primary rounded-full top-[1%] right-[1%] flex justify-center items-center absolute hover:bg-secondary'
-                    onClick={handleOpenDialog}
-                >
-                    {isLiked ? (
-                        <FaHeart className='text-white' size={20} />
-                    ) : (
-                        <FaRegHeart className='text-white' size={20} />
-                    )}
-                </div>
+
 
                 <div disableSpacing className='p-0 flex items-center gap-1'>
                     <Rating name="disabled" value={value} readOnly />
@@ -93,7 +104,11 @@ export default function RecipeReviewCard({ recipe }) {
                 </div>
             </div>
             {/* Collection Dialog */}
+
+
             <AddCollectionDialog open={dialogOpen} onClose={handleCloseDialog} recipe={recipe} />
+
+
         </div>
     );
 }

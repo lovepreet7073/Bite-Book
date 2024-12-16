@@ -52,8 +52,14 @@ const recipeSchema = new mongoose.Schema({
         type: [String],
         required: true,
         default: [],
-    },
-    reviews: [reviewSchema],
+    }, reviews: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Review', // Reference to the Review model
+        },
+    ],
+    
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Recipe', recipeSchema);

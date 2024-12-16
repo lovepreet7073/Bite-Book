@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Grid, Box, Typography, Rating, Button, TextField } from '@mui/material';
 import VariantAvatars from '../Navbar/Avatar';
 import moment from 'moment';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import EditDialog from './EditDialog';
-import { UpdateReview } from '../../redux/Recipe/Actions';
-import { useDispatch } from 'react-redux';
+import { UpdateReview } from '../../redux/Reviews/Actions';
 import showCustomToast from '../Shared/ToastComponent';
-const Reviews = ({ userReviews, recipeId }) => {
-  const { auth } = useSelector((store) => store);
+
+const Reviews = ({ allReviews, recipeId }) => {
+  const { auth, review } = useSelector((store) => store);
+  const { isLoading } = useSelector(state => state.review);
   const [isExpanded, setIsExpanded] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [error, setError] = useState('');
   const [selectedReview, setSelectedReview] = useState(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const dispatch = useDispatch();
-
-  const reviewsToShow = isExpanded ? userReviews : userReviews?.slice(0, 5);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const reviewsToShow = isExpanded ? allReviews : allReviews?.slice(0, 5);
 
   const toggleReviewVisibility = () => {
     setIsExpanded((prev) => !prev);
@@ -44,43 +46,53 @@ const Reviews = ({ userReviews, recipeId }) => {
       recipeId,
     };
 
-    // Dispatch the action to update the review
+    setHasSubmitted(true);
     dispatch(UpdateReview(updatedReview));
-    showCustomToast('Updated Successfully', 'success');
-
-    // Close the dialog
-    handleDialogClose();
   };
+
+  useEffect(() => {
+    if (!hasSubmitted || isLoading) return; // Prevent showing toast until submission is attempted and loading is done
+
+    if (review?.error) {
+      setError('Review contains offensive language and cannot be submitted.');
+    } else if (review) {
+      showCustomToast('Thanks for adding your feedback', 'success');
+      setError('');
+      handleDialogClose();
+    }
+
+    setHasSubmitted(false); // Reset submission tracker
+  }, [review, isLoading, hasSubmitted]);
 
   return (
     <div className="border-t mt-[20px]">
       <h2 className="font-semibold text-3xl mb-4 mt-3">
-        Reviews ({userReviews?.length || '0'})
+        Reviews ({allReviews?.length || '0'})
       </h2>
 
       <Grid item xs={12} md={6}>
         <Box className="mt-0 px-1 py-2">
-          {userReviews?.length > 0 ? (
+          {allReviews?.length > 0 ? (
             reviewsToShow?.map((review) => (
               <Box
-                key={review._id}
+                key={review?._id}
                 className="p-0 mb-4 mt-4 bg-white rounded-lg border-b mb-3"
               >
                 <Box display="flex" alignItems="center" mb={3} gap={1}>
-                  <VariantAvatars username={review.userId.fullName} className="mr-4" />
+                  <VariantAvatars username={review?.userId?.fullName} className="mr-4" />
                   <Typography variant="body1" className="font-medium ml-2">
-                    {review.userId.fullName}
+                    {review?.userId?.fullName}
                   </Typography>
                 </Box>
                 <div className="flex gap-4 mt-0">
-                  {review.rating ? (
-                    <Rating value={review.rating} readOnly size="small" />
+                  {review?.rating ? (
+                    <Rating value={review?.rating} readOnly size="small" />
                   ) : (
                     <p className="text-sm text-gray-500">No rating provided</p>
                   )}
 
                   <Typography variant="caption" className="text-gray-500">
-                    {moment(review.createdAt).format('MM/DD/YYYY')}
+                    {moment(review?.createdAt).format('MM/DD/YYYY')}
                   </Typography>
                 </div>
                 <div className="flex items-center justify-between">
@@ -91,7 +103,7 @@ const Reviews = ({ userReviews, recipeId }) => {
                   >
                     {review.comment}
                   </Typography>
-                  {review?.userId._id === auth.user._id && (
+                  {review?.userId?._id === auth?.user?._id && (
                     <Button onClick={() => handleEditClick(review)}>Edit</Button>
                   )}
                 </div>
@@ -104,12 +116,10 @@ const Reviews = ({ userReviews, recipeId }) => {
           )}
 
           {/* Show More / Show Less link */}
-          {userReviews?.length > 5 && (
+          {allReviews?.length > 5 && (
             <Box className="mt-4 mb-3">
               <span
-                className={`text-orange-500 cursor-pointer mb-3 ${
-                  isExpanded ? 'mb-[5%]' : 'mb-3 '
-                }`}
+                className={`text-orange-500 cursor-pointer mb-3 ${isExpanded ? 'mb-[5%]' : 'mb-3 '}`}
                 onClick={toggleReviewVisibility}
               >
                 {isExpanded ? 'Show Less' : 'Show More Reviews'}
@@ -147,6 +157,7 @@ const Reviews = ({ userReviews, recipeId }) => {
             />
           </div>
         }
+        error={error} // Pass error to the dialog for display
         actions={[
           { label: 'Cancel', onClick: handleDialogClose, color: 'secondary', variant: 'outlined' },
           { label: 'Save', onClick: handleReviewSubmit, color: 'primary' },
@@ -157,4 +168,3 @@ const Reviews = ({ userReviews, recipeId }) => {
 };
 
 export default Reviews;
-

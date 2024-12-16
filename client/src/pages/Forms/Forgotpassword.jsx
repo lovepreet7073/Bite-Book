@@ -32,7 +32,6 @@ const ForgotPassword = () => {
         await dispatch(forgotPassword(values))
         if(!auth.error){
             showCustomToast('Password reset link sent to your email','success')
-
         }
        
     };

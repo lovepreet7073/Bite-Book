@@ -9,7 +9,6 @@ import { API_BASE_URL } from "../../config/apiUrl";
 import CollectionDialog from "./CollectionDialog";
 import showCustomToast from '../Shared/ToastComponent'
 const AddCollectionDialog = ({ open, onClose, recipe }) => {
-    console.log(recipe, 'recipe')
     const { collection } = useSelector((store) => store);
     const dispatch = useDispatch();
     const [dialogStep, setDialogStep] = useState("main"); // Tracks current dialog step

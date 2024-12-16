@@ -1,5 +1,5 @@
 import {
-    ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS, USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS, DELETE_RECIPE_REQUEST, DELETE_RECIPE_FAILURE, DELETE_RECIPE_SUCCESS, UPDATE_RECIPE_FAILURE, UPDATE_RECIPE_REQUEST, UPDATE_RECIPE_SUCCESS, POST_REVIEW_REQUEST, POST_REVIEW_FAILURE, POST_REVIEW_SUCCESS, UPDATE_REVIEW_SUCCESS, UPDATE_REVIEW_REQUEST, UPDATE_REVIEW_FAILURE, FETCH_POPULAR_RECIPES_REQUEST,
+    ADD_RECIPE_FAILURE, ADD_RECIPE_REQUEST, ADD_RECIPE_SUCCESS, FIND_RECIPE_BY_ID_FAILURE, FIND_RECIPE_BY_ID_REQUEST, FIND_RECIPE_BY_ID_SUCCESS, FIND_RECIPES_FAILURE, FIND_RECIPES_REQUEST, FIND_RECIPES_SUCCESS, USER_RECIPES_FAILURE, USER_RECIPES_REQUEST, USER_RECIPES_SUCCESS, DELETE_RECIPE_REQUEST, DELETE_RECIPE_FAILURE, DELETE_RECIPE_SUCCESS, UPDATE_RECIPE_FAILURE, UPDATE_RECIPE_REQUEST, UPDATE_RECIPE_SUCCESS,   FETCH_POPULAR_RECIPES_REQUEST,
     FETCH_POPULAR_RECIPES_SUCCESS,
     FETCH_POPULAR_RECIPES_FAILURE
 } from "./ActionTypes"
@@ -16,13 +16,11 @@ const initialState = {
 export const recipeReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_RECIPE_REQUEST:
-        case UPDATE_REVIEW_REQUEST:
         case FETCH_POPULAR_RECIPES_REQUEST:
         case FIND_RECIPES_REQUEST:
         case FIND_RECIPE_BY_ID_REQUEST:
         case USER_RECIPES_REQUEST:
         case DELETE_RECIPE_REQUEST:
-        case POST_REVIEW_REQUEST:
         case UPDATE_RECIPE_REQUEST:
             return { ...state, isLoading: true, error: null }
         case DELETE_RECIPE_SUCCESS:
@@ -60,41 +58,7 @@ export const recipeReducer = (state = initialState, action) => {
                     recipe._id === updatedRecipe._id ? updatedRecipe : recipe
                 ) : null,
             };
-        case POST_REVIEW_SUCCESS:
-            const { recipe, reviews } = action.payload;
-            return {
-                ...state,
-                isLoading: false,
-                error: null,
-                recipe: { ...recipe, reviews },
-                allRecipes: state.allRecipes.map((r) =>
-                    r._id === recipe._id ? { ...r, reviews } : r
-                ),
-            };
-            case UPDATE_REVIEW_SUCCESS: {
-                const { recipe, review } = action.payload;
-                return {
-                    ...state,
-                    isLoading: false,
-                    error: null,
-                    recipe: {
-                        ...state.recipe,
-                        reviews: state.recipe.reviews.map((r) =>
-                            r._id === review._id ? review : r
-                        ),
-                    },
-                    allRecipes: state.allRecipes.map((r) =>
-                        r._id === recipe._id
-                            ? {
-                                  ...r,
-                                  reviews: r.reviews.map((rev) =>
-                                      rev._id === review._id ? review : rev
-                                  ),
-                              }
-                            : r
-                    ),
-                };
-            }
+      
             
         case FETCH_POPULAR_RECIPES_SUCCESS:
             return {
@@ -110,8 +74,6 @@ export const recipeReducer = (state = initialState, action) => {
         case USER_RECIPES_FAILURE:
         case DELETE_RECIPE_FAILURE:
         case UPDATE_RECIPE_FAILURE:
-        case POST_REVIEW_FAILURE:
-        case UPDATE_REVIEW_FAILURE:
             return { ...state, isLoading: false, error: action.payload }
         default:
             return state;

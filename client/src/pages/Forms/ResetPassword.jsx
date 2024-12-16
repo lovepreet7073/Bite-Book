@@ -43,7 +43,7 @@ const ResetPassword = () => {
     if (isLoading || isTokenValid === null) {
         return <div>Loading...</div>;
     }
-    
+
     if (isTokenValid === false || error) {
         return <InvalidToken />;
     }

@@ -33,7 +33,7 @@ const SearchBar = () => {
 
   const handleSuggestionClick = (suggestion) => {
     console.log("Suggestion clicked:", suggestion);
-    navigate(`/user/recipe/${suggestion._id}`);
+    navigate(`/user/recipe/${suggestion?._id}`);
     setSearchQuery('');
     setResults([]);
   };
@@ -52,8 +52,8 @@ const SearchBar = () => {
       </div>
 
       {results.length > 0 ? (
-        <div className="absolute left-[25.6rem] right-0 top-[3.5rem] mt-2 bg-neutral-100 border border-gray-300 rounded-lg shadow-lg w-[27rem] z-10 p-2  text-gray-700">
-          {results.slice(0, 3).map((suggestion, index) => (
+        <div className="absolute left-[25.6rem] right-0 top-[3.5rem] mt-2 bg-neutral-100 border border-gray-300 rounded-lg shadow-lg w-[27rem] z-10 p-2  text-gray-700 overflow-y-scroll h-[16rem]">
+          {results.map((suggestion, index) => (
             <div
               key={index}
               className="p-2 cursor-pointer hover:bg-gray-200 flex items-center"

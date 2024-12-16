@@ -7,6 +7,7 @@ import showCustomToast from '../../components/Shared/ToastComponent';
 import UserRecipes from './UserRecipes';
 import { userRecipes } from '../../redux/Recipe/Actions';
 import SavedRecipes from './SavedRecipes';
+import { TfiCommentAlt } from "react-icons/tfi";
 import { MdLock } from "react-icons/md";
 import { FcLike } from "react-icons/fc";
 import { BsFillInfoCircleFill } from "react-icons/bs";
@@ -78,31 +79,32 @@ const UserProfile = () => {
                 }`}
               onClick={() => setActiveSection('personalInfo')}
             >
-           <span><BsFillInfoCircleFill/></span>   Personal Info
+              <span><BsFillInfoCircleFill /></span>   Personal Info
             </button>
             <button
               className={`w-full gap-2 flex items-center text-left p-3 hover:bg-slate-200 ${activeSection === 'myRecipes' ? 'border-l-primary border-l-4   text-primary' : 'border-l-0'
                 }`}
               onClick={() => setActiveSection('myRecipes')}
             >
-             <span><BiSolidFoodMenu className=''/></span> My Recipes
+              <span><BiSolidFoodMenu className='' /></span> My Recipes
             </button>
             <button
               className={`w-full text-left p-3 gap-2 flex items-center hover:bg-slate-200 ${activeSection === 'savedRecipes' ? 'border-l-primary border-l-4 text-primary' : 'border-l-0'}`}
               onClick={() => setActiveSection('savedRecipes')}
             >
-             <span><FcLike/></span> Saved Recipes & Collections
+              <span><FcLike /></span> Saved Recipes & Collections
             </button>
+            
           </Paper>
         </Grid>
 
         {/* Main content */}
         <Grid item xs={12} sm={9}>
-          
-            {/* Conditionally render the content based on the active section */}
-            {activeSection === 'personalInfo' ? (
-              <>
-                <Paper elevation={3} className="p-5 lg:mb-[18%]">
+
+          {/* Conditionally render the content based on the active section */}
+          {activeSection === 'personalInfo' ? (
+            <>
+              <Paper elevation={3} className="p-5 lg:mb-[18%]">
 
                 <div className="flex justify-between items-center ">
                   <Typography variant="h5" gutterBottom>
@@ -123,11 +125,11 @@ const UserProfile = () => {
                   </Button>
                 </div>
 
-                <Typography variant="body1" paragraph sx={{ marginTop: '13px',}}>
+                <Typography variant="body1" paragraph sx={{ marginTop: '13px', }}>
                   These details will be used for all the Meredith profiles associated with your email address...
                 </Typography>
-                <Typography variant='body2' sx={{ opacity: 0.5 ,display:'flex' ,alignItems:"center"}}>
-                <span><MdLock size={20}/></span>  Only you can see the information on this page. It will not be displayed for other users to see.
+                <Typography variant='body2' sx={{ opacity: 0.5, display: 'flex', alignItems: "center" }}>
+                  <span><MdLock size={20} /></span>  Only you can see the information on this page. It will not be displayed for other users to see.
                 </Typography>
 
                 <form id="user-form" onSubmit={handleSave}>
@@ -154,18 +156,17 @@ const UserProfile = () => {
                     onChange={handleChange}
                   />
                 </form>
-                </Paper>
+              </Paper>
 
-              </>
-            ) : activeSection === 'myRecipes' ? (
-              <UserRecipes />
-            ) : (
-              <>
-               <SavedRecipes />
-               <Collection/>
-              </>
-             
-            )}
+            </>
+          ) : activeSection === 'myRecipes' ? (
+            <UserRecipes />
+          ) : activeSection === 'savedRecipes' ? (
+            <>
+              <SavedRecipes />
+              <Collection />
+            </>
+          ) :null}
         </Grid>
       </Grid>
     </Container>

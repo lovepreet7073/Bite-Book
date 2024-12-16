@@ -1,27 +1,50 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Rating, Button, TextField, Typography, Box, Grid, } from "@mui/material";
-import { ReviewOnRecipe } from "../../redux/Recipe/Actions";
+import { ReviewOnRecipe } from "../../redux/Reviews/Actions";
 import showCustomToast from "../Shared/ToastComponent";
 
 const RecipeRatingReview = ({ recipeId }) => {
   const dispatch = useDispatch();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
-
-  const handleRatingChange = (newRating) => {
-    setRating(newRating);
+  const { review } = useSelector(store => store)
+  const [hasSubmitted, setHasSubmitted] = useState(false); // Tracks if submission is attempted
+ const [error,setError] = useState('')
+  const { isLoading } = useSelector(state => state.review);
+  console.log(review, "review")
+  const handleRatingChange = (event, newValue) => {
+    console.log('rating', newValue);
+    setRating(newValue);
   };
+
   const handleSubmit = async () => {
     if (rating === 0 && comment.trim() === "") {
       showCustomToast('Add a rating or comment to submit.', 'error');
       return;
     }
+
+    setHasSubmitted(true); // Mark as submitted
     dispatch(ReviewOnRecipe(recipeId, rating, comment));
-    showCustomToast('Thanks for adding your feedback', 'success');
-    setRating(0);
-    setComment("");
+
+    // Reset input fields after dispatch
+   
   };
+
+  useEffect(() => {
+    if (!hasSubmitted || isLoading) return; // Prevent showing toast until submission is attempted and loading is done
+    if (review?.error) {
+      setError("Review contains offensive language and cannot be submitted.");
+    } else if (review) {
+      showCustomToast('Thanks for adding your feedback', 'success');
+      setRating(0);
+      setError('')
+      setComment("");
+    }
+
+    setHasSubmitted(false); // Reset submission tracker
+  }, [review, isLoading, hasSubmitted]);
+
 
   return (
     <div className="mt-[10%]">
@@ -64,6 +87,11 @@ const RecipeRatingReview = ({ recipeId }) => {
               onChange={(e) => setComment(e.target.value)}
               className="mb-4 mt-[14px]"
             />
+             {error && (
+              <Typography variant="body2" color="error" className="mb-4">
+                {error}
+              </Typography>
+            )}
 
             <Box display="flex" justifyContent="right" gap={2}>
               <Button

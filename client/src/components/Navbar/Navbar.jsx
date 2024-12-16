@@ -86,24 +86,27 @@ export default function Navbar() {
   //QUERY LOGIC FOR FILTERS
   useEffect(() => {
     const query = new URLSearchParams();
+
     if (selectedIngredient) {
       query.set("ingredient", selectedIngredient);
     }
     if (selectedCuisine) {
       query.set("cuisine", selectedCuisine);
     }
-    const queryString = query.toString();
-    const newUrl = queryString
-      ? `${window.location.pathname}?${queryString}`
-      : window.location.pathname;
+
+    const newUrl = `${window.location.pathname}?${query.toString()}`;
     window.history.pushState(null, "", newUrl);
+    console.log(newUrl, "newUrl");
+    console.log(selectedIngredient, "selectedIngredient");
+    console.log(selectedCuisine, "selectedCuisine");
     if (selectedIngredient || selectedCuisine) {
       dispatch(GetRecipes({ ingredient: selectedIngredient, cuisine: selectedCuisine }));
-      navigate(`/user/recipes?${queryString}`);
+      navigate(`/user/recipes?${query.toString()}`);
     } else {
       dispatch(GetRecipes({}));
     }
-  }, [selectedIngredient, selectedCuisine, dispatch, navigate]);
+
+  }, [selectedIngredient, selectedCuisine, dispatch]);
 
 
 
@@ -163,31 +166,42 @@ export default function Navbar() {
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
                 {navigation.map((item) =>
-                  item.hasDropdown ? (
-                    <DropdownMenu
-                      key={item.name}
-                      title={item.name}
-                      items={item.dropdownItems}
-                      filterType={item.name.toLowerCase()}
-                      onFilterChange={handleFilterChange}
-                    />
-                  ) : (
+                  item.name === "Home" ? (
                     <div
                       onClick={() => handleNavigation(item.id)}
                       key={item.name}
-                      href={item.href}
-                      aria-current={item.current ? "page" : undefined}
-
+                      aria-current={location.pathname === "/" ? "page" : undefined}
                       className={classNames(
-                        item.current
-                          ? "text-[#FF6216] border-b-[#FF6216] border-b-2 cursor-pointer"
-                          : "text-gray-300 hover:text-[#FF6216] hover:border-b-[#FF6216] hover:border-b-2 cursor-pointer",
-                        " px-3 py-2 text-md font-medium"
+                        location.pathname === "/" ? "text-[#FF6216] border-b-[#FF6216] border-b-2 cursor-pointer" : "text-black-300 hover:text-[#FF6216] hover:border-b-[#FF6216] hover:border-b-2 cursor-pointer",
+                        "px-3 py-2 text-md font-medium"
                       )}
-
                     >
                       {item.name}
                     </div>
+                  ) : (
+                    item.hasDropdown ? (
+                      <DropdownMenu
+                        key={item.name}
+                        title={item.name}
+                        items={item.dropdownItems}
+                        filterType={item.name.toLowerCase()}
+                        onFilterChange={handleFilterChange}
+                      />
+                    ) : (
+                      <div
+                        onClick={() => handleNavigation(item.id)}
+                        key={item.name}
+                        aria-current={item.current ? "page" : undefined}
+                        className={classNames(
+                          item.current
+                            ? "text-[#FF6216] border-b-[#FF6216] border-b-2 cursor-pointer"
+                            : "text-gray-300 hover:text-[#FF6216] hover:border-b-[#FF6216] hover:border-b-2 cursor-pointer",
+                          "px-3 py-2 text-md font-medium"
+                        )}
+                      >
+                        {item.name}
+                      </div>
+                    )
                   )
                 )}
               </div>

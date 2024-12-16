@@ -7,17 +7,20 @@ const reviewSchema = new mongoose.Schema({
     ref: 'users',
     required: true,
   },
+  recipeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Recipe',
+    required: true,
+  },
   rating: {
     type: Number,
-    max: 5, 
+    max: 5,
   },
   comment: {
     type: String,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-} ,{ timestamps: true });
 
-module.exports = reviewSchema; 
+}, { timestamps: true });
+
+const Review = mongoose.model('Review', reviewSchema);
+module.exports = Review;
